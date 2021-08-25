@@ -505,25 +505,41 @@ function App(props) {
                     onClick={async () => {
                       let sig = await userSigner.signMessage(message);
 
-                      const res = await axios.post(appServer, {
-                        address: address,
-                        message: message,
-                        signature: sig,
-                      });
-
-                      if (res.data) {
-                        notification.success({
-                          message: "Signed in successfully",
-                          placement: "bottomRight",
-                        });
-                      } else {
-                        notification.error({
-                          message: "Failed to sign in!",
-                          description: "You have already signed in",
+                      if(typeof(appServer) == 'undefined') {
+                        return notification.error({
+                          message: "Setup Error",
+                          description: "Missing backend URL",
                           placement: "bottomRight",
                         });
                       }
-                      setRes("");
+
+                      const res = await axios
+                        .post(appServer, {
+                          address: address,
+                          message: message,
+                          signature: sig,
+                        })
+                        .catch((error)=> {
+                          return notification.error({
+                            message: "Failed to Sign!",
+                            description: `Connection issue ${error}`,
+                            placement: "bottomRight",
+                          });
+                        });
+
+                        if (res.data) {
+                          notification.success({
+                            message: "Signed in successfully",
+                            placement: "bottomRight",
+                          });
+                        } else {
+                          notification.error({
+                            message: "Failed to sign in!",
+                            description: "You have already signed in",
+                            placement: "bottomRight",
+                          });
+                        }
+                        setRes("");
                     }}
                   >
                     Sign In
