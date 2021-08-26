@@ -16,6 +16,9 @@ yarn install
 yarn chain
 ```
 
+Add .env in packages/react-app/.env with "REACT_APP_SERVER=<server url>"
+Set "Your Frontend Address" on packages/hardhat/deploy/01_deploy_tokendistributor_contract.js to top address in local environment
+
 > in a second terminal window, start your 📱 frontend:
 
 ```bash
@@ -38,6 +41,7 @@ yarn deploy
 cd app/packages/backend
 node index.js 
 ```
+
 
 # 📚 Documentation
 
