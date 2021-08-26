@@ -11,7 +11,7 @@ contract TokenDistributor is Ownable, AccessControl {
     bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
 
     event tokenShareCompleted(uint256 amount, uint256 share, address from);
-    event ethShareCompleted(uint256 amount, uint256 share);
+    event ethShareCompleted(uint256 share);
 
     modifier isPermittedDistributor() {
         require(
@@ -47,21 +47,21 @@ contract TokenDistributor is Ownable, AccessControl {
         _setupRole(DISTRIBUTOR_ROLE, admin);
     }
 
-    function splitEth(address[] memory users, uint256 amount)
+    function splitEth(address[] memory users)
         public
+        payable
         isPermittedDistributor
         hasValidUsers(users)
-        hasEnoughBalance(address(this).balance, amount)
     {
         uint256 share = _handleDistribution(
             users,
-            amount,
+            msg.value,
             address(this),
             address(0),
             false
         );
 
-        emit ethShareCompleted(amount, share);
+        emit ethShareCompleted(share);
     }
 
     // split contract's own token
