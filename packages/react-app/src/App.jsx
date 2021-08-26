@@ -52,7 +52,7 @@ const { ethers, BigNumber } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -510,7 +510,7 @@ function App(props) {
                       if (res.data) {
                         // set up some user messages here besides the alert...
                         // how many other users are signed-in?
-                        // 
+                        //
 
                         notification.success({
                           message: "Signed in successfully",
