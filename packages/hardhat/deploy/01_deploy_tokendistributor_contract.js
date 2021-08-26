@@ -3,7 +3,7 @@
 const { ethers } = require("hardhat");
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
-  const frontendAddress = "YOUR FRONTEND ADDRESS";
+  const frontendAddress = "FRONT END ADDRESS";
 
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
@@ -49,4 +49,5 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     distributor: distributorBalance.toString(),
   });
 };
+
 module.exports.tags = ["TokenDistributor", "DummyToken"];

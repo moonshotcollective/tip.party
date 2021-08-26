@@ -508,11 +508,16 @@ function App(props) {
                       });
 
                       if (res.data) {
+                        // set up some user messages here besides the alert...
+                        // how many other users are signed-in?
+                        // 
+
                         notification.success({
                           message: "Signed in successfully",
                           placement: "bottomRight",
                         });
                       } else {
+                        // set up user error notice besides the alert...
                         notification.error({
                           message: "Failed to sign in!",
                           description: "You have already signed in",
