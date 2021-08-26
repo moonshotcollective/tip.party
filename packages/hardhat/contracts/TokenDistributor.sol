@@ -20,7 +20,7 @@ contract TokenDistributor is Ownable, AccessControl {
     event tokenShareCompleted(uint256 amount, uint256 share, address from);
 
     /// @notice Emitted when an ETH share has been distributed
-    event ethShareCompleted(uint256 amount, uint256 share);
+    event ethShareCompleted(uint256 share);
 
     modifier isPermittedDistributor() {
         require(
