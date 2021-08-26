@@ -1,7 +1,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, Input, List, notification, Select } from "antd";
+import { Alert, Button, Col, Menu, Row, Input, List, notification, Select, Divider } from "antd";
 const { SubMenu } = Menu;
 const { Option } = Select;
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
@@ -178,6 +178,7 @@ function App(props) {
 
   const [message, setMessage] = useState();
   const [addresses, setAddresses] = useState([]);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const [amount, setAmount] = useState(0);
   const [tokenAddress, setTokenAddress] = useState("");
   const [owner, setOwner] = useState("");
@@ -445,9 +446,14 @@ function App(props) {
     );
   }
 
-  // const [message,setMessage] = useState()
-  // const [addresses,setAddresses] = useState()
   const [res, setRes] = useState("");
+
+  useEffect(async () => {
+    // console.log("**************** " + message)
+    const res = await axios.get(appServer + message);
+    // console.log("res", res);
+    if(res.data) setAddresses(res.data);
+  }, [appServer, message])
 
   return (
     <div className="App">
@@ -497,45 +503,55 @@ function App(props) {
               />
               <div style={{ marginBottom: "10px" }}>
                 {!isOwner && (
-                  <Button
-                    onClick={async () => {
-                      let sig = await userSigner.signMessage(message);
+                  <div>
+                    <Button
+                      onClick={async () => {
+                        let sig = await userSigner.signMessage(message);
 
-                      const res = await axios.post(appServer, {
-                        address: address,
-                        message: message,
-                        signature: sig,
-                      });
-
-                      if (res.data) {
-                        // set up some user messages here besides the alert...
-                        // how many other users are signed-in?
-                        //
-
-                        notification.success({
-                          message: "Signed in successfully",
-                          placement: "bottomRight",
+                        const res = await axios.post(appServer, {
+                          address: address,
+                          message: message,
+                          signature: sig,
                         });
-                      } else {
-                        // set up user error notice besides the alert...
-                        notification.error({
-                          message: "Failed to sign in!",
-                          description: "You have already signed in",
-                          placement: "bottomRight",
-                        });
-                      }
-                      setRes("");
-                    }}
-                  >
-                    Sign In
-                  </Button>
+
+                        if (res.data) {
+                          // set up some user messages here besides the alert...
+                          // how many other users are signed-in?
+                          //
+                          setIsSignedIn(true);
+                          notification.success({
+                            message: "Signed in successfully",
+                            placement: "bottomRight",
+                          });
+                        } else {
+                          setIsSignedIn(true);
+                          // set up user error notice besides the alert...
+                          notification.error({
+                            message: "Failed to sign in!",
+                            description: "You have already signed in",
+                            placement: "bottomRight",
+                          });
+                        }
+                        setRes("");
+                      }}
+                    >
+                      Sign In
+                    </Button>
+                    <Divider />
+                    <div style={{ color: (!isSignedIn ? "red" : "green") }}>
+                      {"Signed In: " + isSignedIn}
+                    </div>
+                    <div>
+                      Users Currently Signed In: {addresses.length}
+                    </div>
+                  </div>
                 )}
 
                 {isOwner && (
                   <div>
                     {/*<Button onClick = {() =>setLink(message)}>
-                    Generate Link
-                </Button>*/}
+                      Generate Link
+                    </Button>*/}
                     <Button
                       style={{ marginLeft: "10px" }}
                       onClick={async () => {
