@@ -1,8 +1,9 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, Input, List, notification, Dropdown } from "antd";
+import { Alert, Button, Col, Menu, Row, Input, List, notification, Select } from "antd";
 const { SubMenu } = Menu;
+const { Option } = Select;
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
@@ -27,8 +28,9 @@ import { ExampleUI, Hints, Subgraph } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
+import { HexString } from "walletlink/dist/types";
 const axios = require("axios");
-const { ethers } = require("ethers");
+const { ethers, BigNumber } = require("ethers");
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -181,8 +183,8 @@ function App(props) {
   const [owner, setOwner] = useState("");
   const [payoutCompleted, setPayoutCompleted] = useState(false);
   const [approved, setApproved] = useState(false);
-  const [menuTitle, setMenuTitle] = useState("Select Token...");
-  const [openKeys, setOpenKeys] = useState([]);
+  const [token, setToken] = useState("");
+  const [link, setLink] = useState("");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -447,11 +449,6 @@ function App(props) {
   // const [addresses,setAddresses] = useState()
   const [res, setRes] = useState("");
 
-  function handleMenuClick(e) {
-    message.info("Click on menu item.");
-    console.log("click", e);
-  }
-
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
@@ -535,18 +532,29 @@ function App(props) {
                 )}
 
                 {isOwner && (
-                  <Button
-                    style={{ marginLeft: "10px" }}
-                    onClick={async () => {
-                      const res = await axios.get(appServer + message);
-                      console.log("res", res);
-                      //setMessage("")
+                  <div>
+                    {/*<Button onClick = {() =>setLink(message)}>
+                    Generate Link
+                </Button>*/}
+                    <Button
+                      style={{ marginLeft: "10px" }}
+                      onClick={async () => {
+                        const res = await axios.get(appServer + message);
+                        console.log("res", res);
+                        //setMessage("")
 
-                      setAddresses(res.data);
-                    }}
-                  >
-                    Fetch Logged Accounts
-                  </Button>
+                        setAddresses(res.data);
+                      }}
+                    >
+                      Fetch Logged Accounts
+                    </Button>
+
+                    {/*<p>
+                    Link: 
+                  {link? <a>https://signupfortokens.surge.sh/{link}</a> : ""}
+                  </p>
+                 */}
+                  </div>
                 )}
               </div>
               {isOwner && (
@@ -584,147 +592,147 @@ function App(props) {
 
                   {addresses && addresses.length > 0 && (
                     <div>
-                      <Menu
-                        mode="inline"
-                        openKeys={openKeys}
-                        onOpenChange={keys => {
-                          setOpenKeys(openKeys ? keys : []);
-                        }}
-                        style={{ marginTop: "10px", border: "1px solid" }}
-                        onClick={e => {
-                          setMenuTitle(e.key);
-                          setOpenKeys([]);
+                      <Select
+                        defaultValue="Select token..."
+                        style={{ width: "100%", textAlign: "left", float: "left", marginTop: "10px" }}
+                        onChange={value => {
+                          setToken(value);
                         }}
                       >
-                        <SubMenu key="sub1" title={menuTitle}>
-                          <Menu.Item key="GTC">GTC</Menu.Item>
-                          <Menu.Item key="DAI">DAI</Menu.Item>
-                          <Menu.Item key="USDC">USDC</Menu.Item>
-                        </SubMenu>
-                      </Menu>
+                        <Option value="ETH">ETH</Option>
+                        <Option value="GTC">GTC</Option>
+                      </Select>
 
                       {/* TODO : disable input until ERC-20 token is selected */}
                       <Input
                         value={amount}
                         addonBefore="Total Amount to Distribute"
-                        addonAfter={menuTitle == "Select Token..." ? <span /> : menuTitle}
+                        addonAfter={token == "" ? <span /> : token}
                         style={{ marginTop: "10px" }}
                         onChange={e => setAmount(e.target.value.toLowerCase())}
                       />
+                      {token && token == "ETH" && (
+                        <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+                          <Button
+                            onClick={async () => {
+                              /* look how you call setPurpose on your contract: */
+                              /* notice how you pass a call back for tx updates too */
+                              const result = tx(
+                                writeContracts.TokenDistributor.splitEth(addresses, {
+                                  value: ethers.utils.parseEther(amount),
+                                }),
+                                update => {
+                                  console.log("📡 Transaction Update:", update);
+                                  if (update && (update.status === "confirmed" || update.status === 1)) {
+                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
+                                    console.log(
+                                      " ⛽️ " +
+                                        update.gasUsed +
+                                        "/" +
+                                        (update.gasLimit || update.gas) +
+                                        " @ " +
+                                        parseFloat(update.gasPrice) / 1000000000 +
+                                        " gwei",
+                                    );
+                                    notification.success({
+                                      message: "Payout successful",
+                                      description: "Each user received " + amount / addresses.length + " " + token,
+                                      placement: "topRight",
+                                    });
+                                  }
+                                },
+                              );
+                              console.log("awaiting metamask/web3 confirm result...", result);
+                              console.log(await result);
+                              setApproved(true);
+                            }}
+                          >
+                            Payout
+                          </Button>
+                        </div>
+                      )}
 
-                      {/* TODO : disable button util token and amount > 0 <= balance */}
-                      {/* <div style={{ marginTop: "15px" }}>
-                        <Button
-                          block
-                          type="primary"
-                          size="large"
-                          disabled={payoutCompleted}
-                          onClick={async () => {
-                            const result = tx(
-                              writeContracts.TokenDistributor.splitTokenBalance(addresses, amount, tokenAddress),
-                              update => {
-                                console.log("📡 Transaction Update:", update);
-                                if (update && (update.status === "confirmed" || update.status === 1)) {
-                                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                  console.log(
-                                    " ⛽️ " +
-                                      update.gasUsed +
-                                      "/" +
-                                      (update.gasLimit || update.gas) +
-                                      " @ " +
-                                      parseFloat(update.gasPrice) / 1000000000 +
-                                      " gwei",
-                                  );
-                                  notification.success({
-                                    message: "Payout successful",
-                                    description:
-                                      "Each user received " + Math.floor(amount / addresses.length) + " " + menuTitle,
-                                    placement: "topRight",
-                                  });
-                                }
-                              },
-                            );
-                            console.log("awaiting metamask/web3 confirm result...", result);
-                            console.log(await result);
-                            setPayoutCompleted(true);
-                          }}
-                        >
-                          Payout
-                        </Button>
-                      </div> */}
-                      <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                        <Button
-                          onClick={async () => {
-                            /* look how you call setPurpose on your contract: */
-                            /* notice how you pass a call back for tx updates too */
-                            const result = tx(
-                              writeContracts.DummyToken.approve(readContracts?.TokenDistributor.address, amount),
-                              update => {
-                                console.log("📡 Transaction Update:", update);
-                                if (update && (update.status === "confirmed" || update.status === 1)) {
-                                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                  console.log(
-                                    " ⛽️ " +
-                                      update.gasUsed +
-                                      "/" +
-                                      (update.gasLimit || update.gas) +
-                                      " @ " +
-                                      parseFloat(update.gasPrice) / 1000000000 +
-                                      " gwei",
-                                  );
-                                  notification.success({
-                                    message: "Token successfully approved",
-                                    placement: "topRight",
-                                  });
-                                }
-                              },
-                            );
-                            console.log("awaiting metamask/web3 confirm result...", result);
-                            console.log(await result);
-                            setApproved(true);
-                          }}
-                        >
-                          Approve Token
-                        </Button>
+                      {token && token != "ETH" && (
+                        <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+                          <Button
+                            onClick={async () => {
+                              /* look how you call setPurpose on your contract: */
+                              /* notice how you pass a call back for tx updates too */
+                              const result = tx(
+                                writeContracts.DummyToken.approve(
+                                  readContracts?.TokenDistributor.address,
+                                  ethers.utils.parseUnits(amount, 18),
+                                ),
+                                update => {
+                                  console.log("📡 Transaction Update:", update);
+                                  if (update && (update.status === "confirmed" || update.status === 1)) {
+                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
+                                    console.log(
+                                      " ⛽️ " +
+                                        update.gasUsed +
+                                        "/" +
+                                        (update.gasLimit || update.gas) +
+                                        " @ " +
+                                        parseFloat(update.gasPrice) / 1000000000 +
+                                        " gwei",
+                                    );
+                                    notification.success({
+                                      message: "Token successfully approved",
+                                      placement: "topRight",
+                                    });
+                                  }
+                                },
+                              );
+                              console.log("awaiting metamask/web3 confirm result...", result);
+                              console.log(await result);
+                              setApproved(true);
+                            }}
+                          >
+                            Approve Token
+                          </Button>
 
-                        <Button
-                          disabled={!approved}
-                          style={{ marginLeft: "10px" }}
-                          onClick={async () => {
-                            /* look how you call setPurpose on your contract: */
-                            /* notice how you pass a call back for tx updates too */
-                            const result = tx(
-                              writeContracts.TokenDistributor.splitTokenFromUser(addresses, amount, tokenAddress),
-                              update => {
-                                console.log("📡 Transaction Update:", update);
-                                if (update && (update.status === "confirmed" || update.status === 1)) {
-                                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                  console.log(
-                                    " ⛽️ " +
-                                      update.gasUsed +
-                                      "/" +
-                                      (update.gasLimit || update.gas) +
-                                      " @ " +
-                                      parseFloat(update.gasPrice) / 1000000000 +
-                                      " gwei",
-                                  );
-                                  notification.success({
-                                    message: "Payout successful",
-                                    description:
-                                      "Each user received " + Math.floor(amount / addresses.length) + " " + menuTitle,
-                                    placement: "topRight",
-                                  });
-                                }
-                              },
-                            );
-                            console.log("awaiting metamask/web3 confirm result...", result);
-                            console.log(await result);
-                            setApproved(false);
-                          }}
-                        >
-                          Payout
-                        </Button>
-                      </div>
+                          <Button
+                            disabled={!approved}
+                            style={{ marginLeft: "10px" }}
+                            onClick={async () => {
+                              /* look how you call setPurpose on your contract: */
+                              /* notice how you pass a call back for tx updates too */
+                              const result = tx(
+                                writeContracts.TokenDistributor.splitTokenFromUser(
+                                  addresses,
+                                  ethers.utils.parseUnits(amount, 18),
+                                  tokenAddress,
+                                ),
+                                update => {
+                                  console.log("📡 Transaction Update:", update);
+                                  if (update && (update.status === "confirmed" || update.status === 1)) {
+                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
+                                    console.log(
+                                      " ⛽️ " +
+                                        update.gasUsed +
+                                        "/" +
+                                        (update.gasLimit || update.gas) +
+                                        " @ " +
+                                        parseFloat(update.gasPrice) / 1000000000 +
+                                        " gwei",
+                                    );
+                                    notification.success({
+                                      message: "Payout successful",
+                                      description: "Each user received " + amount / addresses.length + " " + token,
+                                      placement: "topRight",
+                                    });
+                                  }
+                                },
+                              );
+                              console.log("awaiting metamask/web3 confirm result...", result);
+                              console.log(await result);
+                              setApproved(false);
+                            }}
+                          >
+                            Payout
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -806,7 +814,27 @@ function App(props) {
             }
           </Col>
         </Row>
-      </div> */}
+      </div>
+          <Menu
+            mode="inline"
+            openKeys={openKeys}
+          onOpenChange={keys => {
+          setOpenKeys(openKeys ? keys : []);
+        }}
+          style={{ marginTop: "10px", border: "1px solid" }}
+          onClick={e => {
+          setMenuTitle(e.key);
+          setOpenKeys([]);
+        }}
+      >
+      <SubMenu key="sub1" title={menuTitle}>
+        <Menu.Item key="GTC">GTC</Menu.Item>
+        <Menu.Item key="DAI">DAI</Menu.Item>
+        <Menu.Item key="USDC">USDC</Menu.Item>
+      </SubMenu>
+    </Menu>
+      
+      */}
     </div>
   );
 }

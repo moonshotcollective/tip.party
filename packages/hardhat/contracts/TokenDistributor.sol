@@ -59,22 +59,21 @@ contract TokenDistributor is Ownable, AccessControl {
     /// @notice Splits ETH that is 'Tipped'
     /// @dev 
     /// @param users an ordered list of users addresses
-    /// @param amount the total amount to be split
-    function splitEth(address[] memory users, uint256 amount)
+    function splitEth(address[] memory users)
         public
+        payable
         isPermittedDistributor
         hasValidUsers(users)
-        hasEnoughBalance(address(this).balance, amount)
     {
         uint256 share = _handleDistribution(
             users,
-            amount,
+            msg.value,
             address(this),
             address(0),
             false
         );
 
-        emit ethShareCompleted(amount, share);
+        emit ethShareCompleted(share);
     }
 
     /// @notice Splits contracts own token
