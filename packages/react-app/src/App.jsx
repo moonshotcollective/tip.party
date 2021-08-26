@@ -1,7 +1,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, Input, List, notification, Select, Divider } from "antd";
+import { Alert, Button, Col, Menu, Row, Input, List, notification, Select, Divider, Statistic } from "antd";
 const { SubMenu } = Menu;
 const { Option } = Select;
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
@@ -538,11 +538,11 @@ function App(props) {
                       Sign In
                     </Button>
                     <Divider />
-                    <div style={{ color: (!isSignedIn ? "red" : "green") }}>
-                      {"Signed In: " + isSignedIn}
+                    <div>
+                      <Statistic title="Signed In" value={isSignedIn} valueStyle={{ color: (!isSignedIn ? "red" : "green") }} />
                     </div>
                     <div>
-                      Users Currently Signed In: {addresses.length}
+                      <Statistic title="Active Users" value={addresses.length} />
                     </div>
                   </div>
                 )}
