@@ -506,12 +506,37 @@ function App(props) {
                   <div>
                     <Button
                       onClick={async () => {
+
+                        if(typeof(appServer) == 'undefined') {
+                          return notification.error({
+                            message: "Setup Error",
+                            description: "Missing backend URL",
+                            placement: "bottomRight",
+                          });
+                        }
+  
+                        const messageLength = message && message.split(' ').length;
+                        if(typeof(message) == 'undefined' || message === '' || messageLength > 1) {
+                          return notification.error({
+                            message: "Failed to Sign!",
+                            description: "Message should be one word",
+                            placement: "bottomRight",
+                          });
+                        }
+
                         let sig = await userSigner.signMessage(message);
 
                         const res = await axios.post(appServer, {
                           address: address,
                           message: message,
                           signature: sig,
+                        })
+                        .catch((error)=> {
+                          return notification.error({
+                            message: "Failed to Sign!",
+                            description: `Connection issue ${error}`,
+                            placement: "bottomRight",
+                          });
                         });
 
                         if (res.data) {
