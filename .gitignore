@@ -31,6 +31,7 @@ build
 # misc
 .DS_Store
 .env*
+yarn.lock
 
 # debug
 npm-debug.log*

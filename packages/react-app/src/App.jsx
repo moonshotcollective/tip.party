@@ -1,7 +1,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, Input, List, notification, Select } from "antd";
+import { Alert, Button, Col, Menu, Row, Input, List, notification, Select, Divider, Statistic } from "antd";
 const { SubMenu } = Menu;
 const { Option } = Select;
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
@@ -28,8 +28,9 @@ import { ExampleUI, Hints, Subgraph } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
+import { HexString } from "walletlink/dist/types";
 const axios = require("axios");
-const { ethers } = require("ethers");
+const { ethers, BigNumber } = require("ethers");
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -51,7 +52,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -177,13 +178,14 @@ function App(props) {
 
   const [message, setMessage] = useState();
   const [addresses, setAddresses] = useState([]);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const [amount, setAmount] = useState(0);
   const [tokenAddress, setTokenAddress] = useState("");
   const [owner, setOwner] = useState("");
   const [payoutCompleted, setPayoutCompleted] = useState(false);
   const [approved, setApproved] = useState(false);
-  const [menuTitle, setMenuTitle] = useState("Select Token...");
-  const [link, setLink] = useState("")  
+  const [token, setToken] = useState("");
+  const [link, setLink] = useState("");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -444,14 +446,14 @@ function App(props) {
     );
   }
 
-  // const [message,setMessage] = useState()
-  // const [addresses,setAddresses] = useState()
   const [res, setRes] = useState("");
 
-  function handleMenuClick(e) {
-    message.info("Click on menu item.");
-    console.log("click", e);
-  }
+  useEffect(async () => {
+    // console.log("**************** " + message)
+    const res = await axios.get(appServer + message);
+    // console.log("res", res);
+    if(res.data) setAddresses(res.data);
+  }, [appServer, message])
 
   return (
     <div className="App">
@@ -501,38 +503,29 @@ function App(props) {
               />
               <div style={{ marginBottom: "10px" }}>
                 {!isOwner && (
-                  <Button
-                    onClick={async () => {
-                      let sig = await userSigner.signMessage(message);
+                  <div>
+                    <Button
+                      onClick={async () => {
+                        let sig = await userSigner.signMessage(message);
 
-                      if(typeof(appServer) == 'undefined') {
-                        return notification.error({
-                          message: "Setup Error",
-                          description: "Missing backend URL",
-                          placement: "bottomRight",
-                        });
-                      }
-
-                      const res = await axios
-                        .post(appServer, {
+                        const res = await axios.post(appServer, {
                           address: address,
                           message: message,
                           signature: sig,
-                        })
-                        .catch((error)=> {
-                          return notification.error({
-                            message: "Failed to Sign!",
-                            description: `Connection issue ${error}`,
-                            placement: "bottomRight",
-                          });
                         });
 
                         if (res.data) {
+                          // set up some user messages here besides the alert...
+                          // how many other users are signed-in?
+                          //
+                          setIsSignedIn(true);
                           notification.success({
                             message: "Signed in successfully",
                             placement: "bottomRight",
                           });
                         } else {
+                          setIsSignedIn(true);
+                          // set up user error notice besides the alert...
                           notification.error({
                             message: "Failed to sign in!",
                             description: "You have already signed in",
@@ -540,35 +533,43 @@ function App(props) {
                           });
                         }
                         setRes("");
-                    }}
-                  >
-                    Sign In
-                  </Button>
+                      }}
+                    >
+                      Sign In
+                    </Button>
+                    <Divider />
+                    <div>
+                      <Statistic title="Signed In" value={isSignedIn} valueStyle={{ color: (!isSignedIn ? "red" : "green") }} />
+                    </div>
+                    <div>
+                      <Statistic title="Active Users" value={addresses.length} />
+                    </div>
+                  </div>
                 )}
 
                 {isOwner && (
                   <div>
-                  {/*<Button onClick = {() =>setLink(message)}>
-                    Generate Link
-                </Button>*/}
-                  <Button
-                    style={{ marginLeft: "10px" }}
-                    onClick={async () => {
-                      const res = await axios.get(appServer + message);
-                      console.log("res", res);
-                      //setMessage("")
+                    {/*<Button onClick = {() =>setLink(message)}>
+                      Generate Link
+                    </Button>*/}
+                    <Button
+                      style={{ marginLeft: "10px" }}
+                      onClick={async () => {
+                        const res = await axios.get(appServer + message);
+                        console.log("res", res);
+                        //setMessage("")
 
-                      setAddresses(res.data);
-                    }}
-                  >
-                    Fetch Logged Accounts
-                  </Button>
- 
-                 { /*<p>
+                        setAddresses(res.data);
+                      }}
+                    >
+                      Fetch Logged Accounts
+                    </Button>
+
+                    {/*<p>
                     Link: 
                   {link? <a>https://signupfortokens.surge.sh/{link}</a> : ""}
                   </p>
-                 */ }
+                 */}
                   </div>
                 )}
               </div>
@@ -607,140 +608,147 @@ function App(props) {
 
                   {addresses && addresses.length > 0 && (
                     <div>
-
-                      <Select defaultValue={menuTitle} 
-                      style={{ width: 150, textAlign: "left", float: "left", marginTop: "10px" }}
-                      onChange={value => {
-                        setMenuTitle(value);
-                       }} >
+                      <Select
+                        defaultValue="Select token..."
+                        style={{ width: "100%", textAlign: "left", float: "left", marginTop: "10px" }}
+                        onChange={value => {
+                          setToken(value);
+                        }}
+                      >
                         <Option value="ETH">ETH</Option>
                         <Option value="GTC">GTC</Option>
-                        <Option value="USDC">USDC</Option>
-  
                       </Select>
 
                       {/* TODO : disable input until ERC-20 token is selected */}
                       <Input
                         value={amount}
                         addonBefore="Total Amount to Distribute"
-                        addonAfter={menuTitle == "Select Token..." ? <span /> : menuTitle}
+                        addonAfter={token == "" ? <span /> : token}
                         style={{ marginTop: "10px" }}
                         onChange={e => setAmount(e.target.value.toLowerCase())}
                       />
+                      {token && token == "ETH" && (
+                        <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+                          <Button
+                            onClick={async () => {
+                              /* look how you call setPurpose on your contract: */
+                              /* notice how you pass a call back for tx updates too */
+                              const result = tx(
+                                writeContracts.TokenDistributor.splitEth(addresses, {
+                                  value: ethers.utils.parseEther(amount),
+                                }),
+                                update => {
+                                  console.log("📡 Transaction Update:", update);
+                                  if (update && (update.status === "confirmed" || update.status === 1)) {
+                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
+                                    console.log(
+                                      " ⛽️ " +
+                                        update.gasUsed +
+                                        "/" +
+                                        (update.gasLimit || update.gas) +
+                                        " @ " +
+                                        parseFloat(update.gasPrice) / 1000000000 +
+                                        " gwei",
+                                    );
+                                    notification.success({
+                                      message: "Payout successful",
+                                      description: "Each user received " + amount / addresses.length + " " + token,
+                                      placement: "topRight",
+                                    });
+                                  }
+                                },
+                              );
+                              console.log("awaiting metamask/web3 confirm result...", result);
+                              console.log(await result);
+                              setApproved(true);
+                            }}
+                          >
+                            Payout
+                          </Button>
+                        </div>
+                      )}
 
-                      {/* TODO : disable button util token and amount > 0 <= balance */}
-                      {/* <div style={{ marginTop: "15px" }}>
-                        <Button
-                          block
-                          type="primary"
-                          size="large"
-                          disabled={payoutCompleted}
-                          onClick={async () => {
-                            const result = tx(
-                              writeContracts.TokenDistributor.splitTokenBalance(addresses, amount, tokenAddress),
-                              update => {
-                                console.log("📡 Transaction Update:", update);
-                                if (update && (update.status === "confirmed" || update.status === 1)) {
-                                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                  console.log(
-                                    " ⛽️ " +
-                                      update.gasUsed +
-                                      "/" +
-                                      (update.gasLimit || update.gas) +
-                                      " @ " +
-                                      parseFloat(update.gasPrice) / 1000000000 +
-                                      " gwei",
-                                  );
-                                  notification.success({
-                                    message: "Payout successful",
-                                    description:
-                                      "Each user received " + Math.floor(amount / addresses.length) + " " + menuTitle,
-                                    placement: "topRight",
-                                  });
-                                }
-                              },
-                            );
-                            console.log("awaiting metamask/web3 confirm result...", result);
-                            console.log(await result);
-                            setPayoutCompleted(true);
-                          }}
-                        >
-                          Payout
-                        </Button>
-                      </div> */}
-                      <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                        <Button
-                          onClick={async () => {
-                            /* look how you call setPurpose on your contract: */
-                            /* notice how you pass a call back for tx updates too */
-                            const result = tx(
-                              writeContracts.DummyToken.approve(readContracts?.TokenDistributor.address, amount),
-                              update => {
-                                console.log("📡 Transaction Update:", update);
-                                if (update && (update.status === "confirmed" || update.status === 1)) {
-                                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                  console.log(
-                                    " ⛽️ " +
-                                      update.gasUsed +
-                                      "/" +
-                                      (update.gasLimit || update.gas) +
-                                      " @ " +
-                                      parseFloat(update.gasPrice) / 1000000000 +
-                                      " gwei",
-                                  );
-                                  notification.success({
-                                    message: "Token successfully approved",
-                                    placement: "topRight",
-                                  });
-                                }
-                              },
-                            );
-                            console.log("awaiting metamask/web3 confirm result...", result);
-                            console.log(await result);
-                            setApproved(true);
-                          }}
-                        >
-                          Approve Token
-                        </Button>
+                      {token && token != "ETH" && (
+                        <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+                          <Button
+                            onClick={async () => {
+                              /* look how you call setPurpose on your contract: */
+                              /* notice how you pass a call back for tx updates too */
+                              const result = tx(
+                                writeContracts.DummyToken.approve(
+                                  readContracts?.TokenDistributor.address,
+                                  ethers.utils.parseUnits(amount, 18),
+                                ),
+                                update => {
+                                  console.log("📡 Transaction Update:", update);
+                                  if (update && (update.status === "confirmed" || update.status === 1)) {
+                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
+                                    console.log(
+                                      " ⛽️ " +
+                                        update.gasUsed +
+                                        "/" +
+                                        (update.gasLimit || update.gas) +
+                                        " @ " +
+                                        parseFloat(update.gasPrice) / 1000000000 +
+                                        " gwei",
+                                    );
+                                    notification.success({
+                                      message: "Token successfully approved",
+                                      placement: "topRight",
+                                    });
+                                  }
+                                },
+                              );
+                              console.log("awaiting metamask/web3 confirm result...", result);
+                              console.log(await result);
+                              setApproved(true);
+                            }}
+                          >
+                            Approve Token
+                          </Button>
 
-                        <Button
-                          disabled={!approved}
-                          style={{ marginLeft: "10px" }}
-                          onClick={async () => {
-                            /* look how you call setPurpose on your contract: */
-                            /* notice how you pass a call back for tx updates too */
-                            const result = tx(
-                              writeContracts.TokenDistributor.splitTokenFromUser(addresses, amount, tokenAddress),
-                              update => {
-                                console.log("📡 Transaction Update:", update);
-                                if (update && (update.status === "confirmed" || update.status === 1)) {
-                                  console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                  console.log(
-                                    " ⛽️ " +
-                                      update.gasUsed +
-                                      "/" +
-                                      (update.gasLimit || update.gas) +
-                                      " @ " +
-                                      parseFloat(update.gasPrice) / 1000000000 +
-                                      " gwei",
-                                  );
-                                  notification.success({
-                                    message: "Payout successful",
-                                    description:
-                                      "Each user received " + Math.floor(amount / addresses.length) + " " + menuTitle,
-                                    placement: "topRight",
-                                  });
-                                }
-                              },
-                            );
-                            console.log("awaiting metamask/web3 confirm result...", result);
-                            console.log(await result);
-                            setApproved(false);
-                          }}
-                        >
-                          Payout
-                        </Button>
-                      </div>
+                          <Button
+                            disabled={!approved}
+                            style={{ marginLeft: "10px" }}
+                            onClick={async () => {
+                              /* look how you call setPurpose on your contract: */
+                              /* notice how you pass a call back for tx updates too */
+                              const result = tx(
+                                writeContracts.TokenDistributor.splitTokenFromUser(
+                                  addresses,
+                                  ethers.utils.parseUnits(amount, 18),
+                                  tokenAddress,
+                                ),
+                                update => {
+                                  console.log("📡 Transaction Update:", update);
+                                  if (update && (update.status === "confirmed" || update.status === 1)) {
+                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
+                                    console.log(
+                                      " ⛽️ " +
+                                        update.gasUsed +
+                                        "/" +
+                                        (update.gasLimit || update.gas) +
+                                        " @ " +
+                                        parseFloat(update.gasPrice) / 1000000000 +
+                                        " gwei",
+                                    );
+                                    notification.success({
+                                      message: "Payout successful",
+                                      description: "Each user received " + amount / addresses.length + " " + token,
+                                      placement: "topRight",
+                                    });
+                                  }
+                                },
+                              );
+                              console.log("awaiting metamask/web3 confirm result...", result);
+                              console.log(await result);
+                              setApproved(false);
+                            }}
+                          >
+                            Payout
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

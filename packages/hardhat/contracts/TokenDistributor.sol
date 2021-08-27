@@ -6,12 +6,21 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+/// @title Token Distributor Contract
+/// @author 
+/// @notice distributes donations or tips
+/// @dev 
 contract TokenDistributor is Ownable, AccessControl {
     using SafeMath for uint256;
+
+    /// @notice bytes32 of the distributor role
     bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
 
+    /// @notice Emitted when a token share has been distributed
     event tokenShareCompleted(uint256 amount, uint256 share, address from);
-    event ethShareCompleted(uint256 amount, uint256 share);
+
+    /// @notice Emitted when an ETH share has been distributed
+    event ethShareCompleted(uint256 share);
 
     modifier isPermittedDistributor() {
         require(
@@ -47,24 +56,31 @@ contract TokenDistributor is Ownable, AccessControl {
         _setupRole(DISTRIBUTOR_ROLE, admin);
     }
 
-    function splitEth(address[] memory users, uint256 amount)
+    /// @notice Splits ETH that is 'Tipped'
+    /// @dev 
+    /// @param users an ordered list of users addresses
+    function splitEth(address[] memory users)
         public
+        payable
         isPermittedDistributor
         hasValidUsers(users)
-        hasEnoughBalance(address(this).balance, amount)
     {
         uint256 share = _handleDistribution(
             users,
-            amount,
+            msg.value,
             address(this),
             address(0),
             false
         );
 
-        emit ethShareCompleted(amount, share);
+        emit ethShareCompleted(share);
     }
 
-    // split contract's own token
+    /// @notice Splits contracts own token
+    /// @dev 
+    /// @param users an ordered list of users addresses
+    /// @param amount the total amount to be split
+    /// @param token the token to be split
     function splitTokenBalance(
         address[] memory users,
         uint256 amount,
@@ -86,6 +102,11 @@ contract TokenDistributor is Ownable, AccessControl {
         emit tokenShareCompleted(amount, share, address(token));
     }
 
+    /// @notice Splits token from user
+    /// @dev 
+    /// @param users an ordered list of users addresses
+    /// @param amount the total amount to be split
+    /// @param token the token to be split
     function splitTokenFromUser(
         address[] memory users,
         uint256 amount,
@@ -107,13 +128,20 @@ contract TokenDistributor is Ownable, AccessControl {
         emit tokenShareCompleted(amount, share, msg.sender);
     }
 
-    function _handleDistribution(
+    /// @notice Handles the distribution
+    /// @dev called internally by contract function
+    /// @return share of the distribution
+    function _handleDistribution
+    (
         address[] memory users,
         uint256 amount,
         address from,
         address token,
         bool isToken
-    ) private returns (uint256 share) {
+    )   
+        private
+        returns (uint256 share)
+    {
         uint256 totalMembers = users.length;
         share = amount.div(totalMembers);
 
@@ -131,11 +159,23 @@ contract TokenDistributor is Ownable, AccessControl {
         }
     }
 
-    function addNewDistributor(address user) public isAdminOrOwner {
+    /// @notice Grants DISTRIBUTOR_ROLE to a new user
+    /// @dev have to be admin/owner to call this function
+    /// @param user the user to assign the new role to
+    function addNewDistributor(address user)
+        public
+        isAdminOrOwner
+    {
         grantRole(DISTRIBUTOR_ROLE, user);
     }
 
-    function revokeDistributor(address user) public isAdminOrOwner {
+    /// @notice Revokes DISTRIBUTOR_ROLE to a new user
+    /// @dev have to be admin/owner to call this function
+    /// @param user the user to revoke the role from
+    function revokeDistributor(address user)
+        public
+        isAdminOrOwner
+    {
         revokeRole(DISTRIBUTOR_ROLE, user);
     }
 }
