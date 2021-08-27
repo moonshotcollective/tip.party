@@ -53,7 +53,7 @@ const { ethers, BigNumber } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -259,7 +259,7 @@ function App(props) {
   ]);
 
   const isOwner = (address || "").toLowerCase() === (owner || "0x").toLowerCase();
-  const isAdmin = (address || "").toLowerCase() === (admin || "0x").toLowerCase();
+  const isAdmin = admin;
 
   const title = isOwner ? "Pay your contributors" : "Sign in with your message";
 
@@ -271,9 +271,8 @@ function App(props) {
   };
 
   const updateAdmin = async () => {
-    const o = await readContracts?.TokenDistributor?.checkIsDistributor(address, {
-      value: ethers.utils.parseEther(amount),
-    });
+    console.log('update admin ');
+    const o = await readContracts?.TokenDistributor?.checkIsDistributor(address);
     setAdmin(o);
   };
 
@@ -309,11 +308,13 @@ function App(props) {
       console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
       console.log("🔐 writeContracts", writeContracts);
       console.log("owner: ", owner);
+      console.log("Current user admin: ", admin?'Yes':"No");
     }
 
     if (readContracts) {
       setTokenAddress(readContracts?.DummyToken?.address);
       updateOwner();
+      console.log('outside');
       updateAdmin();
       //setOwnerAddress(readContracts?.TokenDistributor.owner());
       //console.log(ownerAddress);
@@ -821,15 +822,13 @@ function App(props) {
                         /* look how you call setPurpose on your contract: */
                         /* notice how you pass a call back for tx updates too */
                         const result = tx(
-                          writeContracts.TokenDistributor.addNewDistributor(newAdmin, {
-                            value: ethers.utils.parseEther(amount),
-                          }),
+                          writeContracts.TokenDistributor.addNewDistributor(newAdmin),
                           update => {
                             console.log("📡 Admin Update:", update);
                             if (update && (update.status === "confirmed" || update.status === 1)) {
                               console.log(" 🍾 Transaction " + update.hash + " finished!");
                               notification.success({
-                                message: "Admin add",
+                                message: "Admin Add",
                                 description: "successful",
                                 placement: "bottomRight",
                               });
@@ -863,7 +862,7 @@ function App(props) {
           loadWeb3Modal={loadWeb3Modal}
           logoutOfWeb3Modal={logoutOfWeb3Modal}
           blockExplorer={blockExplorer}
-          isOwner={isOwner}
+          isOwner={isOwner || isAdmin}
         />
         {faucetHint}
       </div>

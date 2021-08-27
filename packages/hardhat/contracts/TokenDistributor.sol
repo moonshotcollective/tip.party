@@ -184,8 +184,13 @@ contract TokenDistributor is Ownable, AccessControl {
     /// @param user the user to revoke the role from
     function checkIsDistributor(address user)
         public
+        view
+        returns (bool)
     {
-        hasRole(DISTRIBUTOR_ROLE, user);
+        if (hasRole(DISTRIBUTOR_ROLE, user)) {
+            return true;
+        }
+        return false;
     }
 
 }
