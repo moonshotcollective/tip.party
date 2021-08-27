@@ -271,7 +271,6 @@ function App(props) {
   };
 
   const updateAdmin = async () => {
-    console.log('update admin ');
     const o = await readContracts?.TokenDistributor?.checkIsDistributor(address);
     setAdmin(o);
   };
@@ -314,7 +313,6 @@ function App(props) {
     if (readContracts) {
       setTokenAddress(readContracts?.DummyToken?.address);
       updateOwner();
-      console.log('outside');
       updateAdmin();
       //setOwnerAddress(readContracts?.TokenDistributor.owner());
       //console.log(ownerAddress);
