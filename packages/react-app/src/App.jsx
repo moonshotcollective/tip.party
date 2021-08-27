@@ -178,7 +178,6 @@ function App(props) {
 
   const [message, setMessage] = useState();
   const [addresses, setAddresses] = useState([]);
-  const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [amount, setAmount] = useState(0);
   const [tokenAddress, setTokenAddress] = useState("");
@@ -187,6 +186,8 @@ function App(props) {
   const [approved, setApproved] = useState(false);
   const [token, setToken] = useState("");
   const [link, setLink] = useState("");
+  const [admin, setAdmin] = useState("");
+  const [newAdmin, setNewAdmin] = useState("");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -257,6 +258,7 @@ function App(props) {
   ]);
 
   const isOwner = (address || "").toLowerCase() === (owner || "0x").toLowerCase();
+  const isAdmin = (address || "").toLowerCase() === (admin || "0x").toLowerCase();
 
   const title = isOwner ? "Pay your contributors" : "Sign in with your message";
 
@@ -267,72 +269,11 @@ function App(props) {
     setOwner(o);
   };
 
-  const handleSignIn = async () => {
-    setIsSigning(true);
-    if (typeof appServer == "undefined") {
-      return notification.error({
-        message: "Setup Error",
-        description: "Missing backend URL",
-        placement: "bottomRight",
-      });
-      setIsSigning(false);
-    }
-
-    const messageLength = message && message.split(" ").length;
-    if (typeof message == "undefined" || message === "" || messageLength > 1) {
-      return notification.error({
-        message: "Failed to Sign!",
-        description: "Message should be one word",
-        placement: "bottomRight",
-      });
-
-      setIsSigning(false);
-    }
-
-    let sig = await userSigner.signMessage(message);
-
-    let res;
-    let addressResponse;
-
-    try {
-      res = await axios.post(appServer, {
-        address: address,
-        message: message,
-        signature: sig,
-      });
-
-      addressResponse = await axios.get(appServer + message);
-    } catch (error) {
-      return notification.error({
-        message: "Failed to Sign!",
-        description: `Connection issue ${error}`,
-        placement: "bottomRight",
-      });
-
-      setIsSigning(false);
-    }
-
-    if (res.data) {
-      // set up some user messages here besides the alert...
-      // how many other users are signed-in?
-      setIsSignedIn(true);
-      notification.success({
-        message: "Signed in successfully",
-        placement: "bottomRight",
-      });
-    } else {
-      setIsSignedIn(true);
-      // set up user error notice besides the alert...
-      notification.warn({
-        message: "Failed to sign in!",
-        description: "You have already signed in",
-        placement: "bottomRight",
-      });
-    }
-
-    setAddresses(addressResponse.data || []);
-    setIsSigning(false);
-    setRes("");
+  const updateAdmin = async () => {
+    const o = await readContracts?.TokenDistributor?.checkIsDistributor(address, {
+      value: ethers.utils.parseEther(amount),
+    });
+    setAdmin(o);
   };
 
   /*
@@ -372,6 +313,7 @@ function App(props) {
     if (readContracts) {
       setTokenAddress(readContracts?.DummyToken?.address);
       updateOwner();
+      updateAdmin();
       //setOwnerAddress(readContracts?.TokenDistributor.owner());
       //console.log(ownerAddress);
     }
@@ -517,12 +459,12 @@ function App(props) {
 
   const [res, setRes] = useState("");
 
-  // useEffect(async () => {
-  //   // console.log("**************** " + message)
-  //   const res = await axios.get(appServer + message);
-  //   // console.log("res", res);
-  //   if(res.data) setAddresses(res.data);
-  // }, [appServer, message])
+  useEffect(async () => {
+    // console.log("**************** " + message)
+    const res = await axios.get(appServer + message);
+    // console.log("res", res);
+    if(res.data) setAddresses(res.data);
+  }, [appServer, message])
 
   return (
     <div className="App">
@@ -551,6 +493,19 @@ function App(props) {
               Contracts
             </Link>
           </Menu.Item>
+          {(isOwner || isAdmin) && (
+            <Menu.Item key="/adminpanel">
+              <Link
+                onClick={() => {
+                  setRoute("/adminpanel");
+                }}
+                to="/adminpanel"
+              >
+                Admin Panel
+              </Link>
+            </Menu.Item>
+          )}
+
         </Menu>
 
         <Switch>
@@ -573,20 +528,46 @@ function App(props) {
               <div style={{ marginBottom: "10px" }}>
                 {!isOwner && (
                   <div>
-                    <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
+                    <Button
+                      onClick={async () => {
+                        let sig = await userSigner.signMessage(message);
+
+                        const res = await axios.post(appServer, {
+                          address: address,
+                          message: message,
+                          signature: sig,
+                        });
+
+                        if (res.data) {
+                          // set up some user messages here besides the alert...
+                          // how many other users are signed-in?
+                          //
+                          setIsSignedIn(true);
+                          notification.success({
+                            message: "Signed in successfully",
+                            placement: "bottomRight",
+                          });
+                        } else {
+                          setIsSignedIn(true);
+                          // set up user error notice besides the alert...
+                          notification.error({
+                            message: "Failed to sign in!",
+                            description: "You have already signed in",
+                            placement: "bottomRight",
+                          });
+                        }
+                        setRes("");
+                      }}
+                    >
                       Sign In
                     </Button>
                     <Divider />
                     <div>
-                      <Statistic
-                        title="Signed In"
-                        value={isSignedIn}
-                        valueStyle={{ color: !isSignedIn ? "red" : "green" }}
-                      />
+                      <Statistic title="Signed In" value={isSignedIn} valueStyle={{ color: (!isSignedIn ? "red" : "green") }} />
                     </div>
-                    {isSignedIn &&(<div>
+                    <div>
                       <Statistic title="Active Users" value={addresses.length} />
-                    </div>)}
+                    </div>
                   </div>
                 )}
 
@@ -813,6 +794,56 @@ function App(props) {
               address={address}
               blockExplorer={blockExplorer}
             />
+          </Route>
+          <Route exact path="/adminpanel">
+            {/*
+                🎛 this scaffolding is full of commonly used components
+                this <Contract/> component will automatically parse your ABI
+                and give you a form to interact with it locally
+            */}
+
+            <div style={{ margin: "20px auto", width: 500, padding: 60, border: "3px solid" }}>
+              <h2>Add Admin</h2>
+              <Input
+                style={{ marginTop: "10px", marginBottom: "10px" }}
+                addonBefore="Address"
+                value={newAdmin}
+                placeholder="Address"
+                onChange={e => setNewAdmin(e.target.value)}
+              />
+              <div style={{ marginBottom: "10px" }}>
+                {(isOwner || isAdmin) && (
+                  <div>
+                    <Button
+                      style={{ marginLeft: "10px" }}
+                      onClick={async () => {
+                        /* look how you call setPurpose on your contract: */
+                        /* notice how you pass a call back for tx updates too */
+                        const result = tx(
+                          writeContracts.TokenDistributor.addNewDistributor(newAdmin, {
+                            value: ethers.utils.parseEther(amount),
+                          }),
+                          update => {
+                            console.log("📡 Admin Update:", update);
+                            if (update && (update.status === "confirmed" || update.status === 1)) {
+                              console.log(" 🍾 Transaction " + update.hash + " finished!");
+                              notification.success({
+                                message: "Admin add",
+                                description: "successful",
+                                placement: "bottomRight",
+                              });
+                            }
+                          },
+                        );
+                        setNewAdmin("");
+                      }}
+                    >
+                      Add User As Admin
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
           </Route>
         </Switch>
       </BrowserRouter>
