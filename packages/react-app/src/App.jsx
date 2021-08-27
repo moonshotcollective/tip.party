@@ -503,7 +503,6 @@ function App(props) {
                 {!isOwner && (
                   <Button
                     onClick={async () => {
-                      let sig = await userSigner.signMessage(message);
 
                       if(typeof(appServer) == 'undefined') {
                         return notification.error({
@@ -513,6 +512,16 @@ function App(props) {
                         });
                       }
 
+                      const messageLength = message && message.split(' ').length;
+                      if(typeof(message) == 'undefined' || message === '' || messageLength > 1) {
+                        return notification.error({
+                          message: "Failed to Sign!",
+                          description: "Message should be one word",
+                          placement: "bottomRight",
+                        });
+                      }
+
+                      let sig = await userSigner.signMessage(message);
                       const res = await axios
                         .post(appServer, {
                           address: address,
