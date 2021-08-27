@@ -8,6 +8,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // dummyToken Contract to test out TokenDistribution locally
 contract DummyToken is ERC20 {
     constructor() public ERC20("DummyToken", "DTKN") {
-        _mint(msg.sender, 100**12);
+        _mint(msg.sender, 10000000e18);
+    }
+
+    function mint4Me(uint256 amount) public {
+        _mint(msg.sender, amount);
     }
 }

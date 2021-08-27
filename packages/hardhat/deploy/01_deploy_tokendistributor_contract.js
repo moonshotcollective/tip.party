@@ -2,8 +2,11 @@
 
 const { ethers } = require("hardhat");
 
+const testDeploy = false;
+
 module.exports = async ({ getNamedAccounts, deployments }) => {
-  const frontendAddress = "YOUR_FRONTEND_ADDRESS";
+  // const frontendAddress = "YOUR_FRONTEND_ADDRESS";
+  const frontendAddress = "0xCf597eEF21d720dCaEe9Cb8DAd16E73059F7B680";
 
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
@@ -13,41 +16,49 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("DummyToken", {
-    from: deployer,
-    log: true,
-  });
+  console.log(`Deployed`);
 
   const tokenDistributorContract = await ethers.getContract(
     "TokenDistributor",
     deployer
   );
-  const dummyTokenContract = await ethers.getContract("DummyToken", deployer);
 
-  // transfer ownership to UI owner if needed
-  tokenDistributorContract.transferOwnership(frontendAddress);
+  console.log(`Gotten`);
 
-  const mintedBalance = await dummyTokenContract.balanceOf(deployer);
-  const splitValue = mintedBalance.div(ethers.BigNumber.from(2));
+  if (testDeploy) {
+    await deploy("DummyToken", {
+      from: deployer,
+      log: true,
+    });
 
-  // split tokens between frontendAddress and tokenDistributorContract for later distribution
-  await dummyTokenContract.transfer(frontendAddress, splitValue);
-  await dummyTokenContract.transfer(
-    tokenDistributorContract.address,
-    splitValue
-  );
+    const dummyTokenContract = await ethers.getContract("DummyToken", deployer);
 
-  // allow tokenDistributor to spend frontendAddress balance
+    // transfer ownership to UI owner if needed
+    await tokenDistributorContract.transferOwnership(frontendAddress);
+    console.log(`Owned`);
 
-  const frontendBalance = await dummyTokenContract.balanceOf(frontendAddress);
-  const distributorBalance = await dummyTokenContract.balanceOf(
-    tokenDistributorContract.address
-  );
+    const mintedBalance = await dummyTokenContract.balanceOf(deployer);
+    const splitValue = mintedBalance.div(ethers.BigNumber.from(2));
 
-  console.log({
-    frontend: frontendBalance.toString(),
-    distributor: distributorBalance.toString(),
-  });
+    // split tokens between frontendAddress and tokenDistributorContract for later distribution
+    await dummyTokenContract.transfer(frontendAddress, splitValue);
+    await dummyTokenContract.transfer(
+      tokenDistributorContract.address,
+      splitValue
+    );
+
+    // allow tokenDistributor to spend frontendAddress balance
+
+    const frontendBalance = await dummyTokenContract.balanceOf(frontendAddress);
+    const distributorBalance = await dummyTokenContract.balanceOf(
+      tokenDistributorContract.address
+    );
+
+    console.log({
+      frontend: frontendBalance.toString(),
+      distributor: distributorBalance.toString(),
+    });
+  }
 };
 
 module.exports.tags = ["TokenDistributor", "DummyToken"];

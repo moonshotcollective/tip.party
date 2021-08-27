@@ -7,9 +7,8 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @title Token Distributor Contract
-/// @author 
+/// @author
 /// @notice distributes donations or tips
-/// @dev 
 contract TokenDistributor is Ownable, AccessControl {
     using SafeMath for uint256;
 
@@ -57,7 +56,6 @@ contract TokenDistributor is Ownable, AccessControl {
     }
 
     /// @notice Splits ETH that is 'Tipped'
-    /// @dev 
     /// @param users an ordered list of users addresses
     function splitEth(address[] memory users)
         public
@@ -77,7 +75,6 @@ contract TokenDistributor is Ownable, AccessControl {
     }
 
     /// @notice Splits contracts own token
-    /// @dev 
     /// @param users an ordered list of users addresses
     /// @param amount the total amount to be split
     /// @param token the token to be split
@@ -103,7 +100,6 @@ contract TokenDistributor is Ownable, AccessControl {
     }
 
     /// @notice Splits token from user
-    /// @dev 
     /// @param users an ordered list of users addresses
     /// @param amount the total amount to be split
     /// @param token the token to be split
@@ -131,17 +127,13 @@ contract TokenDistributor is Ownable, AccessControl {
     /// @notice Handles the distribution
     /// @dev called internally by contract function
     /// @return share of the distribution
-    function _handleDistribution
-    (
+    function _handleDistribution(
         address[] memory users,
         uint256 amount,
         address from,
         address token,
         bool isToken
-    )   
-        private
-        returns (uint256 share)
-    {
+    ) private returns (uint256 share) {
         uint256 totalMembers = users.length;
         share = amount.div(totalMembers);
 
@@ -162,29 +154,21 @@ contract TokenDistributor is Ownable, AccessControl {
     /// @notice Grants DISTRIBUTOR_ROLE to a new user
     /// @dev have to be admin/owner to call this function
     /// @param user the user to assign the new role to
-    function addNewDistributor(address user)
-        public
-        isAdminOrOwner
-    {
+    function addNewDistributor(address user) public isAdminOrOwner {
         grantRole(DISTRIBUTOR_ROLE, user);
     }
 
     /// @notice Revokes DISTRIBUTOR_ROLE to a new user
     /// @dev have to be admin/owner to call this function
     /// @param user the user to revoke the role from
-    function revokeDistributor(address user)
-        public
-        isAdminOrOwner
-    {
+    function revokeDistributor(address user) public isAdminOrOwner {
         revokeRole(DISTRIBUTOR_ROLE, user);
     }
 
     /// @notice check if user has DISTRIBUTOR_ROLE
     /// @dev have to be admin/owner to call this function
     /// @param user the user to revoke the role from
-    function checkIsDistributor(address user)
-        public
-    {
-        hasRole(DISTRIBUTOR_ROLE, user);
+    function checkIsDistributor(address user) public view returns (bool) {
+        return hasRole(DISTRIBUTOR_ROLE, user) || owner() == user;
     }
 }
