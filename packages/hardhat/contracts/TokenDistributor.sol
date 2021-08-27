@@ -187,4 +187,5 @@ contract TokenDistributor is Ownable, AccessControl {
     {
         hasRole(DISTRIBUTOR_ROLE, user);
     }
+
 }
