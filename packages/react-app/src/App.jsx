@@ -584,9 +584,9 @@ function App(props) {
                         valueStyle={{ color: !isSignedIn ? "red" : "green" }}
                       />
                     </div>
-                    <div>
+                    {isSignedIn &&(<div>
                       <Statistic title="Active Users" value={addresses.length} />
-                    </div>
+                    </div>)}
                   </div>
                 )}
 
