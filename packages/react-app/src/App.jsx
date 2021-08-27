@@ -186,6 +186,8 @@ function App(props) {
   const [approved, setApproved] = useState(false);
   const [token, setToken] = useState("");
   const [link, setLink] = useState("");
+  const [admin, setAdmin] = useState("");
+  const [newAdmin, setNewAdmin] = useState("");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -256,6 +258,7 @@ function App(props) {
   ]);
 
   const isOwner = (address || "").toLowerCase() === (owner || "0x").toLowerCase();
+  const isAdmin = (address || "").toLowerCase() === (admin || "0x").toLowerCase();
 
   const title = isOwner ? "Pay your contributors" : "Sign in with your message";
 
@@ -264,6 +267,13 @@ function App(props) {
   const updateOwner = async () => {
     const o = await readContracts?.TokenDistributor?.owner();
     setOwner(o);
+  };
+
+  const updateAdmin = async () => {
+    const o = await readContracts?.TokenDistributor?.checkIsDistributor(address, {
+      value: ethers.utils.parseEther(amount),
+    });
+    setAdmin(o);
   };
 
   /*
@@ -303,6 +313,7 @@ function App(props) {
     if (readContracts) {
       setTokenAddress(readContracts?.DummyToken?.address);
       updateOwner();
+      updateAdmin();
       //setOwnerAddress(readContracts?.TokenDistributor.owner());
       //console.log(ownerAddress);
     }
@@ -482,6 +493,19 @@ function App(props) {
               Contracts
             </Link>
           </Menu.Item>
+          {(isOwner || isAdmin) && (
+            <Menu.Item key="/adminpanel">
+              <Link
+                onClick={() => {
+                  setRoute("/adminpanel");
+                }}
+                to="/adminpanel"
+              >
+                Admin Panel
+              </Link>
+            </Menu.Item>
+          )}
+
         </Menu>
 
         <Switch>
@@ -770,6 +794,56 @@ function App(props) {
               address={address}
               blockExplorer={blockExplorer}
             />
+          </Route>
+          <Route exact path="/adminpanel">
+            {/*
+                🎛 this scaffolding is full of commonly used components
+                this <Contract/> component will automatically parse your ABI
+                and give you a form to interact with it locally
+            */}
+
+            <div style={{ margin: "20px auto", width: 500, padding: 60, border: "3px solid" }}>
+              <h2>Add Admin</h2>
+              <Input
+                style={{ marginTop: "10px", marginBottom: "10px" }}
+                addonBefore="Address"
+                value={newAdmin}
+                placeholder="Address"
+                onChange={e => setNewAdmin(e.target.value)}
+              />
+              <div style={{ marginBottom: "10px" }}>
+                {(isOwner || isAdmin) && (
+                  <div>
+                    <Button
+                      style={{ marginLeft: "10px" }}
+                      onClick={async () => {
+                        /* look how you call setPurpose on your contract: */
+                        /* notice how you pass a call back for tx updates too */
+                        const result = tx(
+                          writeContracts.TokenDistributor.addNewDistributor(newAdmin, {
+                            value: ethers.utils.parseEther(amount),
+                          }),
+                          update => {
+                            console.log("📡 Admin Update:", update);
+                            if (update && (update.status === "confirmed" || update.status === 1)) {
+                              console.log(" 🍾 Transaction " + update.hash + " finished!");
+                              notification.success({
+                                message: "Admin add",
+                                description: "successful",
+                                placement: "bottomRight",
+                              });
+                            }
+                          },
+                        );
+                        setNewAdmin("");
+                      }}
+                    >
+                      Add User As Admin
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
           </Route>
         </Switch>
       </BrowserRouter>
