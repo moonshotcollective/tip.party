@@ -178,6 +178,7 @@ function App(props) {
 
   const [message, setMessage] = useState();
   const [addresses, setAddresses] = useState([]);
+  const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [amount, setAmount] = useState(0);
   const [tokenAddress, setTokenAddress] = useState("");
@@ -264,6 +265,74 @@ function App(props) {
   const updateOwner = async () => {
     const o = await readContracts?.TokenDistributor?.owner();
     setOwner(o);
+  };
+
+  const handleSignIn = async () => {
+    setIsSigning(true);
+    if (typeof appServer == "undefined") {
+      return notification.error({
+        message: "Setup Error",
+        description: "Missing backend URL",
+        placement: "bottomRight",
+      });
+      setIsSigning(false);
+    }
+
+    const messageLength = message && message.split(" ").length;
+    if (typeof message == "undefined" || message === "" || messageLength > 1) {
+      return notification.error({
+        message: "Failed to Sign!",
+        description: "Message should be one word",
+        placement: "bottomRight",
+      });
+
+      setIsSigning(false);
+    }
+
+    let sig = await userSigner.signMessage(message);
+
+    let res;
+    let addressResponse;
+
+    try {
+      res = await axios.post(appServer, {
+        address: address,
+        message: message,
+        signature: sig,
+      });
+
+      addressResponse = await axios.get(appServer + message);
+    } catch (error) {
+      return notification.error({
+        message: "Failed to Sign!",
+        description: `Connection issue ${error}`,
+        placement: "bottomRight",
+      });
+
+      setIsSigning(false);
+    }
+
+    if (res.data) {
+      // set up some user messages here besides the alert...
+      // how many other users are signed-in?
+      setIsSignedIn(true);
+      notification.success({
+        message: "Signed in successfully",
+        placement: "bottomRight",
+      });
+    } else {
+      setIsSignedIn(true);
+      // set up user error notice besides the alert...
+      notification.warn({
+        message: "Failed to sign in!",
+        description: "You have already signed in",
+        placement: "bottomRight",
+      });
+    }
+
+    setAddresses(addressResponse.data || []);
+    setIsSigning(false);
+    setRes("");
   };
 
   /*
@@ -448,12 +517,12 @@ function App(props) {
 
   const [res, setRes] = useState("");
 
-  useEffect(async () => {
-    // console.log("**************** " + message)
-    const res = await axios.get(appServer + message);
-    // console.log("res", res);
-    if(res.data) setAddresses(res.data);
-  }, [appServer, message])
+  // useEffect(async () => {
+  //   // console.log("**************** " + message)
+  //   const res = await axios.get(appServer + message);
+  //   // console.log("res", res);
+  //   if(res.data) setAddresses(res.data);
+  // }, [appServer, message])
 
   return (
     <div className="App">
@@ -504,67 +573,16 @@ function App(props) {
               <div style={{ marginBottom: "10px" }}>
                 {!isOwner && (
                   <div>
-                    <Button
-                      onClick={async () => {
-
-                        if(typeof(appServer) == 'undefined') {
-                          return notification.error({
-                            message: "Setup Error",
-                            description: "Missing backend URL",
-                            placement: "bottomRight",
-                          });
-                        }
-  
-                        const messageLength = message && message.split(' ').length;
-                        if(typeof(message) == 'undefined' || message === '' || messageLength > 1) {
-                          return notification.error({
-                            message: "Failed to Sign!",
-                            description: "Message should be one word",
-                            placement: "bottomRight",
-                          });
-                        }
-
-                        let sig = await userSigner.signMessage(message);
-
-                        const res = await axios.post(appServer, {
-                          address: address,
-                          message: message,
-                          signature: sig,
-                        })
-                        .catch((error)=> {
-                          return notification.error({
-                            message: "Failed to Sign!",
-                            description: `Connection issue ${error}`,
-                            placement: "bottomRight",
-                          });
-                        });
-
-                        if (res.data) {
-                          // set up some user messages here besides the alert...
-                          // how many other users are signed-in?
-                          //
-                          setIsSignedIn(true);
-                          notification.success({
-                            message: "Signed in successfully",
-                            placement: "bottomRight",
-                          });
-                        } else {
-                          setIsSignedIn(true);
-                          // set up user error notice besides the alert...
-                          notification.error({
-                            message: "Failed to sign in!",
-                            description: "You have already signed in",
-                            placement: "bottomRight",
-                          });
-                        }
-                        setRes("");
-                      }}
-                    >
+                    <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
                       Sign In
                     </Button>
                     <Divider />
                     <div>
-                      <Statistic title="Signed In" value={isSignedIn} valueStyle={{ color: (!isSignedIn ? "red" : "green") }} />
+                      <Statistic
+                        title="Signed In"
+                        value={isSignedIn}
+                        valueStyle={{ color: !isSignedIn ? "red" : "green" }}
+                      />
                     </div>
                     <div>
                       <Statistic title="Active Users" value={addresses.length} />
