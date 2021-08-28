@@ -2,30 +2,26 @@
 
 const { ethers } = require("hardhat");
 
-const testDeploy = false;
-
-module.exports = async ({ getNamedAccounts, deployments }) => {
+module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
   // const frontendAddress = "YOUR_FRONTEND_ADDRESS";
   const frontendAddress = "0xCf597eEF21d720dCaEe9Cb8DAd16E73059F7B680";
 
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
+  const chainId = await getChainId();
   await deploy("TokenDistributor", {
     from: deployer,
     args: [frontendAddress],
     log: true,
   });
 
-  console.log(`Deployed`);
-
   const tokenDistributorContract = await ethers.getContract(
     "TokenDistributor",
     deployer
   );
 
-  console.log(`Gotten`);
-
-  if (testDeploy) {
+  // run this if not for production deployment
+  if (chainId !== 1) {
     await deploy("DummyToken", {
       from: deployer,
       log: true,
@@ -47,8 +43,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
       splitValue
     );
 
-    // allow tokenDistributor to spend frontendAddress balance
-
+    // split dummyToken balance between frontend account and tokenDistributor
     const frontendBalance = await dummyTokenContract.balanceOf(frontendAddress);
     const distributorBalance = await dummyTokenContract.balanceOf(
       tokenDistributorContract.address
