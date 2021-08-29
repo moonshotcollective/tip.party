@@ -24,7 +24,7 @@ import {
   useUserSigner,
 } from "./hooks";
 // import Hints from "./Hints";
-import { ExampleUI, Hints, Subgraph } from "./views";
+import { Admin } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
@@ -52,7 +52,7 @@ const { ethers, BigNumber } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -180,13 +180,9 @@ function App(props) {
   const [addresses, setAddresses] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [amount, setAmount] = useState(0);
   const [tokenAddress, setTokenAddress] = useState("");
   const [owner, setOwner] = useState("");
-  const [payoutCompleted, setPayoutCompleted] = useState(false);
-  const [approved, setApproved] = useState(false);
-  const [token, setToken] = useState("");
-  const [link, setLink] = useState("");
+  const [admin, setAdmin] = useState(false);
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -256,9 +252,7 @@ function App(props) {
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
 
-  const isOwner = (address || "").toLowerCase() === (owner || "0x").toLowerCase();
-
-  const title = isOwner ? "Pay your contributors" : "Sign in with your message";
+  const title = admin ? "Pay your contributors" : "Sign in with your message";
 
   const appServer = process.env.REACT_APP_SERVER;
 
@@ -270,23 +264,23 @@ function App(props) {
   const handleSignIn = async () => {
     setIsSigning(true);
     if (typeof appServer == "undefined") {
+      setIsSigning(false);
       return notification.error({
         message: "Setup Error",
         description: "Missing backend URL",
         placement: "bottomRight",
       });
-      setIsSigning(false);
     }
 
     const messageLength = message && message.split(" ").length;
     if (typeof message == "undefined" || message === "" || messageLength > 1) {
+      setIsSigning(false);
+
       return notification.error({
         message: "Failed to Sign!",
         description: "Message should be one word",
         placement: "bottomRight",
       });
-
-      setIsSigning(false);
     }
 
     let sig = await userSigner.signMessage(message);
@@ -303,13 +297,13 @@ function App(props) {
 
       addressResponse = await axios.get(appServer + message);
     } catch (error) {
+      setIsSigning(false);
+
       return notification.error({
         message: "Failed to Sign!",
         description: `Connection issue ${error}`,
         placement: "bottomRight",
       });
-
-      setIsSigning(false);
     }
 
     if (res.data) {
@@ -333,6 +327,11 @@ function App(props) {
     setAddresses(addressResponse.data || []);
     setIsSigning(false);
     setRes("");
+  };
+
+  const updateAdmin = async () => {
+    const isAdmin = await readContracts?.TokenDistributor?.checkIsDistributor(address);
+    setAdmin(isAdmin);
   };
 
   /*
@@ -372,6 +371,7 @@ function App(props) {
     if (readContracts) {
       setTokenAddress(readContracts?.DummyToken?.address);
       updateOwner();
+      updateAdmin();
       //setOwnerAddress(readContracts?.TokenDistributor.owner());
       //console.log(ownerAddress);
     }
@@ -551,6 +551,18 @@ function App(props) {
               Contracts
             </Link>
           </Menu.Item>
+          {admin && (
+            <Menu.Item key="/adminpanel">
+              <Link
+                onClick={() => {
+                  setRoute("/adminpanel");
+                }}
+                to="/adminpanel"
+              >
+                Admin Panel
+              </Link>
+            </Menu.Item>
+          )}
         </Menu>
 
         <Switch>
@@ -571,231 +583,25 @@ function App(props) {
                 onChange={e => setMessage(e.target.value)}
               />
               <div style={{ marginBottom: "10px" }}>
-                {!isOwner && (
-                  <div>
-                    <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                      Sign In
-                    </Button>
-                    <Divider />
-                    <div>
-                      <Statistic
-                        title="Signed In"
-                        value={isSignedIn}
-                        valueStyle={{ color: !isSignedIn ? "red" : "green" }}
-                      />
-                    </div>
-                    {isSignedIn &&(<div>
-                      <Statistic title="Active Users" value={addresses.length} />
-                    </div>)}
-                  </div>
-                )}
-
-                {isOwner && (
-                  <div>
-                    {/*<Button onClick = {() =>setLink(message)}>
-                      Generate Link
-                    </Button>*/}
-                    <Button
-                      style={{ marginLeft: "10px" }}
-                      onClick={async () => {
-                        const res = await axios.get(appServer + message);
-                        console.log("res", res);
-                        //setMessage("")
-
-                        setAddresses(res.data);
-                      }}
-                    >
-                      Fetch Logged Accounts
-                    </Button>
-
-                    {/*<p>
-                    Link: 
-                  {link? <a>https://signupfortokens.surge.sh/{link}</a> : ""}
-                  </p>
-                 */}
-                  </div>
-                )}
-              </div>
-              {isOwner && (
                 <div>
-                  <List
-                    bordered
-                    dataSource={addresses}
-                    renderItem={(item, index) => (
-                      <List.Item>
-                        <div
-                          style={{
-                            width: "100%",
-                            flex: 1,
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                          <Button
-                            onClick={async () => {
-                              const updatedAddresses = [...addresses];
-                              updatedAddresses.splice(index, 1);
-                              setAddresses(updatedAddresses);
-                            }}
-                            size="medium"
-                          >
-                            X
-                          </Button>
-                        </div>
-                      </List.Item>
-                    )}
-                  />
-
-                  {addresses && addresses.length > 0 && (
+                  <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
+                    Sign In
+                  </Button>
+                  <Divider />
+                  <div>
+                    <Statistic
+                      title="Signed In"
+                      value={isSignedIn}
+                      valueStyle={{ color: !isSignedIn ? "red" : "green" }}
+                    />
+                  </div>
+                  {isSignedIn && (
                     <div>
-                      <Select
-                        defaultValue="Select token..."
-                        style={{ width: "100%", textAlign: "left", float: "left", marginTop: "10px" }}
-                        onChange={value => {
-                          setToken(value);
-                        }}
-                      >
-                        <Option value="ETH">ETH</Option>
-                        <Option value="GTC">GTC</Option>
-                      </Select>
-
-                      {/* TODO : disable input until ERC-20 token is selected */}
-                      <Input
-                        value={amount}
-                        addonBefore="Total Amount to Distribute"
-                        addonAfter={token == "" ? <span /> : token}
-                        style={{ marginTop: "10px" }}
-                        onChange={e => setAmount(e.target.value.toLowerCase())}
-                      />
-                      {token && token == "ETH" && (
-                        <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                          <Button
-                            onClick={async () => {
-                              /* look how you call setPurpose on your contract: */
-                              /* notice how you pass a call back for tx updates too */
-                              const result = tx(
-                                writeContracts.TokenDistributor.splitEth(addresses, {
-                                  value: ethers.utils.parseEther(amount),
-                                }),
-                                update => {
-                                  console.log("📡 Transaction Update:", update);
-                                  if (update && (update.status === "confirmed" || update.status === 1)) {
-                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                    console.log(
-                                      " ⛽️ " +
-                                        update.gasUsed +
-                                        "/" +
-                                        (update.gasLimit || update.gas) +
-                                        " @ " +
-                                        parseFloat(update.gasPrice) / 1000000000 +
-                                        " gwei",
-                                    );
-                                    notification.success({
-                                      message: "Payout successful",
-                                      description: "Each user received " + amount / addresses.length + " " + token,
-                                      placement: "topRight",
-                                    });
-                                  }
-                                },
-                              );
-                              console.log("awaiting metamask/web3 confirm result...", result);
-                              console.log(await result);
-                              setApproved(true);
-                            }}
-                          >
-                            Payout
-                          </Button>
-                        </div>
-                      )}
-
-                      {token && token != "ETH" && (
-                        <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                          <Button
-                            onClick={async () => {
-                              /* look how you call setPurpose on your contract: */
-                              /* notice how you pass a call back for tx updates too */
-                              const result = tx(
-                                writeContracts.DummyToken.approve(
-                                  readContracts?.TokenDistributor.address,
-                                  ethers.utils.parseUnits(amount, 18),
-                                ),
-                                update => {
-                                  console.log("📡 Transaction Update:", update);
-                                  if (update && (update.status === "confirmed" || update.status === 1)) {
-                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                    console.log(
-                                      " ⛽️ " +
-                                        update.gasUsed +
-                                        "/" +
-                                        (update.gasLimit || update.gas) +
-                                        " @ " +
-                                        parseFloat(update.gasPrice) / 1000000000 +
-                                        " gwei",
-                                    );
-                                    notification.success({
-                                      message: "Token successfully approved",
-                                      placement: "topRight",
-                                    });
-                                  }
-                                },
-                              );
-                              console.log("awaiting metamask/web3 confirm result...", result);
-                              console.log(await result);
-                              setApproved(true);
-                            }}
-                          >
-                            Approve Token
-                          </Button>
-
-                          <Button
-                            disabled={!approved}
-                            style={{ marginLeft: "10px" }}
-                            onClick={async () => {
-                              /* look how you call setPurpose on your contract: */
-                              /* notice how you pass a call back for tx updates too */
-                              const result = tx(
-                                writeContracts.TokenDistributor.splitTokenFromUser(
-                                  addresses,
-                                  ethers.utils.parseUnits(amount, 18),
-                                  tokenAddress,
-                                ),
-                                update => {
-                                  console.log("📡 Transaction Update:", update);
-                                  if (update && (update.status === "confirmed" || update.status === 1)) {
-                                    console.log(" 🍾 Transaction " + update.hash + " finished!");
-                                    console.log(
-                                      " ⛽️ " +
-                                        update.gasUsed +
-                                        "/" +
-                                        (update.gasLimit || update.gas) +
-                                        " @ " +
-                                        parseFloat(update.gasPrice) / 1000000000 +
-                                        " gwei",
-                                    );
-                                    notification.success({
-                                      message: "Payout successful",
-                                      description: "Each user received " + amount / addresses.length + " " + token,
-                                      placement: "topRight",
-                                    });
-                                  }
-                                },
-                              );
-                              console.log("awaiting metamask/web3 confirm result...", result);
-                              console.log(await result);
-                              setApproved(false);
-                            }}
-                          >
-                            Payout
-                          </Button>
-                        </div>
-                      )}
+                      <Statistic title="Active Users" value={addresses.length} />
                     </div>
                   )}
                 </div>
-              )}
+              </div>
             </div>
           </Route>
           <Route exact path="/contracts">
@@ -814,6 +620,21 @@ function App(props) {
               blockExplorer={blockExplorer}
             />
           </Route>
+          {admin && (
+            <Route exact path="/adminpanel">
+              <Admin
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+                mainnetProvider={mainnetProvider}
+                mainnetContracts={mainnetContracts}
+                tokenAddress={tokenAddress}
+                title={title}
+                appServer={appServer}
+                tx={tx}
+                admin={admin}
+              />
+            </Route>
+          )}
         </Switch>
       </BrowserRouter>
 
@@ -831,7 +652,7 @@ function App(props) {
           loadWeb3Modal={loadWeb3Modal}
           logoutOfWeb3Modal={logoutOfWeb3Modal}
           blockExplorer={blockExplorer}
-          isOwner={isOwner}
+          isOwner={admin}
         />
         {faucetHint}
       </div>
