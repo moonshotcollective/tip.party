@@ -517,13 +517,6 @@ function App(props) {
 
   const [res, setRes] = useState("");
 
-  // useEffect(async () => {
-  //   // console.log("**************** " + message)
-  //   const res = await axios.get(appServer + message);
-  //   // console.log("res", res);
-  //   if(res.data) setAddresses(res.data);
-  // }, [appServer, message])
-
   return (
     <div className="App">
       {/* ✏️ Edit the header and change the title to your project name */}
