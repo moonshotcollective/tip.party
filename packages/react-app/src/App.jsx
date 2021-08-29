@@ -573,7 +573,7 @@ function App(props) {
                 and give you a form to interact with it locally
             */}
 
-            <div style={{ margin: "20px auto", width: 500, padding: 60, border: "3px solid" }}>
+            <div style={{ margin: "20px auto", width: 500, padding: 60, paddingBottom: 40, border: "3px solid" }}>
               <h2>{title}</h2>
               <Input
                 style={{ marginTop: "10px", marginBottom: "10px" }}
@@ -596,7 +596,7 @@ function App(props) {
                     />
                   </div>
                   {isSignedIn && (
-                    <div>
+                    <div style={{ marginTop: 5 }}>
                       <Statistic title="Active Users" value={addresses.length} />
                     </div>
                   )}
