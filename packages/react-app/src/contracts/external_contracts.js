@@ -809,7 +809,7 @@ module.exports = {
         abi: DAIABI,
       },
       GTC: {
-        address: "0x6538f2e2e35fbbaddf602ad6637b27b98fcbd582",
+        address: "0x6538f2e2e35fbbaddf602ad6637b27b98fcbd582", // using DummyToken as GTC on Rinkeby
         abi: ERC20ABI,
       },
     },
