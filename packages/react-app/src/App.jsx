@@ -256,26 +256,33 @@ function App(props) {
   };
 
   const handleSignIn = async () => {
-    setIsSigning(true);
+
     if (typeof appServer == "undefined") {
-      setIsSigning(false);
       return notification.error({
         message: "Setup Error",
-        description: "Missing backend URL",
+        description: "Missing REACT_APP_SERVER environment variable in localhost environment",
+        placement: "bottomRight",
+      });
+    }
+
+    if (web3Modal.cachedProvider == "") {
+      return notification.error({
+        message: "Failed to Sign In!",
+        description: "Please Connect a wallet before Signing in",
         placement: "bottomRight",
       });
     }
 
     const messageLength = message && message.split(" ").length;
     if (typeof message == "undefined" || message === "" || messageLength > 1) {
-      setIsSigning(false);
-
       return notification.error({
-        message: "Failed to Sign!",
+        message: "Failed to Sign In!",
         description: "Message should be one word",
         placement: "bottomRight",
       });
     }
+
+    setIsSigning(true);
 
     let sig = await userSigner.signMessage(message);
 
