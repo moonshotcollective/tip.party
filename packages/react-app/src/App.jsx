@@ -52,7 +52,7 @@ const { ethers, BigNumber } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -180,7 +180,6 @@ function App(props) {
   const [addresses, setAddresses] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [tokenAddress, setTokenAddress] = useState("");
   const [owner, setOwner] = useState("");
   const [admin, setAdmin] = useState(false);
 
@@ -246,11 +245,6 @@ function App(props) {
   useOnBlock(mainnetProvider, () => {
     console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
   });
-
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(mainnetContracts, "DAI", "balanceOf", [
-    "0x34aA3F359A9D614239015126635CE7732c18fDF3",
-  ]);
 
   const title = admin ? "Pay your contributors" : "Sign in with your message";
 
@@ -363,17 +357,13 @@ function App(props) {
       console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
       console.log("🔐 writeContracts", writeContracts);
       console.log("owner: ", owner);
     }
 
     if (readContracts) {
-      setTokenAddress(readContracts?.DummyToken?.address);
       updateOwner();
       updateAdmin();
-      //setOwnerAddress(readContracts?.TokenDistributor.owner());
-      //console.log(ownerAddress);
     }
   }, [
     mainnetProvider,
@@ -619,11 +609,12 @@ function App(props) {
                 readContracts={readContracts}
                 writeContracts={writeContracts}
                 mainnetProvider={mainnetProvider}
-                mainnetContracts={mainnetContracts}
-                tokenAddress={tokenAddress}
+                localProvider={localProvider}
+                yourLocalBalance={yourLocalBalance}
                 title={title}
                 appServer={appServer}
                 tx={tx}
+                address={address}
                 admin={admin}
               />
             </Route>
