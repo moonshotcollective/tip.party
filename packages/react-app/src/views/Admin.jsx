@@ -20,14 +20,19 @@ export default function Admin({
   const [spender, setSpender] = useState("");
   const [availableTokens, setAvailableTokens] = useState([]);
   const [addresses, setAddresses] = useState([]);
-  const [payoutCompleted, setPayoutCompleted] = useState(false);
-  const [approved, setApproved] = useState(false);
   const [newAdmin, setNewAdmin] = useState("");
-  const [status, setStatus] = useState(0); // 1 - approving | 2 - Approved | 2 - Sending | 3 - sent
 
   useEffect(() => {
     setSpender(readContracts?.TokenDistributor?.address);
   }, [readContracts]);
+
+  const amountChangeHandler = e => {
+    // clean validation for only numbers: https://stackoverflow.com/a/43067857
+    const re = /^[0-9\b]+$/;
+    if (e.target.value === "" || re.test(e.target.value)) {
+      setAmount(e.target.value);
+    }
+  };
 
   const ethPayHandler = async () => {
     const result = tx(
@@ -168,7 +173,7 @@ export default function Admin({
                 </Select>
               }
               style={{ marginTop: "10px" }}
-              onChange={e => setAmount(e.target.value.toLowerCase())}
+              onChange={amountChangeHandler}
             />
 
             <PayButton
