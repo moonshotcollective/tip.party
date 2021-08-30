@@ -1,33 +1,99 @@
 import React, { useEffect, useState } from "react";
-import { Address } from "../components";
-import { Button, Col, Menu, Row, Input, List, notification, Select, Divider, Statistic } from "antd";
+import { Address, PayButton } from "../components";
+import { Button, Input, InputNumber, List, notification, Select } from "antd";
 import axios from "axios";
-const { ethers, BigNumber } = require("ethers");
+const { ethers } = require("ethers");
 
 export default function Admin({
   writeContracts,
   readContracts,
   admin,
+  address,
+  yourLocalBalance,
   mainnetProvider,
-  mainnetContracts,
   tx,
   appServer,
-  tokenAddress,
 }) {
   const [message, setMessage] = useState("");
   const [amount, setAmount] = useState(0);
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState("ETH");
+  const [spender, setSpender] = useState("");
+  const [availableTokens, setAvailableTokens] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [payoutCompleted, setPayoutCompleted] = useState(false);
-  const [approved, setApproved] = useState(true);
+  const [approved, setApproved] = useState(false);
   const [newAdmin, setNewAdmin] = useState("");
+  const [status, setStatus] = useState(0); // 1 - approving | 2 - Approved | 2 - Sending | 3 - sent
 
-  const getDecimal = async () => {
-    return await mainnetContracts.GTC.decimals();
+  useEffect(() => {
+    setSpender(readContracts?.TokenDistributor?.address);
+  }, [readContracts]);
+
+  const ethPayHandler = async () => {
+    const result = tx(
+      writeContracts.TokenDistributor.splitEth(addresses, {
+        value: ethers.utils.parseEther(amount),
+      }),
+      update => {
+        console.log("📡 Transaction Update:", update);
+        if (update && (update.status === "confirmed" || update.status === 1)) {
+          console.log(" 🍾 Transaction " + update.hash + " finished!");
+          console.log(
+            " ⛽️ " +
+              update.gasUsed +
+              "/" +
+              (update.gasLimit || update.gas) +
+              " @ " +
+              parseFloat(update.gasPrice) / 1000000000 +
+              " gwei",
+          );
+          notification.success({
+            message: "Payout successful",
+            description: "Each user received " + amount / addresses.length + " " + token,
+            placement: "topRight",
+          });
+        }
+      },
+    );
+    console.log("awaiting metamask/web3 confirm result...", result);
+    console.log(await result);
+    setAmount(0);
   };
 
-  const getTokenAddress = () => {
-    return mainnetContracts.GTC.address;
+  const tokenPayHandler = async opts => {
+    console.log(opts);
+
+    const result = tx(
+      writeContracts.TokenDistributor.splitTokenFromUser(
+        addresses,
+        ethers.utils.parseUnits(amount, opts.decimals),
+        opts.address,
+      ),
+      update => {
+        console.log("📡 Transaction Update:", update);
+        if (update && (update.status === "confirmed" || update.status === 1)) {
+          console.log(" 🍾 Transaction " + update.hash + " finished!");
+          console.log(
+            " ⛽️ " +
+              update.gasUsed +
+              "/" +
+              (update.gasLimit || update.gas) +
+              " @ " +
+              parseFloat(update.gasPrice) / 1000000000 +
+              " gwei",
+          );
+          notification.success({
+            message: "Payout successful",
+            description: "Each user received " + amount / addresses.length + " " + token,
+            placement: "topRight",
+          });
+        }
+      },
+    );
+    console.log("awaiting metamask/web3 confirm result...", result);
+    console.log(await result);
+
+    setAmount(0);
   };
 
   return (
@@ -87,152 +153,39 @@ export default function Admin({
 
         {addresses && addresses.length > 0 && (
           <div>
-            <Select
-              defaultValue="Select token..."
-              style={{ width: "100%", textAlign: "left", float: "left", marginTop: "10px" }}
-              onChange={value => {
-                setToken(value);
-              }}
-            >
-              <Option value="ETH">ETH</Option>
-              <Option value="GTC">GTC</Option>
-            </Select>
-
             {/* TODO : disable input until ERC-20 token is selected */}
             <Input
               value={amount}
               addonBefore="Total Amount to Distribute"
-              addonAfter={token == "" ? <span /> : token}
+              addonAfter={
+                <Select defaultValue="ETH" onChange={value => setToken(value)}>
+                  <Select.Option value="ETH">ETH</Select.Option>
+                  {availableTokens.map(name => (
+                    <Select.Option key={name} value={name}>
+                      {name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              }
               style={{ marginTop: "10px" }}
               onChange={e => setAmount(e.target.value.toLowerCase())}
             />
-            {token && token == "ETH" && (
-              <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                <Button
-                  onClick={async () => {
-                    /* look how you call setPurpose on your contract: */
-                    /* notice how you pass a call back for tx updates too */
-                    const result = tx(
-                      writeContracts.TokenDistributor.splitEth(addresses, {
-                        value: ethers.utils.parseEther(amount),
-                      }),
-                      update => {
-                        console.log("📡 Transaction Update:", update);
-                        if (update && (update.status === "confirmed" || update.status === 1)) {
-                          console.log(" 🍾 Transaction " + update.hash + " finished!");
-                          console.log(
-                            " ⛽️ " +
-                              update.gasUsed +
-                              "/" +
-                              (update.gasLimit || update.gas) +
-                              " @ " +
-                              parseFloat(update.gasPrice) / 1000000000 +
-                              " gwei",
-                          );
-                          notification.success({
-                            message: "Payout successful",
-                            description: "Each user received " + amount / addresses.length + " " + token,
-                            placement: "topRight",
-                          });
-                        }
-                      },
-                    );
-                    console.log("awaiting metamask/web3 confirm result...", result);
-                    console.log(await result);
-                    setApproved(true);
-                  }}
-                >
-                  Payout
-                </Button>
-              </div>
-            )}
 
-            {token && token != "ETH" && (
-              <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                <Button
-                  onClick={async () => {
-                    /* look how you call setPurpose on your contract: */
-                    /* notice how you pass a call back for tx updates too */
-                    const decimal = await getDecimal();
-                    const result = tx(
-                      writeContracts.GTC.approve(
-                        readContracts?.TokenDistributor.address,
-                        ethers.utils.parseUnits(amount, decimal),
-                      ),
-                      update => {
-                        console.log("📡 Transaction Update:", update);
-                        if (update && (update.status === "confirmed" || update.status === 1)) {
-                          console.log(" 🍾 Transaction " + update.hash + " finished!");
-                          console.log(
-                            " ⛽️ " +
-                              update.gasUsed +
-                              "/" +
-                              (update.gasLimit || update.gas) +
-                              " @ " +
-                              parseFloat(update.gasPrice) / 1000000000 +
-                              " gwei",
-                          );
-                          notification.success({
-                            message: "Token successfully approved",
-                            placement: "topRight",
-                          });
-                        }
-                      },
-                    );
-                    console.log("awaiting metamask/web3 confirm result...", result);
-                    console.log(await result);
-                    setApproved(true);
-                  }}
-                >
-                  Approve Token
-                </Button>
-
-                <Button
-                  disabled={!approved}
-                  style={{ marginLeft: "10px" }}
-                  onClick={async () => {
-                    /* look how you call setPurpose on your contract: */
-                    /* notice how you pass a call back for tx updates too */
-                    const decimal = await getDecimal();
-
-                    console.log({ addresses });
-
-                    const result = tx(
-                      writeContracts.TokenDistributor.splitTokenFromUser(
-                        addresses,
-                        ethers.utils.parseUnits(amount, decimal),
-                        getTokenAddress(),
-                      ),
-                      update => {
-                        console.log("📡 Transaction Update:", update);
-                        if (update && (update.status === "confirmed" || update.status === 1)) {
-                          console.log(" 🍾 Transaction " + update.hash + " finished!");
-                          console.log(
-                            " ⛽️ " +
-                              update.gasUsed +
-                              "/" +
-                              (update.gasLimit || update.gas) +
-                              " @ " +
-                              parseFloat(update.gasPrice) / 1000000000 +
-                              " gwei",
-                          );
-                          notification.success({
-                            message: "Payout successful",
-                            description: "Each user received " + amount / addresses.length + " " + token,
-                            placement: "topRight",
-                          });
-                        }
-                      },
-                    );
-                    console.log("awaiting metamask/web3 confirm result...", result);
-                    console.log(await result);
-                    setApproved(false);
-                  }}
-                >
-                  Payout
-                </Button>
-              </div>
-            )}
+            <PayButton
+              style={{ marginTop: 20 }}
+              token={token}
+              appName="D-Tips"
+              tokenListHandler={tokens => setAvailableTokens(tokens)}
+              callerAddress={address}
+              maxApproval={amount}
+              amount={amount}
+              spender={spender}
+              yourLocalBalance={yourLocalBalance}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              ethPayHandler={ethPayHandler}
+              tokenPayHandler={tokenPayHandler}
+            />
           </div>
         )}
       </div>
