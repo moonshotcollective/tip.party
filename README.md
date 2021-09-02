@@ -1,11 +1,11 @@
-# D-Tips
+# Tip.party
 
 Prerequisites: [Node](https://nodejs.org/en/download/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
 
-> clone/fork d-tips:
+> clone/fork Tip.party:
 
 ```bash
-git clone https://github.com/moonshotcollective/d-tips.git app
+git clone https://github.com/moonshotcollective/tip.party.git app
 ```
 
 > install and start your 👷‍ Hardhat chain:
