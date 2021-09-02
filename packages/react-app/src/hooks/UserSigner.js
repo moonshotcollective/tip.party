@@ -18,7 +18,7 @@ import useBurnerSigner from "./BurnerSigner";
     const tx = Transactor(userSigner, gasPrice)
 */
 
-const useUserSigner = (injectedProvider, localProvider) => {
+const useUserSigner = (injectedProvider, localProvider, useBurner) => {
   const [signer, setSigner] = useState();
   const burnerSigner = useBurnerSigner(localProvider);
 
@@ -43,9 +43,11 @@ const useUserSigner = (injectedProvider, localProvider) => {
           window.localStorage.setItem("metaPrivateKey", rawPK);
         }
       }
-
-      console.log("🔥 Using burner signer", burnerSigner);
+      if(useBurner) {
+        console.log("🔥 Using burner signer", burnerSigner);
       setSigner(burnerSigner);
+      }
+      
     }
   }, [injectedProvider, localProvider, burnerSigner]);
 
