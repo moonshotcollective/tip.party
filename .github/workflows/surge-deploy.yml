@@ -12,8 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.1.0
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
       - name: Build React App
-        run: yarn && yarn build
+        run: cd packages/react-app/ && yarn && yarn run build
         env:
           REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/signUpForTokens/'
           
