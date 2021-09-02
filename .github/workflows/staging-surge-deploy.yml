@@ -1,0 +1,30 @@
+name: Scaffold-eth Staging Surge Deployer workflow
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  deployer-job:
+    name: Deployer job
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Build React App
+        run: cd packages/react-app/ && yarn && CI=false yarn run build
+        env:
+          REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/signUpForTokens/'
+          REACT_APP_NETWORK: 'rinkeby'
+
+      - name: Deploy to surge
+        uses: dswistowski/surge-sh-action@v1
+        with:
+          domain: staging.${{ secrets.domain }}
+          project: './packages/react-app/build'
+          token: ${{ secrets.surge_token }}
