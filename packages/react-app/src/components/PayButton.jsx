@@ -142,7 +142,7 @@ export default function PayButton({
 
   return (
     <Button
-      disabled={disabledStatus.indexOf(status) >= 0 || !(amount > 0)}
+      disabled={disabledStatus.indexOf(status) >= 0 || !(parseFloat(amount) > 0)}
       loading={loadingStatus.indexOf(status) >= 0}
       style={style}
       onClick={handlePay}
