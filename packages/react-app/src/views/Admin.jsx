@@ -27,8 +27,8 @@ export default function Admin({
   }, [readContracts]);
 
   const amountChangeHandler = e => {
-    // clean validation for only numbers: https://stackoverflow.com/a/43067857
-    const re = /^[0-9\b]+$/;
+    // clean validation for only numbers: https://stackoverflow.com/a/12643073
+    const re = /([0-9]*[.])?[0-9]+/;
     if (e.target.value === "" || re.test(e.target.value)) {
       setAmount(e.target.value);
     }
@@ -196,15 +196,15 @@ export default function Admin({
       </div>
 
       <div style={{ marginTop: 50 }}>
-        <h2>Add Admin</h2>       
+        <h2>Add Admin</h2>
         <div>
           <div style={{ padding: 10 }}>
             <AddressInput
-             autoFocus
-             ensProvider={mainnetProvider}
-             placeholder="Address"
-             address={newAdmin}
-             onChange={setNewAdmin}
+              autoFocus
+              ensProvider={mainnetProvider}
+              placeholder="Address"
+              address={newAdmin}
+              onChange={setNewAdmin}
             />
           </div>
         </div>
