@@ -27,11 +27,13 @@ export default function Admin({
   }, [readContracts]);
 
   const amountChangeHandler = e => {
-    // clean validation for only numbers: https://stackoverflow.com/a/43067857
-    const re = /^[0-9\b]+$/;
-    if (e.target.value === "" || re.test(e.target.value)) {
+     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
+     const re = /^\d*\.?\d*$/;
+     
+     if ((e.target.value === "" || re.test(e.target.value)) && e.target.value != ".") {
       setAmount(e.target.value);
     }
+  
   };
 
   const ethPayHandler = async () => {
