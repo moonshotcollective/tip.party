@@ -3,8 +3,6 @@ name: Scaffold-eth Staging Surge Deployer workflow
 on:
   push:
     branches: [develop]
-  pull_request:
-    branches: [develop]
 
 jobs:
   deployer-job:
