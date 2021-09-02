@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Address, PayButton } from "../components";
+import { Address, PayButton, AddressInput } from "../components";
 import { Button, Input, InputNumber, List, notification, Select } from "antd";
 import axios from "axios";
 const { ethers } = require("ethers");
@@ -196,14 +196,18 @@ export default function Admin({
       </div>
 
       <div style={{ marginTop: 50 }}>
-        <h2>Add Admin</h2>
-        <Input
-          style={{ marginTop: "10px", marginBottom: "10px" }}
-          addonBefore="Address"
-          value={newAdmin}
-          placeholder="Address"
-          onChange={e => setNewAdmin(e.target.value)}
-        />
+        <h2>Add Admin</h2>       
+        <div>
+          <div style={{ padding: 10 }}>
+            <AddressInput
+             autoFocus
+             ensProvider={mainnetProvider}
+             placeholder="Address"
+             address={newAdmin}
+             onChange={setNewAdmin}
+            />
+          </div>
+        </div>
         <div style={{ marginBottom: "10px" }}>
           {admin && (
             <div>
