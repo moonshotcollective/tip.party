@@ -5,8 +5,8 @@ import React from "react";
 
 export default function Header() {
   return (
-    <a href="https://github.com/austintgriffith/scaffold-eth" target="_blank" rel="noopener noreferrer">
-      <PageHeader title="D-Tips | Decentralized Tipping" subTitle="" style={{ cursor: "pointer" }} />
+    <a href="https://tip.party" target="_blank" rel="noopener noreferrer">
+      <PageHeader title="Tip.Party | Decentralized Tipping Platform" subTitle="" style={{ cursor: "pointer" }} />
     </a>
   );
 }
