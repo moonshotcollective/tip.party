@@ -94,9 +94,12 @@ export default function Account({
       {address ? (
         <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
       ) : (
-        "Connecting..."
+        "Please connect your wallet"
       )}
-      <Balance address={address} provider={localProvider} price={price} />
+
+      {address ? (
+        <Balance address={address} provider={localProvider} price={price} />
+      ) : ("")}
       {/* <Wallet
         address={address}
         provider={localProvider}
