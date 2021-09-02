@@ -27,13 +27,12 @@ export default function Admin({
   }, [readContracts]);
 
   const amountChangeHandler = e => {
-     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
-     const re = /^\d*\.?\d*$/;
-     
-     if ((e.target.value === "" || re.test(e.target.value)) && e.target.value != ".") {
+    // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
+    const re = /^\d*\.?\d*$/;
+
+    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value != ".") {
       setAmount(e.target.value);
     }
-  
   };
 
   const ethPayHandler = async () => {
@@ -181,7 +180,7 @@ export default function Admin({
             <PayButton
               style={{ marginTop: 20 }}
               token={token}
-              appName="D-Tips"
+              appName="Tip.party"
               tokenListHandler={tokens => setAvailableTokens(tokens)}
               callerAddress={address}
               maxApproval={amount}
@@ -198,15 +197,15 @@ export default function Admin({
       </div>
 
       <div style={{ marginTop: 50 }}>
-        <h2>Add Admin</h2>       
+        <h2>Add Admin</h2>
         <div>
           <div style={{ padding: 10 }}>
             <AddressInput
-             autoFocus
-             ensProvider={mainnetProvider}
-             placeholder="Address"
-             address={newAdmin}
-             onChange={setNewAdmin}
+              autoFocus
+              ensProvider={mainnetProvider}
+              placeholder="Address"
+              address={newAdmin}
+              onChange={setNewAdmin}
             />
           </div>
         </div>
