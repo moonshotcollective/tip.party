@@ -23,12 +23,11 @@ import {
   useOnBlock,
   useUserSigner,
 } from "./hooks";
-import { Admin } from "./views";
+import { Admin, Room } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 import { HexString } from "walletlink/dist/types";
-const axios = require("axios");
 const { ethers, BigNumber } = require("ethers");
 
 /*
@@ -174,7 +173,6 @@ function App(props) {
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
-
   const [message, setMessage] = useState();
   const [addresses, setAddresses] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
@@ -199,7 +197,7 @@ function App(props) {
   const gasPrice = useGasPrice(targetNetwork, "fast");
 
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
-  // we want to remove the burner wallet. 
+  // we want to remove the burner wallet.
   const userSigner = useUserSigner(injectedProvider, localProvider, false);
 
   useEffect(() => {
@@ -254,80 +252,6 @@ function App(props) {
   const updateOwner = async () => {
     const o = await readContracts?.TokenDistributor?.owner();
     setOwner(o);
-  };
-
-  const handleSignIn = async () => {
-    if (typeof appServer == "undefined") {
-      return notification.error({
-        message: "Setup Error",
-        description: "Missing REACT_APP_SERVER environment variable in localhost environment",
-        placement: "bottomRight",
-      });
-    }
-
-    if (web3Modal.cachedProvider == "") {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Please Connect a wallet before Signing in",
-        placement: "bottomRight",
-      });
-    }
-
-    const messageLength = message && message.split(" ").length;
-    if (typeof message == "undefined" || message === "" || messageLength > 1) {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Message should be one word",
-        placement: "bottomRight",
-      });
-    }
-
-    setIsSigning(true);
-
-    let sig = await userSigner.signMessage(message);
-
-    let res;
-    let addressResponse;
-
-    try {
-      res = await axios.post(appServer, {
-        address: address,
-        message: message,
-        signature: sig,
-      });
-
-      addressResponse = await axios.get(appServer + message);
-    } catch (error) {
-      setIsSigning(false);
-
-      return notification.error({
-        message: "Failed to Sign!",
-        description: `Connection issue ${error}`,
-        placement: "bottomRight",
-      });
-    }
-
-    if (res.data) {
-      // set up some user messages here besides the alert...
-      // how many other users are signed-in?
-      setIsSignedIn(true);
-      notification.success({
-        message: "Signed in successfully",
-        placement: "bottomRight",
-      });
-    } else {
-      setIsSignedIn(true);
-      // set up user error notice besides the alert...
-      notification.warn({
-        message: "Failed to sign in!",
-        description: "You have already signed in",
-        placement: "bottomRight",
-      });
-    }
-
-    setAddresses(addressResponse.data || []);
-    setIsSigning(false);
-    setRes("");
   };
 
   const updateAdmin = async () => {
@@ -562,37 +486,22 @@ function App(props) {
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
-
-            <div style={{ margin: "20px auto", width: 500, padding: 60, paddingBottom: 40, border: "3px solid" }}>
-              <h2>{title}</h2>
-              <Input
-                style={{ marginTop: "10px", marginBottom: "10px" }}
-                addonBefore="Message"
-                value={message}
-                placeholder="Message"
-                onChange={e => setMessage(e.target.value)}
-              />
-              <div style={{ marginBottom: "10px" }}>
-                <div>
-                  <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                    Sign In
-                  </Button>
-                  <Divider />
-                  <div>
-                    <Statistic
-                      title="Signed In"
-                      value={isSignedIn}
-                      valueStyle={{ color: !isSignedIn ? "red" : "green" }}
-                    />
-                  </div>
-                  {isSignedIn && (
-                    <div style={{ marginTop: 5 }}>
-                      <Statistic title="Active Users" value={addresses.length} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <div>App Home</div>
+          </Route>
+          <Route path="/room/:id">
+            <Room
+              address={address}
+              appServer={appServer}
+              web3Modal={web3Modal}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              localProvider={localProvider}
+              yourLocalBalance={yourLocalBalance}
+              admin={admin}
+              tx={tx}
+            />
           </Route>
           <Route exact path="/contracts">
             <Contract
