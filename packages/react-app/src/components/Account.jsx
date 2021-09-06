@@ -85,7 +85,7 @@ export default function Account({
   const { currentTheme } = useThemeSwitcher();
 
   function isValidAddress (address) {
-    return address && address != "0x0000000000000000000000000000000000000000";
+    return address && address !== "0x0000000000000000000000000000000000000000";
   }  
 
   const display = minimized ? (
