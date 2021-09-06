@@ -173,6 +173,10 @@ function App(props) {
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
+  const [message, setMessage] = useState();
+  const [addresses, setAddresses] = useState([]);
+  const [isSigning, setIsSigning] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const [owner, setOwner] = useState("");
   const [admin, setAdmin] = useState(false);
 

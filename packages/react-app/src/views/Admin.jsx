@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Address, PayButton, AddressInput } from "../components";
-import { Button, Input, InputNumber, List, notification, Select } from "antd";
+import { Button, Input, InputNumber, List, notification, Select, Switch } from "antd";
 import axios from "axios";
-const { ethers } = require("ethers");
+import { filterLimit } from "async";
+const { ethers, utils } = require("ethers");
 
 export default function Admin({
   writeContracts,
@@ -21,6 +22,8 @@ export default function Admin({
   const [availableTokens, setAvailableTokens] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [newAdmin, setNewAdmin] = useState("");
+  const [ensAddressFilter, setEnsAddressFilter] = useState(true);
+  const [isFetching, setFetchingStatus] = useState(false);
 
   useEffect(() => {
     setSpender(readContracts?.TokenDistributor?.address);
@@ -102,6 +105,46 @@ export default function Admin({
     setAmount(0);
   };
 
+  const lookupAddress = async (provider, address) => {
+    if (address && utils.isAddress(address)) {
+      // console.log(`looking up ${address}`)
+      try {
+        // Accuracy of reverse resolution is not enforced.
+        // We then manually ensure that the reported ens name resolves to address
+        const reportedName = await provider.lookupAddress(address);
+  
+        const resolvedAddress = await provider.resolveName(reportedName);
+  
+        if (address && utils.getAddress(address) === utils.getAddress(resolvedAddress)) {
+          return reportedName;
+        }
+        return utils.getAddress(address);
+      } catch (e) {
+        return utils.getAddress(address);
+      }
+    }
+    return 0;
+  };
+
+  const filterAddresses = async () => {
+    setFetchingStatus(true);
+    const res = await axios.get(appServer + message);
+    const inputAddresses = res.data;
+    const output = await filterLimit(inputAddresses, 10, async (address)=> {
+      const ens = await lookupAddress(mainnetProvider, address).then(name => name);
+      if (ensAddressFilter) {
+        return ens && ens.indexOf("0x") < 0;
+      }
+      return true;
+    })
+    setAddresses(output);
+    setFetchingStatus(false);
+  };
+
+  const toggleEnsFilter = isChecked => {
+    setEnsAddressFilter(isChecked)
+  }
+
   return (
     <div style={{ margin: "20px auto", width: 500, padding: 60, border: "3px solid" }}>
       <div style={{ marginBottom: 10 }}>
@@ -114,15 +157,21 @@ export default function Admin({
         />
         <div>
           <Button
+            disabled={isFetching}
+            loading={isFetching}
             style={{ marginLeft: "10px" }}
-            onClick={async () => {
-              const res = await axios.get(appServer + message);
-              console.log("res", res);
-              setAddresses(res.data);
-            }}
+            onClick={filterAddresses}
           >
-            Fetch Logged Accounts
+          Fetch Logged Accounts
           </Button>
+          <Switch
+            checkedChildren="ENS Only"
+            unCheckedChildren="All Addresses"
+            defaultChecked
+            style={{ marginLeft: "10px" }}
+            checked={ensAddressFilter}
+            onChange={toggleEnsFilter}
+          />
         </div>
       </div>
       <div>
