@@ -51,7 +51,7 @@ const { ethers, BigNumber } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = process.env.REACT_APP_NETWORK ? NETWORKS[process.env.REACT_APP_NETWORK] : NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = process.env.REACT_APP_NETWORK ? NETWORKS[process.env.REACT_APP_NETWORK] : NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -173,7 +173,7 @@ function App(props) {
       : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
-  const [address, setAddress] = useState();
+  const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
 
   const [message, setMessage] = useState();
   const [addresses, setAddresses] = useState([]);
