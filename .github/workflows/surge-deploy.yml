@@ -17,7 +17,7 @@ jobs:
       - name: Build React App
         run: |
           cd packages/react-app/ && yarn && CI=false yarn run build
-          cp packages/react-app/build/index.html packages/react-app/build/200.html
+          cp build/index.html build/200.html
         env:
           REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/signUpForTokens/'
           REACT_APP_NETWORK: 'mainnet'
