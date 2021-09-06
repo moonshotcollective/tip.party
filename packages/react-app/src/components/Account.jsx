@@ -84,7 +84,7 @@ export default function Account({
 
   const { currentTheme } = useThemeSwitcher();
 
-  function isNullAddress (address) {
+  function isValidAddress (address) {
     return address && address != "0x0000000000000000000000000000000000000000";
   }  
 
@@ -95,13 +95,13 @@ export default function Account({
       <Space>
       {isOwner && <Badge count={"admin"} />}
       {!isOwner && <Badge count={"user"} style={{ backgroundColor: '#52c41a' }} />}
-      {isNullAddress(address) ? (
+      {isValidAddress(address) ? (
         <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
       ) : (
         "Please connect your wallet"
       )}
 
-      {isNullAddress(address) ? (
+      {isValidAddress(address) ? (
         <Balance address={address} provider={localProvider} price={price} />
       ) : ("")}
       {/* <Wallet
