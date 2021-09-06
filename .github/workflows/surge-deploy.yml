@@ -15,9 +15,11 @@ jobs:
         with:
           node-version: 16.x
       - name: Build React App
-        run: cd packages/react-app/ && yarn && CI=false yarn run build
+        run: |
+          cd packages/react-app/ && yarn && CI=false yarn run build
+          cp build/index.html build/200.html
         env:
-          REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/signUpForTokens/'
+          REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/'
           REACT_APP_NETWORK: 'mainnet'
 
       - name: Deploy to surge
