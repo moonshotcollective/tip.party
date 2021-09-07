@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Statistic, Input, Select, Collapse } from "antd";
+import { Button, List, notification, Divider, Statistic, Input, Select, Collapse, Switch } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { Address, PayButton } from "../components";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
-import { ethers } from "ethers";
+import { ethers, utils } from "ethers";
+import { filterLimit } from "async";
 
 export default function Rooms({
   appServer,
@@ -30,6 +31,7 @@ export default function Rooms({
   const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
+  const [isFiltering, setIsFiltering] = useState(false);
 
   useEffect(() => {
     setSpender(readContracts?.TokenDistributor?.address);
@@ -205,6 +207,37 @@ export default function Rooms({
     setBlacklist([...blacklist, addressChanged]);
   };
 
+  const lookupAddress = async (provider, address) => {
+    if (address && utils.isAddress(address)) {
+      // console.log(`looking up ${address}`)
+      try {
+        // Accuracy of reverse resolution is not enforced.
+        // We then manually ensure that the reported ens name resolves to address
+        const reportedName = await provider.lookupAddress(address);
+  
+        const resolvedAddress = await provider.resolveName(reportedName);
+  
+        if (address && utils.getAddress(address) === utils.getAddress(resolvedAddress)) {
+          return reportedName;
+        }
+        return utils.getAddress(address);
+      } catch (e) {
+        return utils.getAddress(address);
+      }
+    }
+    return 0;
+  };
+
+  const filterAddresses = async () => {
+    setIsFiltering(true);
+    const output = await filterLimit(addresses, 10, async (address)=> {
+      const ens = await lookupAddress(mainnetProvider, address).then(name => name);
+      return ens && ens.indexOf("0x") < 0;
+    })
+    setAddresses(output);
+    setIsFiltering(false);
+  };
+
   return (
     <div style={{ margin: "20px auto", width: 500, padding: 60, paddingBottom: 40, border: "3px solid" }}>
       <h2>Sign In</h2>
@@ -278,6 +311,14 @@ export default function Rooms({
           <div style={{ marginTop: "10px" }}>
             {admin && addresses && addresses.length > 0 && (
               <div>
+                <Button
+                  disabled={isFiltering}
+                  loading={isFiltering}
+                  style={{ marginLeft: "10px" }}
+                  onClick={filterAddresses}
+                >
+                  Filter Out Non ENS Names
+                </Button>
                 {/* TODO : disable input until ERC-20 token is selected */}
                 <Input
                   value={amount}
