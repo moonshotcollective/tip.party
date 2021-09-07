@@ -1,7 +1,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, Input, List, notification, Select, Divider, Statistic } from "antd";
+import { Alert, Button, Col, Menu, Select, Layout, PageHeader, Title, Space } from "antd";
 const { SubMenu } = Menu;
 const { Option } = Select;
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch, Address } from "./components";
+import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch, Address, Navbar } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
 import {
@@ -29,6 +29,7 @@ import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 import { HexString } from "walletlink/dist/types";
 const { ethers, BigNumber } = require("ethers");
+const MenuItemGroup = Menu.ItemGroup;
 
 /*
     Welcome to 🏗 scaffold-eth !
@@ -368,7 +369,7 @@ function App(props) {
     }
   } else {
     networkDisplay = (
-      <div style={{ zIndex: -1, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
+      <div style={{ color: targetNetwork.color }}>
         {targetNetwork.name}
       </div>
     );
@@ -419,7 +420,7 @@ function App(props) {
     ethers.utils.formatEther(yourLocalBalance) <= 0
   ) {
     faucetHint = (
-      <div style={{ padding: 16 }}>
+      <div >
         <Button
           type="primary"
           onClick={() => {
@@ -440,9 +441,38 @@ function App(props) {
 
   return (
     <div className="App">
-      {/* ✏️ Edit the header and change the title to your project name */}
-      <Header />
-      {networkDisplay}
+      <Layout style={{ fixed: "top"}}>
+          <PageHeader
+            title={
+            <a href="https://tip.party"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ float: "left"}}
+            >
+              Tip.Party
+            </a>}
+            subTitle="Decentralized Tipping Platform" 
+            style={{ cursor: "pointer", margin: 10, padding: 0 }}
+            extra={[
+              <Space>
+                <span>{faucetHint}</span>
+                <span>{networkDisplay}</span>
+                <Account
+                  address={address}
+                  localProvider={localProvider}
+                  userSigner={userSigner}
+                  mainnetProvider={mainnetProvider}
+                  price={price}
+                  web3Modal={web3Modal}
+                  loadWeb3Modal={loadWeb3Modal}
+                  logoutOfWeb3Modal={logoutOfWeb3Modal}
+                  blockExplorer={blockExplorer}
+                  isOwner={admin}
+                />
+              </Space>
+            ]}
+          />
+      </Layout>
       <BrowserRouter>
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
@@ -537,25 +567,9 @@ function App(props) {
           )}
         </Switch>
       </BrowserRouter>
-
       <ThemeSwitch />
 
-      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
-        <Account
-          address={address}
-          localProvider={localProvider}
-          userSigner={userSigner}
-          mainnetProvider={mainnetProvider}
-          price={price}
-          web3Modal={web3Modal}
-          loadWeb3Modal={loadWeb3Modal}
-          logoutOfWeb3Modal={logoutOfWeb3Modal}
-          blockExplorer={blockExplorer}
-          isOwner={admin}
-        />
-        {faucetHint}
-      </div>
+
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
