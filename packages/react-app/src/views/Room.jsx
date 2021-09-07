@@ -214,9 +214,8 @@ export default function Rooms({
         // Accuracy of reverse resolution is not enforced.
         // We then manually ensure that the reported ens name resolves to address
         const reportedName = await provider.lookupAddress(address);
-  
         const resolvedAddress = await provider.resolveName(reportedName);
-  
+
         if (address && utils.getAddress(address) === utils.getAddress(resolvedAddress)) {
           return reportedName;
         }
@@ -230,10 +229,10 @@ export default function Rooms({
 
   const filterAddresses = async () => {
     setIsFiltering(true);
-    const output = await filterLimit(addresses, 10, async (address)=> {
+    const output = await filterLimit(addresses, 10, async address => {
       const ens = await lookupAddress(mainnetProvider, address).then(name => name);
       return ens && ens.indexOf("0x") < 0;
-    })
+    });
     setAddresses(output);
     setIsFiltering(false);
   };

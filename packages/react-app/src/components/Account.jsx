@@ -3,8 +3,6 @@ import React from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import Address from "./Address";
 import Balance from "./Balance";
-const { SubMenu } = Menu;
-const MenuItemGroup = Menu.ItemGroup;
 import { DownOutlined, UserOutlined, CaretDownOutlined } from '@ant-design/icons';
 // import Wallet from "./Wallet";
 
@@ -62,19 +60,18 @@ export default function Account({
 
   const menu = (
     <Menu>
-      <Menu.Item key="1" icon={'Balance: '}>
+      <Menu.ItemGroup key="1" icon={'Balance: '}>
         {isValidAddress(address) ? <Balance address={address} provider={localProvider} price={price} /> :''}
-      </Menu.Item>
-      <Menu.Item key="2">
+      </Menu.ItemGroup>
+      <Menu.ItemGroup key="2" style={{ textAlign: "center" }}>
         <a
           key="logoutbutton"
           size="medium"
           onClick={logoutOfWeb3Modal}
-          style={{ textAlign: "center" }}
         >
           Logout
         </a>
-      </Menu.Item>
+      </Menu.ItemGroup>
     </Menu>
   );
 
