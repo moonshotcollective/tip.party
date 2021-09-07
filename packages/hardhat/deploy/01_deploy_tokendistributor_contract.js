@@ -3,6 +3,7 @@ require("dotenv").config();
 const { ethers } = require("hardhat");
 
 module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
+  // const frontendAddress = "YOUR_FRONTEND_ADDRESS";
   const frontendAddress = process.env.FRONTENDADDRESS;
 
   const { deploy } = deployments;
