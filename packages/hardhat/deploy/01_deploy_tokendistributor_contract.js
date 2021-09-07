@@ -1,10 +1,9 @@
 // deploy/00_deploy_tokendistributor_contract.js
-
+require("dotenv").config();
 const { ethers } = require("hardhat");
 
 module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
-  // const frontendAddress = "YOUR_FRONTEND_ADDRESS";
-  const frontendAddress = "0x3f15B8c6F9939879Cb030D6dd935348E57109637";
+  const frontendAddress = process.env.FRONTENDADDRESS;
 
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
