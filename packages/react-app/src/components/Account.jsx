@@ -50,7 +50,7 @@ export default function Account({
   loadWeb3Modal,
   logoutOfWeb3Modal,
   blockExplorer,
-  isOwner
+  isOwner,
 }) {
   const modalButtons = [];
   if (web3Modal) {
@@ -86,15 +86,14 @@ export default function Account({
 
   function isValidAddress (address) {
     return address && address !== "0x0000000000000000000000000000000000000000";
-  }  
+  }
 
   const display = minimized ? (
     ""
   ) : (
-    
       <Space>
       {isOwner && <Badge count={"admin"} />}
-      {!isOwner && <Badge count={"user"} style={{ backgroundColor: '#52c41a' }} />}
+      {!isOwner && <Badge count={"user"} style={{ backgroundColor: "#52c41a" }} />}
       {isValidAddress(address) ? (
         <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
       ) : (
@@ -102,16 +101,8 @@ export default function Account({
       )}
 
       {isValidAddress(address) ? (
-        <Balance address={address} provider={localProvider} price={price} />
-      ) : ("")}
-      {/* <Wallet
-        address={address}
-        provider={localProvider}
-        signer={userSigner}
-        ensProvider={mainnetProvider}
-        price={price}
-        color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
-      /> */}
+        <Balance address={address} provider={localProvider} price={price} />) : ("")
+      }
     </Space>
   );
 

@@ -43,11 +43,10 @@ const useUserSigner = (injectedProvider, localProvider, useBurner) => {
           window.localStorage.setItem("metaPrivateKey", rawPK);
         }
       }
-      if(useBurner) {
+      if (useBurner) {
         console.log("🔥 Using burner signer", burnerSigner);
-      setSigner(burnerSigner);
+        setSigner(burnerSigner);
       }
-      
     }
   }, [injectedProvider, localProvider, burnerSigner]);
 
