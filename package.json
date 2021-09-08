@@ -64,5 +64,7 @@
       "**/hardhat/**"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "react-confetti": "^6.0.1"
+  }
 }
