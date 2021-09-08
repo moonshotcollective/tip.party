@@ -256,7 +256,6 @@ function App(props) {
   };
 
   const handleSignIn = async () => {
-
     if (typeof appServer == "undefined") {
       return notification.error({
         message: "Setup Error",
