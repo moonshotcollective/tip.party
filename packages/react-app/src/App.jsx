@@ -1,58 +1,25 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Col, Menu, Row, Input, List, notification, Select, Divider, Statistic } from "antd";
-const { SubMenu } = Menu;
-const { Option } = Select;
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
+import { Alert, Button, Menu, Layout, PageHeader, Space } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, Faucet, GasGauge, Header, Ramp, ThemeSwitch, Address } from "./components";
+import { Account, Contract, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
-import {
-  useBalance,
-  useContractLoader,
-  useContractReader,
-  useEventListener,
-  useExchangePrice,
-  useGasPrice,
-  useOnBlock,
-  useUserSigner,
-} from "./hooks";
-// import Hints from "./Hints";
-import { Admin } from "./views";
+import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
+import { Admin, Room } from "./views";
+// Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
-import { HexString } from "walletlink/dist/types";
-const axios = require("axios");
-const { ethers, BigNumber } = require("ethers");
-
-/*
-    Welcome to 🏗 scaffold-eth !
-
-    Code:
-    https://github.com/austintgriffith/scaffold-eth
-
-    Support:
-    https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA
-    or DM @austingriffith on twitter or telegram
-
-    You should get your own Infura.io ID and put it in `constants.js`
-    (this is your connection to the main Ethereum network for ENS etc.)
-
-
-    🌏 EXTERNAL CONTRACTS:
-    You can also bring in contract artifacts in `constants.js`
-    (and then use the `useExternalContractLoader()` hook!)
-*/
+const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = process.env.REACT_APP_NETWORK ? NETWORKS[process.env.REACT_APP_NETWORK] : NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -174,8 +141,7 @@ function App(props) {
       : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
-  const [address, setAddress] = useState();
-
+  const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [message, setMessage] = useState();
   const [addresses, setAddresses] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
@@ -198,8 +164,10 @@ function App(props) {
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork, "fast");
+
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
-  const userSigner = useUserSigner(injectedProvider, localProvider);
+  // we want to remove the burner wallet.
+  const userSigner = useUserSigner(injectedProvider, localProvider, false);
 
   useEffect(() => {
     async function getAddress() {
@@ -253,80 +221,6 @@ function App(props) {
   const updateOwner = async () => {
     const o = await readContracts?.TokenDistributor?.owner();
     setOwner(o);
-  };
-
-  const handleSignIn = async () => {
-    if (typeof appServer == "undefined") {
-      return notification.error({
-        message: "Setup Error",
-        description: "Missing REACT_APP_SERVER environment variable in localhost environment",
-        placement: "bottomRight",
-      });
-    }
-
-    if (web3Modal.cachedProvider == "") {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Please Connect a wallet before Signing in",
-        placement: "bottomRight",
-      });
-    }
-
-    const messageLength = message && message.split(" ").length;
-    if (typeof message == "undefined" || message === "" || messageLength > 1) {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Message should be one word",
-        placement: "bottomRight",
-      });
-    }
-
-    setIsSigning(true);
-
-    let sig = await userSigner.signMessage(message);
-
-    let res;
-    let addressResponse;
-
-    try {
-      res = await axios.post(appServer, {
-        address: address,
-        message: message,
-        signature: sig,
-      });
-
-      addressResponse = await axios.get(appServer + message);
-    } catch (error) {
-      setIsSigning(false);
-
-      return notification.error({
-        message: "Failed to Sign!",
-        description: `Connection issue ${error}`,
-        placement: "bottomRight",
-      });
-    }
-
-    if (res.data) {
-      // set up some user messages here besides the alert...
-      // how many other users are signed-in?
-      setIsSignedIn(true);
-      notification.success({
-        message: "Signed in successfully",
-        placement: "bottomRight",
-      });
-    } else {
-      setIsSignedIn(true);
-      // set up user error notice besides the alert...
-      notification.warn({
-        message: "Failed to sign in!",
-        description: "You have already signed in",
-        placement: "bottomRight",
-      });
-    }
-
-    setAddresses(addressResponse.data || []);
-    setIsSigning(false);
-    setRes("");
   };
 
   const updateAdmin = async () => {
@@ -443,7 +337,7 @@ function App(props) {
     }
   } else {
     networkDisplay = (
-      <div style={{ zIndex: -1, position: "absolute", right: 154, top: 28, padding: 16, color: targetNetwork.color }}>
+      <div style={{ color: targetNetwork.color }}>
         {targetNetwork.name}
       </div>
     );
@@ -494,7 +388,7 @@ function App(props) {
     ethers.utils.formatEther(yourLocalBalance) <= 0
   ) {
     faucetHint = (
-      <div style={{ padding: 16 }}>
+      <div >
         <Button
           type="primary"
           onClick={() => {
@@ -515,9 +409,38 @@ function App(props) {
 
   return (
     <div className="App">
-      {/* ✏️ Edit the header and change the title to your project name */}
-      <Header />
-      {networkDisplay}
+      <Layout style={{ fixed: "top"}}>
+          <PageHeader
+            title={
+            <a href="https://tip.party"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ float: "left"}}
+            >
+              Tip.Party
+            </a>}
+            subTitle="Decentralized Tipping Platform" 
+            style={{ cursor: "pointer", margin: 10, padding: 0 }}
+            extra={[
+              <Space>
+                <span>{faucetHint}</span>
+                <span>{networkDisplay}</span>
+                <Account
+                  address={address}
+                  localProvider={localProvider}
+                  userSigner={userSigner}
+                  mainnetProvider={mainnetProvider}
+                  price={price}
+                  web3Modal={web3Modal}
+                  loadWeb3Modal={loadWeb3Modal}
+                  logoutOfWeb3Modal={logoutOfWeb3Modal}
+                  blockExplorer={blockExplorer}
+                  isOwner={admin}
+                />
+              </Space>
+            ]}
+          />
+      </Layout>
       <BrowserRouter>
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
@@ -561,37 +484,22 @@ function App(props) {
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
-
-            <div style={{ margin: "20px auto", width: 500, padding: 60, paddingBottom: 40, border: "3px solid" }}>
-              <h2>{title}</h2>
-              <Input
-                style={{ marginTop: "10px", marginBottom: "10px" }}
-                addonBefore="Message"
-                value={message}
-                placeholder="Message"
-                onChange={e => setMessage(e.target.value)}
-              />
-              <div style={{ marginBottom: "10px" }}>
-                <div>
-                  <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                    Sign In
-                  </Button>
-                  <Divider />
-                  <div>
-                    <Statistic
-                      title="Signed In"
-                      value={isSignedIn}
-                      valueStyle={{ color: !isSignedIn ? "red" : "green" }}
-                    />
-                  </div>
-                  {isSignedIn && (
-                    <div style={{ marginTop: 5 }}>
-                      <Statistic title="Active Users" value={addresses.length} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <div>App Home</div>
+          </Route>
+          <Route path="/room/:id">
+            <Room
+              address={address}
+              appServer={appServer}
+              web3Modal={web3Modal}
+              userSigner={userSigner}
+              mainnetProvider={mainnetProvider}
+              readContracts={readContracts}
+              writeContracts={writeContracts}
+              localProvider={localProvider}
+              yourLocalBalance={yourLocalBalance}
+              admin={admin}
+              tx={tx}
+            />
           </Route>
           <Route exact path="/contracts">
             <Contract
@@ -627,25 +535,9 @@ function App(props) {
           )}
         </Switch>
       </BrowserRouter>
-
       <ThemeSwitch />
 
-      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
-        <Account
-          address={address}
-          localProvider={localProvider}
-          userSigner={userSigner}
-          mainnetProvider={mainnetProvider}
-          price={price}
-          web3Modal={web3Modal}
-          loadWeb3Modal={loadWeb3Modal}
-          logoutOfWeb3Modal={logoutOfWeb3Modal}
-          blockExplorer={blockExplorer}
-          isOwner={admin}
-        />
-        {faucetHint}
-      </div>
+
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
