@@ -47,7 +47,7 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
       const deployerWallet = ethers.provider.getSigner();
       await deployerWallet.sendTransaction({
         to: developerAddress,
-        value: ethers.utils.parseEther("1"),
+        value: ethers.utils.parseEther("0.15"),
       });
     }
 
