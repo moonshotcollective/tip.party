@@ -1,9 +1,9 @@
-import { Badge, Button , Space, Menu, Dropdown } from "antd";
+import { Badge, Button, Space, Menu, Dropdown } from "antd";
 import React from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import Address from "./Address";
 import Balance from "./Balance";
-import { DownOutlined, UserOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { DownOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
 // import Wallet from "./Wallet";
 
 /*
@@ -54,21 +54,17 @@ export default function Account({
 }) {
   const { currentTheme } = useThemeSwitcher();
 
-  function isValidAddress (address) {
+  function isValidAddress(address) {
     return address && address !== "0x0000000000000000000000000000000000000000";
   }
 
   const menu = (
     <Menu>
-      <Menu.ItemGroup key="1" icon={'Balance: '}>
-        {isValidAddress(address) ? <Balance address={address} provider={localProvider} price={price} /> :''}
+      <Menu.ItemGroup key="1" icon={"Balance: "}>
+        {isValidAddress(address) ? <Balance address={address} provider={localProvider} price={price} /> : ""}
       </Menu.ItemGroup>
       <Menu.ItemGroup key="2" style={{ textAlign: "center" }}>
-        <a
-          key="logoutbutton"
-          size="medium"
-          onClick={logoutOfWeb3Modal}
-        >
+        <a key="logoutbutton" size="medium" onClick={logoutOfWeb3Modal}>
           Logout
         </a>
       </Menu.ItemGroup>
@@ -79,18 +75,22 @@ export default function Account({
   if (web3Modal) {
     if (web3Modal.cachedProvider) {
       modalButtons.push(
-
         <div>
-          {isValidAddress(address) ?
+          {isValidAddress(address) ? (
             <Space wrap>
-              <Dropdown.Button overlay={menu} icon={<DownOutlined/>} size={'large'}>
-                  {isOwner ? <Badge count={"admin"} style={{ marginRight: 5 }}  /> : <Badge count={"user"} style={{ backgroundColor: '#52c41a', marginRight: 5 }} />}
-                  <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
+              <Dropdown.Button overlay={menu} icon={<DownOutlined />} size={"large"}>
+                {isOwner ? (
+                  <Badge count={"admin"} style={{ marginRight: 5 }} />
+                ) : (
+                  <Badge count={"user"} style={{ backgroundColor: "#52c41a", marginRight: 5 }} />
+                )}
+                <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
               </Dropdown.Button>
             </Space>
-           : ""}
-        </div>
-              
+          ) : (
+            ""
+          )}
+        </div>,
       );
     } else {
       modalButtons.push(
@@ -107,9 +107,5 @@ export default function Account({
     }
   }
 
-  return (
-    <div>
-      {modalButtons}
-    </div>
-  );
+  return <div>{modalButtons}</div>;
 }

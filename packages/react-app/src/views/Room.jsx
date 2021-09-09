@@ -6,6 +6,8 @@ import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
+//import useWindowSize from 'react-use/lib/useWindowSize'
+import Confetti from "react-confetti";
 
 export default function Rooms({
   appServer,
@@ -21,6 +23,7 @@ export default function Rooms({
 }) {
   const { id } = useParams();
   const socket = useRef(null);
+  //const { width, height } = useWindowSize()
 
   const [room, setRoom] = useState(id);
   const [amount, setAmount] = useState(0);
@@ -32,10 +35,19 @@ export default function Rooms({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [confetti, setConfetti] = useState(false);
+  const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
 
   useEffect(() => {
     setSpender(readContracts?.TokenDistributor?.address);
   }, [readContracts]);
+
+const handleConfetti = e => {
+    setNumberOfConfettiPieces(200)
+  setTimeout(() => {
+    setNumberOfConfettiPieces(0)
+  }, 4000);
+}
 
   const handleListUpdate = list => {
     const updatedList = [...addresses, ...list];
@@ -100,10 +112,12 @@ export default function Rooms({
 
       // notify user of signIn
       setIsSignedIn(true);
+
       notification.success({
         message: "Signed in successfully",
         placement: "bottomRight",
       });
+      handleConfetti();
     } catch (error) {
       setIsSigning(false);
 
@@ -149,6 +163,7 @@ export default function Rooms({
             description: "Each user received " + amount / addresses.length + " " + token,
             placement: "topRight",
           });
+          handleConfetti();
         }
       },
     );
@@ -182,6 +197,7 @@ export default function Rooms({
             description: "Each user received " + amount / addresses.length + " " + token,
             placement: "topRight",
           });
+          handleConfetti();
         }
       },
     );
@@ -240,6 +256,7 @@ export default function Rooms({
   return (
     <div style={{ margin: "20px auto", width: 500, padding: 60, paddingBottom: 40, border: "3px solid" }}>
       <h2>Sign In</h2>
+      <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
       <div style={{ marginTop: "10px", marginBottom: "10px" }}>
         <div>
           <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
