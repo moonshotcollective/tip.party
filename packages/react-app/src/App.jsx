@@ -11,7 +11,7 @@ import { Account, Contract, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Admin, Room } from "./views";
+import { Admin, Room, Home } from "./views";
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -336,11 +336,7 @@ function App(props) {
       );
     }
   } else {
-    networkDisplay = (
-      <div style={{ color: targetNetwork.color }}>
-        {targetNetwork.name}
-      </div>
-    );
+    networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
   }
 
   const loadWeb3Modal = useCallback(async () => {
@@ -388,7 +384,7 @@ function App(props) {
     ethers.utils.formatEther(yourLocalBalance) <= 0
   ) {
     faucetHint = (
-      <div >
+      <div>
         <Button
           type="primary"
           onClick={() => {
@@ -409,37 +405,34 @@ function App(props) {
 
   return (
     <div className="App">
-      <Layout style={{ fixed: "top"}}>
-          <PageHeader
-            title={
-            <a href="https://tip.party"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ float: "left"}}
-            >
+      <Layout style={{ fixed: "top" }}>
+        <PageHeader
+          title={
+            <a href="https://tip.party" target="_blank" rel="noopener noreferrer" style={{ float: "left" }}>
               Tip.Party
-            </a>}
-            subTitle="Decentralized Tipping Platform" 
-            style={{ cursor: "pointer", margin: 10, padding: 0 }}
-            extra={[
-              <Space>
-                <span>{faucetHint}</span>
-                <span>{networkDisplay}</span>
-                <Account
-                  address={address}
-                  localProvider={localProvider}
-                  userSigner={userSigner}
-                  mainnetProvider={mainnetProvider}
-                  price={price}
-                  web3Modal={web3Modal}
-                  loadWeb3Modal={loadWeb3Modal}
-                  logoutOfWeb3Modal={logoutOfWeb3Modal}
-                  blockExplorer={blockExplorer}
-                  isOwner={admin}
-                />
-              </Space>
-            ]}
-          />
+            </a>
+          }
+          subTitle="Decentralized Tipping Platform"
+          style={{ cursor: "pointer", margin: 10, padding: 0 }}
+          extra={[
+            <Space>
+              <span>{faucetHint}</span>
+              <span>{networkDisplay}</span>
+              <Account
+                address={address}
+                localProvider={localProvider}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                price={price}
+                web3Modal={web3Modal}
+                loadWeb3Modal={loadWeb3Modal}
+                logoutOfWeb3Modal={logoutOfWeb3Modal}
+                blockExplorer={blockExplorer}
+                isOwner={admin}
+              />
+            </Space>,
+          ]}
+        />
       </Layout>
       <BrowserRouter>
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
@@ -484,7 +477,13 @@ function App(props) {
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
-            <div>App Home</div>
+            <Home
+              writeContracts={writeContracts}
+              readContracts={readContracts}
+              admin={admin}
+              mainnetProvider={mainnetProvider}
+              tx={tx}
+            />
           </Route>
           <Route path="/room/:id">
             <Room
@@ -536,8 +535,6 @@ function App(props) {
         </Switch>
       </BrowserRouter>
       <ThemeSwitch />
-
-
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
