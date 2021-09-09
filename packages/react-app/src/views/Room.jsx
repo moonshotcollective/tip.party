@@ -104,11 +104,12 @@ export default function Rooms({
 
       // notify user of signIn
       setIsSignedIn(true);
-      setConfetti(true);
+
       notification.success({
         message: "Signed in successfully",
         placement: "bottomRight",
       });
+      setConfetti(true);
     } catch (error) {
       setIsSigning(false);
 
