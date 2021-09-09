@@ -41,10 +41,12 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
   // run this if not for production deployment
   if (chainId !== 1) {
     // send test ETH to developer address on localhost
-    if (chainId === 31337) {
+    const developerAddress = process.env.DEVELOPER;
+
+    if (chainId === 31337 && developerAddress) {
       const deployerWallet = ethers.provider.getSigner();
       await deployerWallet.sendTransaction({
-        to: receiverAddress,
+        to: developerAddress,
         value: ethers.utils.parseEther("1"),
       });
     }
