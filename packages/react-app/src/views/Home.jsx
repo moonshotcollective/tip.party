@@ -15,6 +15,13 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
   };
 
   const becomeDistributor = async () => {
+    if (!isWalletConnected) {
+      return notification.error({
+        message: "Access request failed",
+        description: "Please connect your wallet to proceed.",
+        placement: "bottomRight",
+      });
+    }
     const value = ethers.utils.parseEther(tipstaCost);
     const result = tx(writeContracts.Tipsta.becomeATipsta({ value }), update => {
       console.log("📡 Admin Update:", update);
@@ -61,7 +68,7 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
         </div>
 
         <div>
-          {!admin && isWalletConnected && (
+          {!admin && (
             <>
               <div style={{ marginTop: 10, marginBottom: 10 }}>OR</div>
               <div>
