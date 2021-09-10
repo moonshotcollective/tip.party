@@ -4,7 +4,7 @@ import { useHistory } from "react-router";
 import slugify from "slugify";
 import { ethers } from "ethers";
 
-export default function Admin({ writeContracts, readContracts, admin, mainnetProvider, tx }) {
+export default function Admin({ writeContracts, readContracts, admin, isWalletConnected, tx }) {
   let history = useHistory();
   const [tipstaCost, setTipstaCost] = useState("...");
 
@@ -61,7 +61,7 @@ export default function Admin({ writeContracts, readContracts, admin, mainnetPro
         </div>
 
         <div>
-          {!admin && (
+          {!admin && isWalletConnected && (
             <>
               <div style={{ marginTop: 10, marginBottom: 10 }}>OR</div>
               <div>
