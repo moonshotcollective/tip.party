@@ -9,9 +9,9 @@ import Web3Modal from "web3modal";
 import "./App.css";
 import { Account, Contract, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
-import { Transactor } from "./helpers";
+import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Admin, Room } from "./views";
+import { Admin, Room, Home } from "./views";
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -142,10 +142,7 @@ function App(props) {
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [message, setMessage] = useState();
-  const [addresses, setAddresses] = useState([]);
-  const [isSigning, setIsSigning] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [owner, setOwner] = useState("");
   const [admin, setAdmin] = useState(false);
 
@@ -264,6 +261,7 @@ function App(props) {
     if (readContracts) {
       updateOwner();
       updateAdmin();
+      setIsWalletConnected(AddressHelper.isValidAddress(address));
     }
   }, [
     mainnetProvider,
@@ -477,7 +475,15 @@ function App(props) {
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
-            <div>App Home</div>
+            <Home
+              writeContracts={writeContracts}
+              readContracts={readContracts}
+              admin={admin}
+              address={address}
+              mainnetProvider={mainnetProvider}
+              tx={tx}
+              isWalletConnected={isWalletConnected}
+            />
           </Route>
           <Route path="/room/:id">
             <Room

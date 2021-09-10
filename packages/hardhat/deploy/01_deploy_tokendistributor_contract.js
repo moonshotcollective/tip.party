@@ -5,6 +5,7 @@ const { ethers } = require("hardhat");
 module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
   // const frontendAddress = "YOUR_FRONTEND_ADDRESS";
   const frontendAddress = process.env.FRONTENDADDRESS;
+  const receiverAddress = process.env.RECEIVERADDRESS;
 
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
@@ -20,8 +21,36 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
     deployer
   );
 
+  // deploy Tipsta
+  await deploy("Tipsta", {
+    from: deployer,
+    args: [
+      tokenDistributorContract.address,
+      receiverAddress,
+      "100000000000000000",
+    ],
+    log: true,
+  });
+
+  const tipstaContract = await ethers.getContract("Tipsta", deployer);
+  const adminRole = await tokenDistributorContract.DEFAULT_ADMIN_ROLE();
+
+  // give admin role to Tipsta - Tipsta can add new distributors
+  await tokenDistributorContract.grantRole(adminRole, tipstaContract.address);
+
   // run this if not for production deployment
   if (chainId !== 1) {
+    // send test ETH to developer address on localhost
+    const developerAddress = process.env.DEVELOPER;
+
+    if (chainId === 31337 && developerAddress) {
+      const deployerWallet = ethers.provider.getSigner();
+      await deployerWallet.sendTransaction({
+        to: developerAddress,
+        value: ethers.utils.parseEther("0.15"),
+      });
+    }
+
     await deploy("DummyToken", {
       from: deployer,
       log: true,
@@ -31,7 +60,6 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
 
     // transfer ownership to UI owner if needed
     await tokenDistributorContract.transferOwnership(frontendAddress);
-    console.log(`Owned`);
 
     const mintedBalance = await dummyTokenContract.balanceOf(deployer);
     const splitValue = mintedBalance.div(ethers.BigNumber.from(2));
@@ -56,4 +84,4 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
   }
 };
 
-module.exports.tags = ["TokenDistributor", "DummyToken"];
+module.exports.tags = ["TokenDistributor", "DummyToken", "Tipsta"];
