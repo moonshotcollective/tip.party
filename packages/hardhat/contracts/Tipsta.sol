@@ -44,7 +44,7 @@ contract Tipsta is Ownable {
     ) public {
         updateTokenDistributorAddress(distributor);
         updateFundsAccount(holder);
-        updateTipperCost(cost);
+        updateTipstaCost(cost);
     }
 
     function updateFundsAccount(address holder) public onlyOwner {
@@ -55,13 +55,13 @@ contract Tipsta is Ownable {
         fundsAccount = holder;
     }
 
-    function updateTipperCost(uint256 cost) public onlyOwner {
+    function updateTipstaCost(uint256 cost) public onlyOwner {
         require(cost > 0, "You really want to fund public goods");
         tipperCost = cost;
     }
 
-    function updateCostForToken(IERC20 token, uint256 amount) public onlyOwner {
-        costs[address(token)] = amount;
+    function updateTipstaCost(IERC20 token, uint256 cost) public onlyOwner {
+        costs[address(token)] = cost;
     }
 
     function updateTokenDistributorAddress(TokenDistributor distributor)
