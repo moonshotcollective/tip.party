@@ -42,12 +42,12 @@ export default function Rooms({
     setSpender(readContracts?.TokenDistributor?.address);
   }, [readContracts]);
 
-const handleConfetti = e => {
-    setNumberOfConfettiPieces(200)
-  setTimeout(() => {
-    setNumberOfConfettiPieces(0)
-  }, 4000);
-}
+  const handleConfetti = e => {
+    setNumberOfConfettiPieces(200);
+    setTimeout(() => {
+      setNumberOfConfettiPieces(0);
+    }, 4000);
+  };
 
   const handleListUpdate = list => {
     const updatedList = [...addresses, ...list];
