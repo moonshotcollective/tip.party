@@ -60,7 +60,7 @@ export default function Rooms({
   };
 
   const hanndleTransactionUpdate = newTx => {
-    const update = [...txHash, ...newTx];
+    const update = [...newTx, ...txHash];
     setTxHash(update);
   };
 

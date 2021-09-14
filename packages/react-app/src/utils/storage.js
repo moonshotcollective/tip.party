@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { collection, onSnapshot, getFirestore, query, where } from "firebase/firestore";
+import { collection, onSnapshot, getFirestore, query, where, orderBy } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 const app = initializeApp({
@@ -28,7 +28,10 @@ export const watchRoom = (room, cb) => {
 };
 
 export const watchRoomTx = (room, network, cb) => {
-  return watchCollection(query(getCollection(room, "tx"), where("network", "==", network)), cb);
+  return watchCollection(
+    query(getCollection(room, "tx"), where("network", "==", network), orderBy("createdAt", "desc")),
+    cb,
+  );
 };
 
 export const signIntoRoom = async (room, signature) => {
