@@ -4,14 +4,17 @@ pragma solidity >=0.6.0 <0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 import "./TokenDistributor.sol";
 
 /// @title Token Distributor Contract
 /// @author @ghostffcode
 /// @notice distributes donations or tips
-contract Tipsta is Ownable {
+contract Tipsta is Ownable, Pausable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     uint256 public tipperCost = 0.1 ether;
     address public fundsAccount;
@@ -47,6 +50,14 @@ contract Tipsta is Ownable {
         updateTipstaCost(cost);
     }
 
+    function managePause(bool pauseIt) public onlyOwner {
+        if (pauseIt) {
+            _pause();
+        } else {
+            _unpause();
+        }
+    }
+
     function updateFundsAccount(address holder) public onlyOwner {
         require(
             holder != address(0),
@@ -60,7 +71,10 @@ contract Tipsta is Ownable {
         tipperCost = cost;
     }
 
-    function updateTipstaCost(IERC20 token, uint256 cost) public onlyOwner {
+    function updateTokenTipstaCost(IERC20 token, uint256 cost)
+        public
+        onlyOwner
+    {
         costs[address(token)] = cost;
     }
 
@@ -71,7 +85,7 @@ contract Tipsta is Ownable {
         tokenDistributorContract = distributor;
     }
 
-    function becomeATipsta() public payable paidEnough {
+    function becomeATipsta() public payable paidEnough whenNotPaused {
         // pay fee to fundsAccount
         (bool sent, ) = fundsAccount.call{value: tipperCost}("");
         require(sent, "Unable to pay tipsta fee");
@@ -87,9 +101,10 @@ contract Tipsta is Ownable {
         }
     }
 
-    function becomeATipsta(IERC20 token, uint256 amount)
+    function becomeATipstaWithToken(IERC20 token, uint256 amount)
         public
         tokenPaidEnough(address(token), amount)
+        whenNotPaused
     {
         require(
             token.allowance(msg.sender, address(this)) >= amount,
@@ -101,7 +116,7 @@ contract Tipsta is Ownable {
         );
 
         // make the transfer
-        token.transferFrom(msg.sender, fundsAccount, amount);
+        token.safeTransferFrom(msg.sender, fundsAccount, amount);
         // make distributor
         addDistributor(msg.sender);
     }

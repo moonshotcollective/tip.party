@@ -485,7 +485,7 @@ function App(props) {
               isWalletConnected={isWalletConnected}
             />
           </Route>
-          <Route path="/room/:id">
+          <Route path="/room/:room">
             <Room
               address={address}
               appServer={appServer}
@@ -497,6 +497,8 @@ function App(props) {
               localProvider={localProvider}
               yourLocalBalance={yourLocalBalance}
               admin={admin}
+              chainId={localChainId || selectedChainId}
+              selectedChainId={selectedChainId}
               tx={tx}
             />
           </Route>

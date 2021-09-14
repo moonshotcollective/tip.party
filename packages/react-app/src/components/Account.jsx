@@ -75,7 +75,7 @@ export default function Account({
   if (web3Modal) {
     if (web3Modal.cachedProvider) {
       modalButtons.push(
-        <div>
+        <div key="first">
           {isValidAddress(address) ? (
             <Space wrap>
               <Dropdown.Button overlay={menu} icon={<DownOutlined />} size={"large"}>
@@ -100,6 +100,7 @@ export default function Account({
           size="medium"
           /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */
           onClick={loadWeb3Modal}
+          key="second"
         >
           Please connect your Wallet
         </Button>,
