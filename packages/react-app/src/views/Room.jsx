@@ -155,7 +155,8 @@ export default function Rooms({
       writeContracts.TokenDistributor.splitEth(addresses, {
         value: ethers.utils.parseEther(amount),
       }),
-      update => {
+      async update => {
+        await handleResponseHash(update);
         console.log("📡 Transaction Update:", update);
         if (update && (update.status === "confirmed" || update.status === 1)) {
           console.log(" 🍾 Transaction " + update.hash + " finished!");
@@ -178,9 +179,7 @@ export default function Rooms({
       },
     );
     console.log("awaiting metamask/web3 confirm result...", result);
-    const response = await result;
-    console.log(response);
-    await storage.registerTransactionForRoom(room, response.hash, selectedChainId);
+    console.log(await result);
     setAmount(0);
   };
 
@@ -191,7 +190,8 @@ export default function Rooms({
         ethers.utils.parseUnits(amount, opts.decimals),
         opts.address,
       ),
-      update => {
+      async update => {
+        await handleResponseHash(update);
         console.log("📡 Transaction Update:", update);
         if (update && (update.status === "confirmed" || update.status === 1)) {
           console.log(" 🍾 Transaction " + update.hash + " finished!");
@@ -214,10 +214,12 @@ export default function Rooms({
       },
     );
     console.log("awaiting metamask/web3 confirm result...", result);
-    const response = await result;
-    console.log(response);
-    await storage.registerTransactionForRoom(room, response.hash, selectedChainId);
+    console.log(await result);
     setAmount(0);
+  };
+
+  const handleResponseHash = async result => {
+    await storage.registerTransactionForRoom(room, result.hash, selectedChainId);
   };
 
   const reList = index => {
