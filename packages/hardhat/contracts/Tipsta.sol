@@ -87,7 +87,7 @@ contract Tipsta is Ownable {
         }
     }
 
-    function becomeATipsta(IERC20 token, uint256 amount)
+    function becomeATipstaWithToken(IERC20 token, uint256 amount)
         public
         tokenPaidEnough(address(token), amount)
     {
