@@ -1,8 +1,8 @@
-name: Scaffold-eth Surge Deployer workflow
+name: Scaffold-eth Staging Surge Deployer workflow
 
 on:
   push:
-    branches: [master]
+    branches: [develop]
 
 jobs:
   deployer-job:
@@ -20,7 +20,7 @@ jobs:
           cp build/index.html build/200.html
         env:
           REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/'
-          REACT_APP_NETWORK: 'mainnet'
+          REACT_APP_NETWORK: 'rinkeby'
           REACT_APP_FIRE_API: ${{ secrets.FIREBASEAPI }}
           REACT_APP_FIRE_DOMAIN: ${{ secrets.FIREBASEDOMAIN }}
           REACT_APP_FIRE_ID: ${{ secrets.FIREBASEID }}
@@ -28,6 +28,6 @@ jobs:
       - name: Deploy to surge
         uses: dswistowski/surge-sh-action@v1
         with:
-          domain: ${{ secrets.domain }}
+          domain: staging.${{ secrets.domain }}
           project: './packages/react-app/build'
           token: ${{ secrets.surge_token }}
