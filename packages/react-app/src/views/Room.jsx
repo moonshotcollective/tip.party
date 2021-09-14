@@ -376,7 +376,7 @@ export default function Rooms({
                   />
                 </Collapse.Panel>
               </Collapse>
-              {/* {canRenderAdminComponents && (
+              {canRenderAdminComponents && (
                 <div style={{ marginTop: 10 }}>
                   <Button
                     disabled={isFiltering}
@@ -387,7 +387,7 @@ export default function Rooms({
                     Filter Out Non ENS Names
                   </Button>
                 </div>
-              )} */}
+              )}
             </div>
           </div>
 
