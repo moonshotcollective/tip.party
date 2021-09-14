@@ -271,8 +271,6 @@ export default function Rooms({
 
   const canRenderAdminComponents = admin && addresses && addresses.length > 0;
 
-  console.log(txHash);
-
   return (
     <div
       style={{
