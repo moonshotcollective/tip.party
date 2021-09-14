@@ -24,11 +24,9 @@ export default function Rooms({
   selectedChainId,
   tx,
 }) {
-  const { id } = useParams();
-  const socket = useRef(null);
+  const { room } = useParams();
   //const { width, height } = useWindowSize()
 
-  const [room, setRoom] = useState(id);
   const [amount, setAmount] = useState(0);
   const [token, setToken] = useState("ETH");
   const [spender, setSpender] = useState("");
@@ -81,12 +79,11 @@ export default function Rooms({
     subs.current.map(sub => sub());
 
     // start new subscriptions
-
     if (chainId) {
-      subs.current.push(storage.watchRoom(id, handleListUpdate));
+      subs.current.push(storage.watchRoom(room, handleListUpdate));
       subs.current.push(storage.watchRoomTx(room, chainId, hanndleTransactionUpdate));
     }
-  }, [id, chainId]);
+  }, [room, chainId]);
 
   const handleSignIn = async () => {
     if (typeof appServer == "undefined") {
@@ -117,7 +114,7 @@ export default function Rooms({
     setIsSigning(true);
 
     // sign roomId using wallet
-    let signature = await userSigner.signMessage(id);
+    let signature = await userSigner.signMessage(room);
 
     try {
       // sign into room
