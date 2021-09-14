@@ -305,12 +305,7 @@ export default function Rooms({
                           width: "100%",
                         }}
                       >
-                        <TransactionHash
-                          localProvider={localProvider}
-                          selectedChainId={selectedChainId}
-                          hash={item}
-                          fontSize={14}
-                        />
+                        <TransactionHash localProvider={localProvider} chainId={chainId} hash={item} fontSize={14} />
                       </div>
                     </List.Item>
                   )}

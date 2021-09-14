@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import { Typography } from "antd";
-import { ethers } from "ethers";
+import { NETWORK } from "../constants";
 
-export default function TransactionHash({ hash, localProvider, selectedChainId, ...props }) {
+export default function TransactionHash({ hash, localProvider, chainId, ...props }) {
   const { currentTheme } = useThemeSwitcher();
   const [loading, updateLoading] = useState(true);
   const [txData, updateTxData] = useState({});
@@ -20,6 +20,8 @@ export default function TransactionHash({ hash, localProvider, selectedChainId, 
     // get transaction status
     checkTx();
   }, []);
+
+  const explorer = NETWORK(chainId).blockExplorer || `https://etherscan.io/`;
 
   return (
     <div style={{ width: "100%" }}>
@@ -39,7 +41,7 @@ export default function TransactionHash({ hash, localProvider, selectedChainId, 
             <a
               style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }}
               target="_blank"
-              href={`https://etherscan.io/tx/${hash}`}
+              href={`${explorer}tx/${hash}`}
               rel="noopener noreferrer"
             >
               {hash.substr(0, 10)}
