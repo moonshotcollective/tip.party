@@ -60,7 +60,10 @@ contract Tipsta is Ownable {
         tipperCost = cost;
     }
 
-    function updateTipstaCost(IERC20 token, uint256 cost) public onlyOwner {
+    function updateTokenTipstaCost(IERC20 token, uint256 cost)
+        public
+        onlyOwner
+    {
         costs[address(token)] = cost;
     }
 
