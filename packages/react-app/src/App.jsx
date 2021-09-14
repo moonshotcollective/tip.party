@@ -433,7 +433,7 @@ function App(props) {
         />
       </Layout>
       <BrowserRouter>
-        <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
+        {(targetNetwork.name == "localhost" || admin) && (<Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
           <Menu.Item key="/">
             <Link
               onClick={() => {
@@ -444,7 +444,7 @@ function App(props) {
               App
             </Link>
           </Menu.Item>
-          <Menu.Item key="/contracts">
+          {(targetNetwork.name == "localhost") &&(<Menu.Item key="/contracts">
             <Link
               onClick={() => {
                 setRoute("/contracts");
@@ -453,7 +453,7 @@ function App(props) {
             >
               Contracts
             </Link>
-          </Menu.Item>
+          </Menu.Item>)}
           {admin && (
             <Menu.Item key="/adminpanel">
               <Link
@@ -466,7 +466,7 @@ function App(props) {
               </Link>
             </Menu.Item>
           )}
-        </Menu>
+        </Menu>)}
 
         <Switch>
           <Route exact path="/">

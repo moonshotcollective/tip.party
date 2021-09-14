@@ -348,7 +348,7 @@ export default function Rooms({
                     )}
                   />
                 </Collapse.Panel>
-                <Collapse.Panel header="Blacklist" key="2">
+                {admin &&<Collapse.Panel header="Blacklist" key="2">
                   <List
                     bordered
                     dataSource={blacklist}
@@ -374,7 +374,7 @@ export default function Rooms({
                       </List.Item>
                     )}
                   />
-                </Collapse.Panel>
+                </Collapse.Panel>}
               </Collapse>
               {/* {canRenderAdminComponents && (
                 <div style={{ marginTop: 10 }}>
