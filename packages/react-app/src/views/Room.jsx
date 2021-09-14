@@ -219,7 +219,9 @@ export default function Rooms({
   };
 
   const handleResponseHash = async result => {
-    await storage.registerTransactionForRoom(room, result.hash, selectedChainId);
+    if (result.hash && selectedChainId && room) {
+      await storage.registerTransactionForRoom(room, result.hash, selectedChainId);
+    }
   };
 
   const reList = index => {
