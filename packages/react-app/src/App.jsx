@@ -497,7 +497,7 @@ function App(props) {
               localProvider={localProvider}
               yourLocalBalance={yourLocalBalance}
               admin={admin}
-              selectedChainId={selectedChainId}
+              chainId={localChainId || selectedChainId}
               tx={tx}
             />
           </Route>

@@ -20,7 +20,7 @@ export default function Rooms({
   admin,
   yourLocalBalance,
   localProvider,
-  selectedChainId,
+  chainId,
   tx,
 }) {
   const { id } = useParams();
@@ -80,11 +80,11 @@ export default function Rooms({
     subs.current.map(sub => sub());
 
     // start new subscriptions
-    if (selectedChainId) {
+    if (chainId) {
       subs.current.push(storage.watchRoom(id, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, selectedChainId, hanndleTransactionUpdate));
+      subs.current.push(storage.watchRoomTx(room, chainId, hanndleTransactionUpdate));
     }
-  }, [id, selectedChainId]);
+  }, [id, chainId]);
 
   const handleSignIn = async () => {
     if (typeof appServer == "undefined") {
