@@ -21,6 +21,7 @@ export default function Rooms({
   yourLocalBalance,
   localProvider,
   chainId,
+  selectedChainId,
   tx,
 }) {
   const { id } = useParams();
@@ -80,6 +81,7 @@ export default function Rooms({
     subs.current.map(sub => sub());
 
     // start new subscriptions
+
     if (chainId) {
       subs.current.push(storage.watchRoom(id, handleListUpdate));
       subs.current.push(storage.watchRoomTx(room, chainId, hanndleTransactionUpdate));
@@ -181,7 +183,7 @@ export default function Rooms({
     console.log("awaiting metamask/web3 confirm result...", result);
     const response = await result;
     console.log(response);
-    await storage.registerTransactionForRoom(room, response.hash, response.chainId);
+    await storage.registerTransactionForRoom(room, response.hash, selectedChainId);
     setAmount(0);
   };
 
@@ -217,7 +219,7 @@ export default function Rooms({
     console.log("awaiting metamask/web3 confirm result...", result);
     const response = await result;
     console.log(response);
-    await storage.registerTransactionForRoom(room, response.hash, response.chainId);
+    await storage.registerTransactionForRoom(room, response.hash, selectedChainId);
     setAmount(0);
   };
 
