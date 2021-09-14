@@ -4,6 +4,7 @@ pragma solidity >=0.6.0 <0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 import "./TokenDistributor.sol";
 
@@ -12,6 +13,7 @@ import "./TokenDistributor.sol";
 /// @notice distributes donations or tips
 contract Tipsta is Ownable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     uint256 public tipperCost = 0.1 ether;
     address public fundsAccount;
@@ -104,7 +106,7 @@ contract Tipsta is Ownable {
         );
 
         // make the transfer
-        token.transferFrom(msg.sender, fundsAccount, amount);
+        token.safeTransferFrom(msg.sender, fundsAccount, amount);
         // make distributor
         addDistributor(msg.sender);
     }
