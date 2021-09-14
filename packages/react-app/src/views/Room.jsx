@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Statistic, Input, Select, Collapse, Switch } from "antd";
+import { Button, List, notification, Divider, Card, Input, Select, Collapse } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
-import { Address, PayButton } from "../components";
-import { io } from "socket.io-client";
+import { Address, PayButton, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
+import * as storage from "../utils/storage";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
 
@@ -19,6 +19,8 @@ export default function Rooms({
   readContracts,
   admin,
   yourLocalBalance,
+  localProvider,
+  selectedChainId,
   tx,
 }) {
   const { id } = useParams();
@@ -30,6 +32,7 @@ export default function Rooms({
   const [token, setToken] = useState("ETH");
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
+  const [txHash, setTxHash] = useState([]);
   const [blacklist, setBlacklist] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -37,6 +40,8 @@ export default function Rooms({
   const [isFiltering, setIsFiltering] = useState(false);
   const [confetti, setConfetti] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
+
+  const subs = useRef([]);
 
   useEffect(() => {
     setSpender(readContracts?.TokenDistributor?.address);
@@ -55,6 +60,11 @@ export default function Rooms({
     setAddresses(updatedList);
   };
 
+  const hanndleTransactionUpdate = newTx => {
+    const update = [...txHash, ...newTx];
+    setTxHash(update);
+  };
+
   useEffect(() => {
     if (addresses.includes(address.toLowerCase())) {
       setIsSignedIn(true);
@@ -62,16 +72,19 @@ export default function Rooms({
   }, [addresses, address]);
 
   useEffect(() => {
-    // log into room as viewer
-    socket.current = io(process.env.REACT_APP_SERVER, {
-      query: {
-        room,
-      },
-    });
-    // add listener for room updates
-    socket.current.once("list", handleListUpdate);
-    socket.current.on("new-sign-in", handleListUpdate);
-  }, [id]);
+    // clear txHash and addresses
+    setAddresses([]);
+    setTxHash([]);
+
+    // clear existing subscriptions
+    subs.current.map(sub => sub());
+
+    // start new subscriptions
+    if (selectedChainId) {
+      subs.current.push(storage.watchRoom(id, handleListUpdate));
+      subs.current.push(storage.watchRoomTx(room, selectedChainId, hanndleTransactionUpdate));
+    }
+  }, [id, selectedChainId]);
 
   const handleSignIn = async () => {
     if (typeof appServer == "undefined") {
@@ -105,10 +118,8 @@ export default function Rooms({
     let signature = await userSigner.signMessage(id);
 
     try {
-      socket.current.emit("sign-in", {
-        room,
-        signature,
-      });
+      // sign into room
+      await storage.signIntoRoom(room, signature);
 
       // notify user of signIn
       setIsSignedIn(true);
@@ -168,7 +179,9 @@ export default function Rooms({
       },
     );
     console.log("awaiting metamask/web3 confirm result...", result);
-    console.log(await result);
+    const response = await result;
+    console.log(response);
+    await storage.registerTransactionForRoom(room, response.hash, response.chainId);
     setAmount(0);
   };
 
@@ -202,8 +215,9 @@ export default function Rooms({
       },
     );
     console.log("awaiting metamask/web3 confirm result...", result);
-    console.log(await result);
-
+    const response = await result;
+    console.log(response);
+    await storage.registerTransactionForRoom(room, response.hash, response.chainId);
     setAmount(0);
   };
 
@@ -253,8 +267,21 @@ export default function Rooms({
     setIsFiltering(false);
   };
 
+  const canRenderAdminComponents = admin && addresses && addresses.length > 0;
+
+  console.log(txHash);
+
   return (
-    <div style={{ margin: "20px auto", width: 500, padding: 60, paddingBottom: 40, border: "3px solid" }}>
+    <div
+      style={{
+        margin: "20px auto",
+        marginBottom: 30,
+        width: 1000,
+        padding: 20,
+        paddingBottom: 40,
+        border: "3px solid",
+      }}
+    >
       <h2>Sign In</h2>
       <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
       <div style={{ marginTop: "10px", marginBottom: "10px" }}>
@@ -263,78 +290,114 @@ export default function Rooms({
             Sign Into "{room}" Room
           </Button>
           <Divider />
-          <div style={{ marginBottom: "10px" }}>
+          {/* <div style={{ marginBottom: "10px" }}>
             <Statistic title="Signed In" value={isSignedIn} valueStyle={{ color: !isSignedIn ? "red" : "green" }} />
+          </div> */}
+
+          <div style={{ display: "flex", flex: 1, width: "100%", flexDirection: "row" }}>
+            {/* Transactions */}
+            <div style={{ marginBottom: 25, flex: 1 }}>
+              <Card title="Payout Transactions" style={{ width: "100%" }}>
+                <List
+                  bordered
+                  dataSource={txHash}
+                  renderItem={(item, index) => (
+                    <List.Item>
+                      <div
+                        style={{
+                          width: "100%",
+                        }}
+                      >
+                        <TransactionHash
+                          localProvider={localProvider}
+                          selectedChainId={selectedChainId}
+                          hash={item}
+                          fontSize={14}
+                        />
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </div>
+
+            <div style={{ width: 10 }}></div>
+
+            <div style={{ flex: 1 }}>
+              <Collapse defaultActiveKey={["1"]}>
+                <Collapse.Panel header="Pay List" key="1">
+                  <List
+                    bordered
+                    dataSource={addresses}
+                    renderItem={(item, index) => (
+                      <List.Item>
+                        <div
+                          style={{
+                            width: "100%",
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                          {admin && (
+                            <Button onClick={() => unList(index)} size="medium">
+                              <CloseOutlined />
+                            </Button>
+                          )}
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </Collapse.Panel>
+                <Collapse.Panel header="Blacklist" key="2">
+                  <List
+                    bordered
+                    dataSource={blacklist}
+                    renderItem={(item, index) => (
+                      <List.Item>
+                        <div
+                          style={{
+                            width: "100%",
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                          {admin && (
+                            <Button onClick={() => reList(index)} size="medium">
+                              <CloseOutlined />
+                            </Button>
+                          )}
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </Collapse.Panel>
+              </Collapse>
+              {canRenderAdminComponents && (
+                <div style={{ marginTop: 10 }}>
+                  <Button
+                    disabled={isFiltering}
+                    loading={isFiltering}
+                    style={{ marginLeft: "10px" }}
+                    onClick={filterAddresses}
+                  >
+                    Filter Out Non ENS Names
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
-          <Collapse defaultActiveKey={["1"]}>
-            <Collapse.Panel header="Pay List" key="1">
-              <List
-                bordered
-                dataSource={addresses}
-                renderItem={(item, index) => (
-                  <List.Item>
-                    <div
-                      style={{
-                        width: "100%",
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                      {admin && (
-                        <Button onClick={() => unList(index)} size="medium">
-                          <CloseOutlined />
-                        </Button>
-                      )}
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </Collapse.Panel>
-            <Collapse.Panel header="Blacklist" key="2">
-              <List
-                bordered
-                dataSource={blacklist}
-                renderItem={(item, index) => (
-                  <List.Item>
-                    <div
-                      style={{
-                        width: "100%",
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                      {admin && (
-                        <Button onClick={() => reList(index)} size="medium">
-                          <CloseOutlined />
-                        </Button>
-                      )}
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </Collapse.Panel>
-          </Collapse>
-
-          <div style={{ marginTop: "10px" }}>
-            {admin && addresses && addresses.length > 0 && (
+          <div style={{ maxWidth: 400, width: "100%", display: "flex", margin: "10px auto" }}>
+            {canRenderAdminComponents && (
               <div>
-                <Button
-                  disabled={isFiltering}
-                  loading={isFiltering}
-                  style={{ marginLeft: "10px" }}
-                  onClick={filterAddresses}
-                >
-                  Filter Out Non ENS Names
-                </Button>
                 {/* TODO : disable input until ERC-20 token is selected */}
                 <Input
                   value={amount}
