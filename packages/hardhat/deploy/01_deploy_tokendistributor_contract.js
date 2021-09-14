@@ -36,16 +36,20 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
   });
 
   const tipstaContract = await ethers.getContract("Tipsta", deployer);
+  console.log(`Loaded tipstaContract`);
 
   const adminRole = await tokenDistributorContract.DEFAULT_ADMIN_ROLE();
+  console.log(`Loaded Admin role`);
 
   // give admin role to Tipsta - Tipsta can add new distributors
   const roleReq = await tokenDistributorContract.grantRole(
     adminRole,
     tipstaContract.address
   );
+  console.log(`Granted Admin role to tipstaContract... awaiting confirmations`);
 
   await roleReq.wait(confirmationRequirement);
+  console.log(`Confirmations received`);
 
   // run this if not for production deployment
   if (chainId !== "1") {
