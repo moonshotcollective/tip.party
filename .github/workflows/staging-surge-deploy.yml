@@ -21,6 +21,9 @@ jobs:
         env:
           REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/'
           REACT_APP_NETWORK: 'rinkeby'
+          REACT_APP_FIRE_API: ${{ secrets.FIREBASEAPI }}
+          REACT_APP_FIRE_DOMAIN: ${{ secrets.FIREBASEDOMAIN }}
+          REACT_APP_FIRE_ID: ${{ secrets.FIREBASEID }}
 
       - name: Deploy to surge
         uses: dswistowski/surge-sh-action@v1
