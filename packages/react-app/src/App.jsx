@@ -433,108 +433,114 @@ function App(props) {
         />
       </Layout>
       <BrowserRouter>
-        {(targetNetwork.name == "localhost" || admin) && (<Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-          <Menu.Item key="/">
-            <Link
-              onClick={() => {
-                setRoute("/");
-              }}
-              to="/"
-            >
-              App
-            </Link>
-          </Menu.Item>
-          {(targetNetwork.name == "localhost") &&(<Menu.Item key="/contracts">
-            <Link
-              onClick={() => {
-                setRoute("/contracts");
-              }}
-              to="/contracts"
-            >
-              Contracts
-            </Link>
-          </Menu.Item>)}
-          {admin && (
-            <Menu.Item key="/adminpanel">
+        {(targetNetwork.name == "localhost" || admin) && (
+          <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
+            <Menu.Item key="/">
               <Link
                 onClick={() => {
-                  setRoute("/adminpanel");
+                  setRoute("/");
                 }}
-                to="/adminpanel"
+                to="/"
               >
-                Admin Panel
+                App
               </Link>
             </Menu.Item>
-          )}
-        </Menu>)}
+            {targetNetwork.name == "localhost" && (
+              <Menu.Item key="/contracts">
+                <Link
+                  onClick={() => {
+                    setRoute("/contracts");
+                  }}
+                  to="/contracts"
+                >
+                  Contracts
+                </Link>
+              </Menu.Item>
+            )}
+            {admin && (
+              <Menu.Item key="/adminpanel">
+                <Link
+                  onClick={() => {
+                    setRoute("/adminpanel");
+                  }}
+                  to="/adminpanel"
+                >
+                  Admin Panel
+                </Link>
+              </Menu.Item>
+            )}
+          </Menu>
+        )}
 
-        <Switch>
-          <Route exact path="/">
-            {/*
+        <main style={{ marginTop: 80 }}>
+          <Switch>
+            <Route exact path="/">
+              {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
-            <Home
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              admin={admin}
-              address={address}
-              mainnetProvider={mainnetProvider}
-              tx={tx}
-              isWalletConnected={isWalletConnected}
-            />
-          </Route>
-          <Route path="/room/:room">
-            <Room
-              address={address}
-              appServer={appServer}
-              web3Modal={web3Modal}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              readContracts={readContracts}
-              writeContracts={writeContracts}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              admin={admin}
-              chainId={localChainId || selectedChainId}
-              selectedChainId={selectedChainId}
-              tx={tx}
-            />
-          </Route>
-          <Route exact path="/contracts">
-            <Contract
-              name="TokenDistributor"
-              signer={userSigner}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-            <Contract
-              name="DummyToken"
-              signer={userSigner}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-          </Route>
-          {admin && (
-            <Route exact path="/adminpanel">
-              <Admin
-                readContracts={readContracts}
+              <Home
                 writeContracts={writeContracts}
-                mainnetProvider={mainnetProvider}
-                localProvider={localProvider}
-                yourLocalBalance={yourLocalBalance}
-                title={title}
-                appServer={appServer}
-                tx={tx}
-                address={address}
+                readContracts={readContracts}
                 admin={admin}
+                address={address}
+                mainnetProvider={mainnetProvider}
+                tx={tx}
+                isWalletConnected={isWalletConnected}
               />
             </Route>
-          )}
-        </Switch>
+            <Route path="/room/:room">
+              <Room
+                address={address}
+                appServer={appServer}
+                web3Modal={web3Modal}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+                localProvider={localProvider}
+                yourLocalBalance={yourLocalBalance}
+                admin={admin}
+                chainId={localChainId || selectedChainId}
+                selectedChainId={selectedChainId}
+                tx={tx}
+              />
+            </Route>
+            <Route exact path="/contracts">
+              <Contract
+                name="TokenDistributor"
+                signer={userSigner}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
+              <Contract
+                name="DummyToken"
+                signer={userSigner}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
+            </Route>
+            {admin && (
+              <Route exact path="/adminpanel">
+                <Admin
+                  readContracts={readContracts}
+                  writeContracts={writeContracts}
+                  mainnetProvider={mainnetProvider}
+                  localProvider={localProvider}
+                  yourLocalBalance={yourLocalBalance}
+                  title={title}
+                  appServer={appServer}
+                  tx={tx}
+                  address={address}
+                  admin={admin}
+                />
+              </Route>
+            )}
+          </Switch>
+        </main>
       </BrowserRouter>
       <ThemeSwitch />
 
