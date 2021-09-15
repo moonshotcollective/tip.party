@@ -316,9 +316,24 @@ function App(props) {
                       },
                     ];
                     console.log("data", data);
-                    const tx = await ethereum.request({ method: "wallet_addEthereumChain", params: data }).catch();
-                    if (tx) {
-                      console.log(tx);
+                    // try to add new chain
+                    try {
+                      await ethereum.request({ method: "wallet_addEthereumChain", params: data });
+                    } catch (error) {
+                      // if failed, try a network switch instead
+                      await ethereum
+                        .request({
+                          method: "wallet_switchEthereumChain",
+                          params: [
+                            {
+                              chainId: "0x" + targetNetwork.chainId.toString(16),
+                            },
+                          ],
+                        })
+                        .catch();
+                      if (tx) {
+                        console.log(tx);
+                      }
                     }
                   }}
                 >
@@ -406,7 +421,7 @@ function App(props) {
       <Layout style={{ fixed: "top" }}>
         <PageHeader
           title={
-            <a href="https://tip.party" target="_blank" rel="noopener noreferrer" style={{ float: "left" }}>
+            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }}>
               Tip.Party
             </a>
           }
@@ -433,108 +448,114 @@ function App(props) {
         />
       </Layout>
       <BrowserRouter>
-        <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-          <Menu.Item key="/">
-            <Link
-              onClick={() => {
-                setRoute("/");
-              }}
-              to="/"
-            >
-              App
-            </Link>
-          </Menu.Item>
-          <Menu.Item key="/contracts">
-            <Link
-              onClick={() => {
-                setRoute("/contracts");
-              }}
-              to="/contracts"
-            >
-              Contracts
-            </Link>
-          </Menu.Item>
-          {admin && (
-            <Menu.Item key="/adminpanel">
+        {(targetNetwork.name == "localhost" || admin) && (
+          <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
+            <Menu.Item key="/">
               <Link
                 onClick={() => {
-                  setRoute("/adminpanel");
+                  setRoute("/");
                 }}
-                to="/adminpanel"
+                to="/"
               >
-                Admin Panel
+                App
               </Link>
             </Menu.Item>
-          )}
-        </Menu>
+            {targetNetwork.name == "localhost" && (
+              <Menu.Item key="/contracts">
+                <Link
+                  onClick={() => {
+                    setRoute("/contracts");
+                  }}
+                  to="/contracts"
+                >
+                  Contracts
+                </Link>
+              </Menu.Item>
+            )}
+            {admin && (
+              <Menu.Item key="/adminpanel">
+                <Link
+                  onClick={() => {
+                    setRoute("/adminpanel");
+                  }}
+                  to="/adminpanel"
+                >
+                  Admin Panel
+                </Link>
+              </Menu.Item>
+            )}
+          </Menu>
+        )}
 
-        <Switch>
-          <Route exact path="/">
-            {/*
+        <main style={{ marginTop: 80 }}>
+          <Switch>
+            <Route exact path="/">
+              {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
-            <Home
-              writeContracts={writeContracts}
-              readContracts={readContracts}
-              admin={admin}
-              address={address}
-              mainnetProvider={mainnetProvider}
-              tx={tx}
-              isWalletConnected={isWalletConnected}
-            />
-          </Route>
-          <Route path="/room/:room">
-            <Room
-              address={address}
-              appServer={appServer}
-              web3Modal={web3Modal}
-              userSigner={userSigner}
-              mainnetProvider={mainnetProvider}
-              readContracts={readContracts}
-              writeContracts={writeContracts}
-              localProvider={localProvider}
-              yourLocalBalance={yourLocalBalance}
-              admin={admin}
-              chainId={localChainId || selectedChainId}
-              selectedChainId={selectedChainId}
-              tx={tx}
-            />
-          </Route>
-          <Route exact path="/contracts">
-            <Contract
-              name="TokenDistributor"
-              signer={userSigner}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-            <Contract
-              name="DummyToken"
-              signer={userSigner}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-          </Route>
-          {admin && (
-            <Route exact path="/adminpanel">
-              <Admin
-                readContracts={readContracts}
+              <Home
                 writeContracts={writeContracts}
-                mainnetProvider={mainnetProvider}
-                localProvider={localProvider}
-                yourLocalBalance={yourLocalBalance}
-                title={title}
-                appServer={appServer}
-                tx={tx}
-                address={address}
+                readContracts={readContracts}
                 admin={admin}
+                address={address}
+                mainnetProvider={mainnetProvider}
+                tx={tx}
+                isWalletConnected={isWalletConnected}
               />
             </Route>
-          )}
-        </Switch>
+            <Route path="/room/:room">
+              <Room
+                address={address}
+                appServer={appServer}
+                web3Modal={web3Modal}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+                localProvider={localProvider}
+                yourLocalBalance={yourLocalBalance}
+                admin={admin}
+                chainId={localChainId || selectedChainId}
+                selectedChainId={selectedChainId}
+                tx={tx}
+              />
+            </Route>
+            <Route exact path="/contracts">
+              <Contract
+                name="TokenDistributor"
+                signer={userSigner}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
+              <Contract
+                name="DummyToken"
+                signer={userSigner}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
+            </Route>
+            {admin && (
+              <Route exact path="/adminpanel">
+                <Admin
+                  readContracts={readContracts}
+                  writeContracts={writeContracts}
+                  mainnetProvider={mainnetProvider}
+                  localProvider={localProvider}
+                  yourLocalBalance={yourLocalBalance}
+                  title={title}
+                  appServer={appServer}
+                  tx={tx}
+                  address={address}
+                  admin={admin}
+                />
+              </Route>
+            )}
+          </Switch>
+        </main>
       </BrowserRouter>
       <ThemeSwitch />
 
