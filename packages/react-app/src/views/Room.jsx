@@ -348,33 +348,35 @@ export default function Rooms({
                     )}
                   />
                 </Collapse.Panel>
-                {admin &&<Collapse.Panel header="Blacklist" key="2">
-                  <List
-                    bordered
-                    dataSource={blacklist}
-                    renderItem={(item, index) => (
-                      <List.Item>
-                        <div
-                          style={{
-                            width: "100%",
-                            flex: 1,
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                          {admin && (
-                            <Button onClick={() => reList(index)} size="medium">
-                              <CloseOutlined />
-                            </Button>
-                          )}
-                        </div>
-                      </List.Item>
-                    )}
-                  />
-                </Collapse.Panel>}
+                {admin && (
+                  <Collapse.Panel header="Blacklist" key="2">
+                    <List
+                      bordered
+                      dataSource={blacklist}
+                      renderItem={(item, index) => (
+                        <List.Item>
+                          <div
+                            style={{
+                              width: "100%",
+                              flex: 1,
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                            {admin && (
+                              <Button onClick={() => reList(index)} size="medium">
+                                <CloseOutlined />
+                              </Button>
+                            )}
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+                  </Collapse.Panel>
+                )}
               </Collapse>
               {/* {canRenderAdminComponents && (
                 <div style={{ marginTop: 10 }}>
