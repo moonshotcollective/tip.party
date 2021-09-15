@@ -406,7 +406,7 @@ function App(props) {
       <Layout style={{ fixed: "top" }}>
         <PageHeader
           title={
-            <a href="https://tip.party" target="_blank" rel="noopener noreferrer" style={{ float: "left" }}>
+            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }}>
               Tip.Party
             </a>
           }
