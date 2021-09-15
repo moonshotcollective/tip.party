@@ -316,9 +316,24 @@ function App(props) {
                       },
                     ];
                     console.log("data", data);
-                    const tx = await ethereum.request({ method: "wallet_addEthereumChain", params: data }).catch();
-                    if (tx) {
-                      console.log(tx);
+                    // try to add new chain
+                    try {
+                      await ethereum.request({ method: "wallet_addEthereumChain", params: data });
+                    } catch (error) {
+                      // if failed, try a network switch instead
+                      await ethereum
+                        .request({
+                          method: "wallet_switchEthereumChain",
+                          params: [
+                            {
+                              chainId: "0x" + targetNetwork.chainId.toString(16),
+                            },
+                          ],
+                        })
+                        .catch();
+                      if (tx) {
+                        console.log(tx);
+                      }
                     }
                   }}
                 >
