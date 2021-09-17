@@ -37,7 +37,6 @@ export default function Rooms({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
-  const [confetti, setConfetti] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
 
   const subs = useRef([]);
