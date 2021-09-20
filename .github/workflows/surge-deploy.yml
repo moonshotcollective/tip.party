@@ -29,6 +29,6 @@ jobs:
       - name: Deploy to surge
         uses: dswistowski/surge-sh-action@v1
         with:
-          domain: ${{ secrets.domain }}
+          domain: app.${{ secrets.domain }}
           project: './packages/react-app/build'
           token: ${{ secrets.surge_token }}
