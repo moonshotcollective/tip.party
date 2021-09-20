@@ -16,7 +16,15 @@ yarn install
 yarn chain
 ```
 
-Add .env in `packages/react-app/.env` with "REACT_APP_SERVER=<THE_SERVER_URL>"
+Add .env in `packages/react-app/.env` with 
+```
+REACT_APP_PROVIDER=<PROVIDER>
+REACT_APP_SERVER=<THE_SERVER_URL>
+REACT_APP_NETWORK=<NETWORK>
+REACT_APP_FIRE_API=<FIREBASE API KEY>
+REACT_APP_FIRE_DOMAIN=<Firebase APP DOMAIN>
+REACT_APP_FIRE_ID=<ID>
+```
 
 > in a second terminal window, start your 📱 frontend:
 
