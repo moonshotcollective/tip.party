@@ -4,9 +4,6 @@ on:
   pull_request:
     types: [closed]
     branches: [master]
-  pull_request:
-    types: [closed]
-    branches: [master]
 
 jobs:
   deployer-job:
