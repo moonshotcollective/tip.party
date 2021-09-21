@@ -65,12 +65,12 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
       await devTransfer.wait(confirmationRequirement);
     }
 
-    await deploy("DummyToken", {
+    await deploy("dGTC", {
       from: deployer,
       log: true,
     });
 
-    const dummyTokenContract = await ethers.getContract("DummyToken", deployer);
+    const dummyTokenContract = await ethers.getContract("dGTC", deployer);
 
     // transfer ownership to UI owner if needed
     const ownershipTransfer = await tokenDistributorContract.transferOwnership(
@@ -110,4 +110,4 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
   }
 };
 
-module.exports.tags = ["TokenDistributor", "DummyToken", "Tipsta"];
+module.exports.tags = ["TokenDistributor", "dGTC", "Tipsta"];

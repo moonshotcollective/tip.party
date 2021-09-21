@@ -800,6 +800,26 @@ module.exports = {
         address: "0xde30da39c46104798bb5aa3fe8b9e0e1f348163f",
         abi: ERC20ABI,
       },
+      ROBOT: {
+        address: "0xfb5453340c03db5ade474b27e68b6a9c6b2823eb",
+        abi: ERC20ABI,
+      },
+      SPORK: {
+        address: "0xb624FdE1a972B1C89eC1dAD691442d5E8E891469",
+        abi: ERC20ABI,
+      },
+      WORK: {
+        address: "0x1482295Df16e7761d128B9823B61785D43CA038B",
+        abi: ERC20ABI,
+      },
+      HAUS: {
+        address: "0xf2051511B9b121394FA75B8F7d4E7424337af687",
+        abi: ERC20ABI,
+      },
+      RAID: {
+        address: "0x154e35c2b0024b3e079c5c5e4fc31c979c189ccb",
+        abi: ERC20ABI,
+      },
     },
   },
   4: {

@@ -1,13 +1,15 @@
 name: Scaffold-eth Staging Surge Deployer workflow
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches: [develop]
 
 jobs:
   deployer-job:
     name: Deployer job
     runs-on: ubuntu-latest
+    # if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v2.1.0
       - name: Use Node.js

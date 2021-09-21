@@ -1,13 +1,15 @@
 name: Scaffold-eth Surge Deployer workflow
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches: [master]
 
 jobs:
   deployer-job:
     name: Deployer job
     runs-on: ubuntu-latest
+    # if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v2.1.0
       - name: Use Node.js
@@ -28,6 +30,6 @@ jobs:
       - name: Deploy to surge
         uses: dswistowski/surge-sh-action@v1
         with:
-          domain: ${{ secrets.domain }}
+          domain: app.${{ secrets.domain }}
           project: './packages/react-app/build'
           token: ${{ secrets.surge_token }}

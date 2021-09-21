@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Card, Input, Select, Collapse } from "antd";
+import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
@@ -37,7 +37,6 @@ export default function Rooms({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
-  const [confetti, setConfetti] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
 
   const subs = useRef([]);
@@ -54,14 +53,14 @@ export default function Rooms({
   };
 
   const handleListUpdate = list => {
-    const updatedList = [...addresses, ...list];
+    const updatedList = new Set([...addresses, ...list]);
     // update addresses list
-    setAddresses(updatedList);
+    setAddresses([...updatedList]);
   };
 
   const hanndleTransactionUpdate = newTx => {
-    const update = [...newTx, ...txHash];
-    setTxHash(update);
+    const update = new Set([...newTx, ...txHash]);
+    setTxHash([...update]);
   };
 
   useEffect(() => {
@@ -71,10 +70,6 @@ export default function Rooms({
   }, [addresses, address]);
 
   useEffect(() => {
-    // clear txHash and addresses
-    setAddresses([]);
-    setTxHash([]);
-
     // clear existing subscriptions
     subs.current.map(sub => sub());
 
@@ -277,25 +272,142 @@ export default function Rooms({
       style={{
         margin: "20px auto",
         marginBottom: 30,
-        width: 1000,
+        width: 500,
         padding: 20,
         paddingBottom: 40,
         border: "3px solid",
       }}
     >
-      <h2>Sign In</h2>
       <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
       <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-        <div>
-          <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-            Sign Into "{room}" Room
-          </Button>
-          <Divider />
-          {/* <div style={{ marginBottom: "10px" }}>
-            <Statistic title="Signed In" value={isSignedIn} valueStyle={{ color: !isSignedIn ? "red" : "green" }} />
-          </div> */}
+        <Tabs defaultActiveKey="1" centered>
+          <Tabs.TabPane tab="Room List" key="1">
+            <div style={{ marginTop: 10 }}>
+              {/* <div style={{ marginBottom: 20 }}>
+                <h2>Sign In</h2>
+              </div> */}
+              <div style={{ marginBottom: 20 }}>
+                <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
+                  Sign Into "{room}" Room
+                </Button>
+              </div>
+              {/* <Divider /> */}
 
-          <div style={{ display: "flex", flex: 1, width: "100%", flexDirection: "row" }}>
+              <div style={{ flex: 1 }}>
+                <Collapse defaultActiveKey={["1"]}>
+                  <Collapse.Panel header={`Pay List - ${addresses.length}`} key="1">
+                    <List
+                      bordered
+                      dataSource={addresses}
+                      renderItem={(item, index) => (
+                        <List.Item key={item.toLowerCase()}>
+                          <div
+                            style={{
+                              width: "100%",
+                              flex: 1,
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                            {admin && (
+                              <Button onClick={() => unList(index)} size="medium">
+                                <CloseOutlined />
+                              </Button>
+                            )}
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+                  </Collapse.Panel>
+                  {admin && (
+                    <Collapse.Panel header="Blacklist" key="2">
+                      <List
+                        bordered
+                        dataSource={blacklist}
+                        renderItem={(item, index) => (
+                          <List.Item>
+                            <div
+                              style={{
+                                width: "100%",
+                                flex: 1,
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                              {admin && (
+                                <Button onClick={() => reList(index)} size="medium">
+                                  <CloseOutlined />
+                                </Button>
+                              )}
+                            </div>
+                          </List.Item>
+                        )}
+                      />
+                    </Collapse.Panel>
+                  )}
+                </Collapse>
+                {/* {canRenderAdminComponents && (
+                <div style={{ marginTop: 10 }}>
+                  <Button
+                    disabled={isFiltering}
+                    loading={isFiltering}
+                    style={{ marginLeft: "10px" }}
+                    onClick={filterAddresses}
+                  >
+                    Filter Out Non ENS Names
+                  </Button>
+                </div>
+              )} */}
+              </div>
+
+              <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>
+                {canRenderAdminComponents && (
+                  <div>
+                    {/* TODO : disable input until ERC-20 token is selected */}
+                    <Input
+                      value={amount}
+                      addonBefore="Total Amount to Distribute"
+                      addonAfter={
+                        <Select defaultValue="ETH" onChange={value => setToken(value)}>
+                          <Select.Option value="ETH">ETH</Select.Option>
+                          {availableTokens.map(name => (
+                            <Select.Option key={name} value={name}>
+                              {name}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      }
+                      style={{ marginTop: "10px" }}
+                      onChange={amountChangeHandler}
+                    />
+
+                    <PayButton
+                      style={{ marginTop: 20 }}
+                      token={token}
+                      appName="Tip.party"
+                      tokenListHandler={tokens => setAvailableTokens(tokens)}
+                      callerAddress={address}
+                      maxApproval={amount}
+                      amount={amount}
+                      spender={spender}
+                      yourLocalBalance={yourLocalBalance}
+                      readContracts={readContracts}
+                      writeContracts={writeContracts}
+                      ethPayHandler={ethPayHandler}
+                      tokenPayHandler={tokenPayHandler}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Payout History" key="2">
             {/* Transactions */}
             <div style={{ marginBottom: 25, flex: 1 }}>
               <Card title="Payout Transactions" style={{ width: "100%" }}>
@@ -316,121 +428,8 @@ export default function Rooms({
                 />
               </Card>
             </div>
-
-            <div style={{ width: 10 }}></div>
-
-            <div style={{ flex: 1 }}>
-              <Collapse defaultActiveKey={["1"]}>
-                <Collapse.Panel header="Pay List" key="1">
-                  <List
-                    bordered
-                    dataSource={addresses}
-                    renderItem={(item, index) => (
-                      <List.Item>
-                        <div
-                          style={{
-                            width: "100%",
-                            flex: 1,
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                          {admin && (
-                            <Button onClick={() => unList(index)} size="medium">
-                              <CloseOutlined />
-                            </Button>
-                          )}
-                        </div>
-                      </List.Item>
-                    )}
-                  />
-                </Collapse.Panel>
-                <Collapse.Panel header="Blacklist" key="2">
-                  <List
-                    bordered
-                    dataSource={blacklist}
-                    renderItem={(item, index) => (
-                      <List.Item>
-                        <div
-                          style={{
-                            width: "100%",
-                            flex: 1,
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                          {admin && (
-                            <Button onClick={() => reList(index)} size="medium">
-                              <CloseOutlined />
-                            </Button>
-                          )}
-                        </div>
-                      </List.Item>
-                    )}
-                  />
-                </Collapse.Panel>
-              </Collapse>
-              {/* {canRenderAdminComponents && (
-                <div style={{ marginTop: 10 }}>
-                  <Button
-                    disabled={isFiltering}
-                    loading={isFiltering}
-                    style={{ marginLeft: "10px" }}
-                    onClick={filterAddresses}
-                  >
-                    Filter Out Non ENS Names
-                  </Button>
-                </div>
-              )} */}
-            </div>
-          </div>
-
-          <div style={{ maxWidth: 400, width: "100%", display: "flex", margin: "10px auto" }}>
-            {canRenderAdminComponents && (
-              <div>
-                {/* TODO : disable input until ERC-20 token is selected */}
-                <Input
-                  value={amount}
-                  addonBefore="Total Amount to Distribute"
-                  addonAfter={
-                    <Select defaultValue="ETH" onChange={value => setToken(value)}>
-                      <Select.Option value="ETH">ETH</Select.Option>
-                      {availableTokens.map(name => (
-                        <Select.Option key={name} value={name}>
-                          {name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  }
-                  style={{ marginTop: "10px" }}
-                  onChange={amountChangeHandler}
-                />
-
-                <PayButton
-                  style={{ marginTop: 20 }}
-                  token={token}
-                  appName="Tip.party"
-                  tokenListHandler={tokens => setAvailableTokens(tokens)}
-                  callerAddress={address}
-                  maxApproval={amount}
-                  amount={amount}
-                  spender={spender}
-                  yourLocalBalance={yourLocalBalance}
-                  readContracts={readContracts}
-                  writeContracts={writeContracts}
-                  ethPayHandler={ethPayHandler}
-                  tokenPayHandler={tokenPayHandler}
-                />
-              </div>
-            )}
-          </div>
-        </div>
+          </Tabs.TabPane>
+        </Tabs>
       </div>
     </div>
   );
