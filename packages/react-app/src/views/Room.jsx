@@ -366,7 +366,7 @@ export default function Rooms({
               )} */}
               </div>
 
-              <div style={{ maxWidth: 400, width: "100%", display: "flex", margin: "10px auto" }}>
+              <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>
                 {canRenderAdminComponents && (
                   <div>
                     {/* TODO : disable input until ERC-20 token is selected */}
