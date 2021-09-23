@@ -280,12 +280,12 @@ export default function Rooms({
 
   const exportMenu = (
     <Menu>
-      <Menu.Item key="Export CSV">
+      <Menu.Item key="export_csv">
         <CSVLink data={addresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
           Export CSV
         </CSVLink>
       </Menu.Item>
-      <Menu.Item key="Copy to ClipBoard">
+      <Menu.Item key="copy_to_clipboard">
         <a target="_blank" onClick={copyToClipBoard}>
           Copy to Clipboard
         </a>
