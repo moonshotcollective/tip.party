@@ -267,7 +267,7 @@ export default function Rooms({
     setIsFiltering(false);
   };
 
-  const copyToClipBoard = async () => {
+  const copyToClipBoard = () => {
     copy(addresses, {
       debug: true,
       message: "Copied List to ClipBoard",
