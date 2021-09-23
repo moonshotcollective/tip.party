@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
+import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
+import { CSVLink } from "react-csv";
+import copy from "copy-to-clipboard";
 import * as storage from "../utils/storage";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -265,6 +267,32 @@ export default function Rooms({
     setIsFiltering(false);
   };
 
+  const copyToClipBoard = () => {
+    copy(addresses, {
+      debug: true,
+      message: "Copied List to ClipBoard",
+    });
+    notification.success({
+      message: "Copied List To ClipBoard",
+      placement: "bottomRight",
+    });
+  };
+
+  const exportMenu = (
+    <Menu>
+      <Menu.Item key="export_csv">
+        <CSVLink data={addresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
+          Export CSV
+        </CSVLink>
+      </Menu.Item>
+      <Menu.Item key="copy_to_clipboard">
+        <a target="_blank" onClick={copyToClipBoard}>
+          Copy to Clipboard
+        </a>
+      </Menu.Item>
+    </Menu>
+  );
+
   const canRenderAdminComponents = admin && addresses && addresses.length > 0;
 
   return (
@@ -295,7 +323,17 @@ export default function Rooms({
 
               <div style={{ flex: 1 }}>
                 <Collapse defaultActiveKey={["1"]}>
-                  <Collapse.Panel header={`Pay List - ${addresses.length}`} key="1">
+                  <Collapse.Panel
+                    header={`Pay List - ${addresses.length}`}
+                    key="1"
+                    extra={
+                      <div onClick={e => e.stopPropagation()}>
+                        <Dropdown overlay={exportMenu} placement="bottomRight" arrow>
+                          <ExportOutlined />
+                        </Dropdown>
+                      </div>
+                    }
+                  >
                     <List
                       bordered
                       dataSource={addresses}
