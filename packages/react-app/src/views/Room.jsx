@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
 import { CSVLink } from "react-csv";
+import copy from "copy-to-clipboard";
 import * as storage from "../utils/storage";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -267,7 +268,10 @@ export default function Rooms({
   };
 
   const copyToClipBoard = async () => {
-    navigator.clipboard.writeText(addresses);
+    copy(addresses, {
+      debug: true,
+      message: "Copied List to ClipBoard",
+    });
     notification.success({
       message: "Copied List To ClipBoard",
       placement: "bottomRight",
@@ -276,12 +280,12 @@ export default function Rooms({
 
   const exportMenu = (
     <Menu>
-      <Menu.Item>
+      <Menu.Item key="Export CSV">
         <CSVLink data={addresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
           Export CSV
         </CSVLink>
       </Menu.Item>
-      <Menu.Item>
+      <Menu.Item key="Copy to ClipBoard">
         <a target="_blank" onClick={copyToClipBoard}>
           Copy to Clipboard
         </a>
