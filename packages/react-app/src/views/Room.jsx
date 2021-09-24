@@ -459,7 +459,6 @@ export default function Rooms({
                         import ERC20 token...
                       </a>
                     </div>
-
                     <PayButton
                       style={{ marginTop: 20 }}
                       token={token}
