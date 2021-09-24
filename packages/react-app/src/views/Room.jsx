@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
-import { Address, PayButton, TransactionHash } from "../components";
+import { Address, PayButton, TransactionHash, AddressModal } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
 import * as storage from "../utils/storage";
+import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
 
@@ -17,8 +18,8 @@ export default function Rooms({
   address,
   userSigner,
   mainnetProvider,
-  writeContracts,
-  readContracts,
+  writeContracts: oldWriteContracts,
+  readContracts: oldReadContracts,
   admin,
   yourLocalBalance,
   localProvider,
@@ -39,13 +40,27 @@ export default function Rooms({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [importToken, setImportToken] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
+  const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+
+  const { readContracts, writeContracts } = contracts;
 
   const subs = useRef([]);
 
   useEffect(() => {
-    setSpender(readContracts?.TokenDistributor?.address);
-  }, [readContracts]);
+    if (oldWriteContracts?.TokenDistributor) {
+      setSpender(oldWriteContracts?.TokenDistributor?.address);
+      addContracts({ writeContracts: oldWriteContracts, readContracts: oldReadContracts });
+    }
+  }, [oldWriteContracts]);
+
+  const handleTokenImport = async tokenAddress => {
+    // load the contract to the scaffold variables
+    const tokenSymbol = await loadContracts(tokenAddress);
+    setToken(tokenSymbol);
+    setImportToken(false);
+  };
 
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
@@ -412,7 +427,7 @@ export default function Rooms({
                       value={amount}
                       addonBefore="Total Amount to Distribute"
                       addonAfter={
-                        <Select defaultValue="ETH" onChange={value => setToken(value)}>
+                        <Select defaultValue="ETH" value={token} onChange={value => setToken(value)}>
                           <Select.Option value="ETH">ETH</Select.Option>
                           {availableTokens.map(name => (
                             <Select.Option key={name} value={name}>
@@ -424,6 +439,26 @@ export default function Rooms({
                       style={{ marginTop: "10px" }}
                       onChange={amountChangeHandler}
                     />
+
+                    <AddressModal
+                      visible={importToken}
+                      handleAddress={handleTokenImport}
+                      onCancel={() => setImportToken(false)}
+                      okText="Import Token"
+                    />
+
+                    <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
+                      <a
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+
+                          setImportToken(true);
+                        }}
+                      >
+                        import ERC20 token...
+                      </a>
+                    </div>
 
                     <PayButton
                       style={{ marginTop: 20 }}
