@@ -20,23 +20,23 @@ function TokenImport(provider, signer) {
     writeContracts: {},
   });
 
-  const loadContracts = data => {
+  const addContract = data => {
     dispatch({ type: "loadContract", data });
   };
 
-  const addContract = async tokenAddress => {
+  const loadContract = async tokenAddress => {
     const readUpdate = new ethers.Contract(tokenAddress, ERC20ABI, provider);
     const writeUpdate = new ethers.Contract(tokenAddress, ERC20ABI, signer);
 
     const symbol = await readUpdate.symbol();
 
     const data = { readContracts: { [symbol]: readUpdate }, writeContracts: { [symbol]: writeUpdate } };
-    loadContracts(data);
+    addContract(data);
 
     return symbol;
   };
 
-  return [contracts, addContract, loadContracts];
+  return [contracts, loadContract, addContract];
 }
 
 export default TokenImport;
