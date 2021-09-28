@@ -324,7 +324,7 @@ export default function Rooms({
       <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
       <div style={{ marginTop: "10px", marginBottom: "10px" }}>
         <Tabs defaultActiveKey="1" centered>
-          <Tabs.TabPane tab="Room List" key="1">
+          <Tabs.TabPane tab="Room" key="1">
             <div style={{ marginTop: 10 }}>
               {/* <div style={{ marginBottom: 20 }}>
                 <h2>Sign In</h2>
@@ -339,7 +339,7 @@ export default function Rooms({
               <div style={{ flex: 1 }}>
                 <Collapse defaultActiveKey={["1"]}>
                   <Collapse.Panel
-                    header={`Pay List - ${addresses.length}`}
+                    header={admin ?  `Pay List - ${addresses.length}` :  `Signed In - ${addresses.length}`}
                     key="1"
                     extra={
                       <div onClick={e => e.stopPropagation()}>
