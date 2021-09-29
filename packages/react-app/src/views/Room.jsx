@@ -11,6 +11,7 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
+import "./Room.css"
 
 export default function Rooms({
   appServer,
@@ -312,13 +313,13 @@ export default function Rooms({
 
   return (
     <div
+      className="Room"
       style={{
         margin: "20px auto",
         marginBottom: 30,
         width: 500,
         padding: 20,
         paddingBottom: 40,
-        border: "3px solid",
       }}
     >
       <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
