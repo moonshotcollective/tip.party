@@ -1,9 +1,10 @@
-import { Badge, Button, Space, Menu, Dropdown } from "antd";
+import { Badge, Button, Space, Menu, Dropdown, Card, Avatar } from "antd";
 import React from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
-import Address from "./Address";
-import Balance from "./Balance";
-import { DownOutlined, UserOutlined, CaretDownOutlined } from "@ant-design/icons";
+import Address from "../Address";
+import Balance from "../Balance";
+import { DownOutlined, LogoutOutlined } from "@ant-design/icons";
+import "./Account.css";
 // import Wallet from "./Wallet";
 
 /*
@@ -60,12 +61,13 @@ export default function Account({
 
   const menu = (
     <Menu>
-      <Menu.ItemGroup key="1" icon={"Balance: "}>
+      <Menu.ItemGroup key="1">
         {isValidAddress(address) ? <Balance address={address} provider={localProvider} price={price} /> : ""}
       </Menu.ItemGroup>
-      <Menu.ItemGroup key="2" style={{ textAlign: "center" }}>
+      <Menu.ItemGroup key="2">
         <a key="logoutbutton" size="medium" onClick={logoutOfWeb3Modal}>
-          Logout
+          <LogoutOutlined />
+          {` Logout`}
         </a>
       </Menu.ItemGroup>
     </Menu>
@@ -77,16 +79,15 @@ export default function Account({
       modalButtons.push(
         <div key="first">
           {isValidAddress(address) ? (
-            <Space wrap>
-              <Dropdown.Button overlay={menu} icon={<DownOutlined />} size={"large"}>
-                {isOwner ? (
-                  <Badge count={"admin"} style={{ marginRight: 5 }} />
-                ) : (
-                  <Badge count={"user"} style={{ backgroundColor: "#52c41a", marginRight: 5 }} />
-                )}
-                <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />
-              </Dropdown.Button>
-            </Space>
+            <Dropdown.Button block ghost overlay={menu} icon={<DownOutlined />} trigger="click" size={"large"}>
+              <Address
+                address={address}
+                ensProvider={mainnetProvider}
+                blockExplorer={blockExplorer}
+                blockieSize={10}
+                extra={isOwner ? <p style={{ color: "#ff0000" }}>Admin</p> : <p style={{ color: "#52c41a" }}>User</p>}
+              />
+            </Dropdown.Button>
           ) : (
             ""
           )}
@@ -98,11 +99,12 @@ export default function Account({
           key="loginbutton"
           style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
           size="medium"
-          /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */
           onClick={loadWeb3Modal}
           key="second"
+          type="primary"
+          shape="round"
         >
-          Please connect your Wallet
+          Connect Wallet
         </Button>,
       );
     }

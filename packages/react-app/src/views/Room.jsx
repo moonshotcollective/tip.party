@@ -339,7 +339,7 @@ export default function Rooms({
               <div style={{ flex: 1 }}>
                 <Collapse defaultActiveKey={["1"]}>
                   <Collapse.Panel
-                    header={admin ?  `Pay List - ${addresses.length}` :  `Signed In - ${addresses.length}`}
+                    header={admin ? `Pay List - ${addresses.length}` : `Signed In - ${addresses.length}`}
                     key="1"
                     extra={
                       <div onClick={e => e.stopPropagation()}>
