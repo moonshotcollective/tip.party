@@ -11,7 +11,7 @@ import { Account, Contract, ThemeSwitch, Ramp, GasGauge, Faucet } from "./compon
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Admin, Room, Home } from "./views";
+import { Admin, Room, Home, WalletNotConnected } from "./views";
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -511,70 +511,92 @@ function App(props) {
 
         <main style={{ marginTop: 80 }}>
           <Switch>
-            <Route exact path="/">
-              {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-              <Home
-                writeContracts={writeContracts}
-                readContracts={readContracts}
-                admin={admin}
-                address={address}
-                mainnetProvider={mainnetProvider}
-                tx={tx}
-                isWalletConnected={isWalletConnected}
+            {!isWalletConnected ? (
+              <WalletNotConnected
+                connector={
+                  <Account
+                    address={address}
+                    localProvider={localProvider}
+                    userSigner={userSigner}
+                    mainnetProvider={mainnetProvider}
+                    price={price}
+                    web3Modal={web3Modal}
+                    loadWeb3Modal={loadWeb3Modal}
+                    logoutOfWeb3Modal={logoutOfWeb3Modal}
+                    blockExplorer={blockExplorer}
+                    isOwner={admin}
+                    width={400}
+                  />
+                }
               />
-            </Route>
-            <Route path="/room/:room">
-              <Room
-                address={address}
-                appServer={appServer}
-                web3Modal={web3Modal}
-                userSigner={userSigner}
-                mainnetProvider={mainnetProvider}
-                readContracts={readContracts}
-                writeContracts={writeContracts}
-                localProvider={localProvider}
-                yourLocalBalance={yourLocalBalance}
-                admin={admin}
-                chainId={localChainId || selectedChainId}
-                selectedChainId={selectedChainId}
-                tx={tx}
-              />
-            </Route>
-            <Route exact path="/contracts">
-              <Contract
-                name="TokenDistributor"
-                signer={userSigner}
-                provider={localProvider}
-                address={address}
-                blockExplorer={blockExplorer}
-              />
-              <Contract
-                name="DummyToken"
-                signer={userSigner}
-                provider={localProvider}
-                address={address}
-                blockExplorer={blockExplorer}
-              />
-            </Route>
-            {admin && (
-              <Route exact path="/adminpanel">
-                <Admin
-                  readContracts={readContracts}
-                  writeContracts={writeContracts}
-                  mainnetProvider={mainnetProvider}
-                  localProvider={localProvider}
-                  yourLocalBalance={yourLocalBalance}
-                  title={title}
-                  appServer={appServer}
-                  tx={tx}
-                  address={address}
-                  admin={admin}
-                />
-              </Route>
+            ) : (
+              <>
+                <Route exact path="/">
+                  {/*
+                    🎛 this scaffolding is full of commonly used components
+                    this <Contract/> component will automatically parse your ABI
+                    and give you a form to interact with it locally
+                */}
+                  <Home
+                    writeContracts={writeContracts}
+                    readContracts={readContracts}
+                    admin={admin}
+                    address={address}
+                    mainnetProvider={mainnetProvider}
+                    tx={tx}
+                    isWalletConnected={isWalletConnected}
+                  />
+                </Route>
+                <Route path="/room/:room">
+                  <Room
+                    address={address}
+                    appServer={appServer}
+                    web3Modal={web3Modal}
+                    userSigner={userSigner}
+                    mainnetProvider={mainnetProvider}
+                    readContracts={readContracts}
+                    writeContracts={writeContracts}
+                    localProvider={localProvider}
+                    yourLocalBalance={yourLocalBalance}
+                    admin={admin}
+                    chainId={localChainId || selectedChainId}
+                    selectedChainId={selectedChainId}
+                    tx={tx}
+                  />
+                </Route>
+                <Route exact path="/contracts">
+                  <Contract
+                    name="TokenDistributor"
+                    signer={userSigner}
+                    provider={localProvider}
+                    address={address}
+                    blockExplorer={blockExplorer}
+                  />
+                  <Contract
+                    name="DummyToken"
+                    signer={userSigner}
+                    provider={localProvider}
+                    address={address}
+                    blockExplorer={blockExplorer}
+                  />
+                </Route>
+                {admin && (
+                  <Route exact path="/adminpanel">
+                    <Admin
+                      readContracts={readContracts}
+                      writeContracts={writeContracts}
+                      mainnetProvider={mainnetProvider}
+                      localProvider={localProvider}
+                      yourLocalBalance={yourLocalBalance}
+                      title={title}
+                      appServer={appServer}
+                      tx={tx}
+                      address={address}
+                      admin={admin}
+                    />
+                  </Route>
+                )}
+              </>
             )}
           </Switch>
         </main>

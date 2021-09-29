@@ -11,7 +11,7 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
-import "./Room.css"
+import "./Room.css";
 
 export default function Rooms({
   appServer,
