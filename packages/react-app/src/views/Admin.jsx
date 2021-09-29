@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { AddressInput } from "../components";
 import { Button, notification } from "antd";
+import "./Admin.css";
 
 export default function Admin({
   writeContracts,
@@ -15,9 +16,9 @@ export default function Admin({
   const [newAdmin, setNewAdmin] = useState("");
 
   return (
-    <div style={{ margin: "20px auto", width: 500, padding: 60, border: "3px solid" }}>
+    <div className="Admin" style={{ margin: "20px auto", width: 500, padding: 60 }}>
       <div style={{ marginTop: 10 }}>
-        <h2>Add Admin</h2>
+        <h2 id="addAdmin">Add Admin</h2>
         <div>
           <div style={{ padding: 10 }}>
             <AddressInput

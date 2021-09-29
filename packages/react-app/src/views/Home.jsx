@@ -3,6 +3,7 @@ import { Input, Button, notification, Form } from "antd";
 import { useHistory } from "react-router";
 import slugify from "slugify";
 import { ethers } from "ethers";
+import "./Home.css"
 
 export default function Admin({ writeContracts, readContracts, admin, isWalletConnected, tx }) {
   let history = useHistory();
@@ -48,18 +49,20 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
   }, [readContracts]);
 
   return (
-    <div style={{ margin: "20px auto", width: 500, padding: 60, border: "3px solid" }}>
-      <div style={{ marginTop: 10 }}>
-        <h2>Join a room</h2>
+    <div className="Home" style={{ margin: "20px auto", width: 500, padding: 60 }}>
+      <div >
+        <h2 id="joinRoom" >Join a room</h2>
         <div>
-          <div style={{ padding: 10 }}>
+          <div >
             <Form name="join_room" onFinish={handleJoinRoom}>
               <Form.Item name="room" rules={[{ required: true, message: "Please enter a room name!" }]}>
-                <Input placeholder="Room name" size="large" />
+                <div>
+                  <Input placeholder="Room name" size="large" />
+                </div>
               </Form.Item>
 
               <Form.Item>
-                <Button type="primary" size="large" block htmlType="submit">
+                <Button id="button1" type="primary" size="large" block htmlType="submit">
                   Load Room
                 </Button>
               </Form.Item>
@@ -72,7 +75,7 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
             <>
               <div style={{ marginTop: 10, marginBottom: 10 }}>OR</div>
               <div>
-                <Button block onClick={becomeDistributor} loading={tipstaCost === "..."}>
+                <Button id="button2" block onClick={becomeDistributor} loading={tipstaCost === "..."}>
                   Become A Distributor for {tipstaCost} ETH
                 </Button>
               </div>
