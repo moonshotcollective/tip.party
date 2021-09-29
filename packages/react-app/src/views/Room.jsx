@@ -343,7 +343,7 @@ export default function Rooms({
                     key="1"
                     extra={
                       <div onClick={e => e.stopPropagation()}>
-                        <Dropdown overlay={exportMenu} placement="bottomRight" arrow>
+                        <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
                           <ExportOutlined />
                         </Dropdown>
                       </div>
