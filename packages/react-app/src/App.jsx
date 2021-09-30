@@ -525,7 +525,7 @@ function App(props) {
                     logoutOfWeb3Modal={logoutOfWeb3Modal}
                     blockExplorer={blockExplorer}
                     isOwner={admin}
-                    width={400}
+                    width={300}
                   />
                 }
               />
