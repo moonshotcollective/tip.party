@@ -331,7 +331,7 @@ export default function Rooms({
                 <h2>Sign In</h2>
               </div> */}
               <div style={{ marginBottom: 20 }}>
-                <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
+                <Button type="primary" shape="round" onClick={handleSignIn}  disabled={isSignedIn} loading={isSigning}>
                   Sign Into "{room}" Room
                 </Button>
               </div>
@@ -480,7 +480,7 @@ export default function Rooms({
               </div>
             </div>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Payout History" key="2">
+          <Tabs.TabPane tab="Payouts" key="2">
             {/* Transactions */}
             <div style={{ marginBottom: 25, flex: 1 }}>
               <Card title="Payout Transactions" style={{ width: "100%" }}>
