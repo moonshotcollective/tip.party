@@ -3,7 +3,7 @@ import { Input, Button, notification, Form } from "antd";
 import { useHistory } from "react-router";
 import slugify from "slugify";
 import { ethers } from "ethers";
-import "./Home.css"
+import "./Home.css";
 
 export default function Admin({ writeContracts, readContracts, admin, isWalletConnected, tx }) {
   let history = useHistory();
@@ -50,10 +50,10 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
 
   return (
     <div className="Home" style={{ margin: "20px auto", width: 500, padding: 60 }}>
-      <div >
-        <h2 id="joinRoom" >Join a room</h2>
+      <div>
+        <h2 id="joinRoom">Join a room</h2>
         <div>
-          <div >
+          <div>
             <Form name="join_room" onFinish={handleJoinRoom}>
               <Form.Item name="room" rules={[{ required: true, message: "Please enter a room name!" }]}>
                 <div>
