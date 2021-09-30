@@ -470,7 +470,7 @@ function App(props) {
         />
       </Layout>
       <BrowserRouter>
-        {(targetNetwork.name == "localhost" || admin) && (
+        {(targetNetwork.name == "localhost") && (
           <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
             <Menu.Item key="/">
               <Link
