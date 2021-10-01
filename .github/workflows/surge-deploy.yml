@@ -18,6 +18,7 @@ jobs:
           node-version: 16.x
       - name: Build React App
         run: |
+          cd packages/react-app/ && yarn && CI=false yarn run theme
           cd packages/react-app/ && yarn && CI=false yarn run build
           cp build/index.html build/200.html
         env:
