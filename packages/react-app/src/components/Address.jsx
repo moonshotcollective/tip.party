@@ -1,8 +1,9 @@
-import { Skeleton, Typography } from "antd";
+import { Skeleton, Typography, Card } from "antd";
 import React from "react";
 import Blockies from "react-blockies";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import { useLookupAddress } from "../hooks";
+const { Meta } = Card;
 
 // changed value={address} to address={address}
 
@@ -96,7 +97,7 @@ export default function Address(props) {
     text = (
       <Text copyable={{ text: address }}>
         <a
-          style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }}
+          style={{ color: currentTheme === "light" ? "#222222" : "#ddd", hoverColor: "#6F3FF5" }}
           target="_blank"
           href={etherscanLink}
           rel="noopener noreferrer"
@@ -108,13 +109,19 @@ export default function Address(props) {
   }
 
   return (
-    <span>
-      <span style={{ verticalAlign: "middle" }}>
-        <Blockies seed={address.toLowerCase()} size={6} scale={props.fontSize ? props.fontSize / 7 : 4} />
-      </span>
-      <span style={{ verticalAlign: "middle", paddingLeft: 5, fontSize: props.fontSize ? props.fontSize : 20 }}>
-        {text}
-      </span>
-    </span>
+    <div style={{ padding: 10 }}>
+      <Meta
+        avatar={
+          <Blockies
+            seed={address.toLowerCase()}
+            size={props.blockieSize || 6}
+            scale={props.fontSize ? props.fontSize / 7 : 4}
+          />
+        }
+        title={text}
+        description={props.extra}
+        key="meta"
+      />
+    </div>
   );
 }

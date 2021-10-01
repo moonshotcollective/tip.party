@@ -1,0 +1,27 @@
+.Home {
+    border: 1px solid rgba(89, 50, 196, 0.6);
+    box-sizing: border-box;
+    box-shadow: 0px 8px 64px rgba(111, 63, 245, 0.08);
+    border-radius: 8px;
+}
+
+#joinRoom{
+    font-family: 'Space Mono';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 140%;
+    color: #FFCC00;
+}
+
+#button1{
+    background: #6F3FF5;
+    border-radius: 40px;
+    border: 1px solid rgba(89, 50, 196, 0.6);
+}
+
+#button2{
+    border: 1px solid #6F3FF5;
+    box-sizing: border-box;
+    border-radius: 40px;
+}

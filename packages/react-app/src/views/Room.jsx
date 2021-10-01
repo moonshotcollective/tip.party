@@ -11,6 +11,7 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
+import "./Room.css";
 
 export default function Rooms({
   appServer,
@@ -312,25 +313,25 @@ export default function Rooms({
 
   return (
     <div
+      className="Room"
       style={{
         margin: "20px auto",
         marginBottom: 30,
         width: 500,
         padding: 20,
         paddingBottom: 40,
-        border: "3px solid",
       }}
     >
       <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
       <div style={{ marginTop: "10px", marginBottom: "10px" }}>
         <Tabs defaultActiveKey="1" centered>
-          <Tabs.TabPane tab="Room List" key="1">
+          <Tabs.TabPane tab="Room" key="1">
             <div style={{ marginTop: 10 }}>
               {/* <div style={{ marginBottom: 20 }}>
                 <h2>Sign In</h2>
               </div> */}
               <div style={{ marginBottom: 20 }}>
-                <Button onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
+                <Button type="primary" shape="round" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
                   Sign Into "{room}" Room
                 </Button>
               </div>
@@ -339,11 +340,11 @@ export default function Rooms({
               <div style={{ flex: 1 }}>
                 <Collapse defaultActiveKey={["1"]}>
                   <Collapse.Panel
-                    header={`Pay List - ${addresses.length}`}
+                    header={admin ? `Pay List - ${addresses.length}` : `Signed In - ${addresses.length}`}
                     key="1"
                     extra={
                       <div onClick={e => e.stopPropagation()}>
-                        <Dropdown overlay={exportMenu} placement="bottomRight" arrow>
+                        <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
                           <ExportOutlined />
                         </Dropdown>
                       </div>
@@ -479,7 +480,7 @@ export default function Rooms({
               </div>
             </div>
           </Tabs.TabPane>
-          <Tabs.TabPane tab="Payout History" key="2">
+          <Tabs.TabPane tab="Payouts" key="2">
             {/* Transactions */}
             <div style={{ marginBottom: 25, flex: 1 }}>
               <Card title="Payout Transactions" style={{ width: "100%" }}>

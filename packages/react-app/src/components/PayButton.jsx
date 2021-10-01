@@ -142,6 +142,7 @@ export default function PayButton({
 
   return (
     <Button
+      type="primary"
       disabled={disabledStatus.indexOf(status) >= 0 || !(amount > 0)}
       loading={loadingStatus.indexOf(status) >= 0}
       style={style}
