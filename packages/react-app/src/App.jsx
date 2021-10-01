@@ -470,7 +470,7 @@ function App(props) {
         />
       </Layout>
       <BrowserRouter>
-        {(targetNetwork.name == "localhost") && (
+        {targetNetwork.name == "localhost" && (
           <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
             <Menu.Item key="/">
               <Link
@@ -509,7 +509,7 @@ function App(props) {
           </Menu>
         )}
 
-        <main style={{ marginTop: 80 }}>
+        <main>
           <Switch>
             {!isWalletConnected ? (
               <WalletNotConnected
@@ -601,10 +601,11 @@ function App(props) {
           </Switch>
         </main>
       </BrowserRouter>
+
       <ThemeSwitch />
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
+      {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
         <Row align="middle" gutter={[4, 4]}>
           <Col span={12}>
             <Ramp price={price} address={address} networks={NETWORKS} />
@@ -612,7 +613,7 @@ function App(props) {
           <Col span={12} style={{ textAlign: "center", opacity: 0.8 }}>
             <GasGauge gasPrice={gasPrice} />
           </Col>
-          {/* <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
+          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
             <Button
               onClick={() => {
                 window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
@@ -625,18 +626,19 @@ function App(props) {
               </span>
               Support
             </Button>
-          </Col> */}
+          </Col> 
         </Row>
         <Row align="middle" gutter={[4, 4]}>
           <Col span={24}>
             {faucetAvailable ? (
               <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
             ) : (
-              ""
-            )}
+                ""
+              )}
           </Col>
         </Row>
-      </div>
+      </div> */}
+
       {/* <Menu
             mode="inline"
             openKeys={openKeys}
