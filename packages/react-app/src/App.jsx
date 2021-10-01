@@ -37,8 +37,8 @@ const scaffoldEthProvider = navigator.onLine
   : null;
 const poktMainnetProvider = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider(
-    "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-  )
+      "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+    )
   : null;
 const mainnetInfura = navigator.onLine
   ? new ethers.providers.StaticJsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs")
@@ -140,8 +140,8 @@ function App(props) {
     poktMainnetProvider && poktMainnetProvider._isProvider
       ? poktMainnetProvider
       : scaffoldEthProvider && scaffoldEthProvider._network
-        ? scaffoldEthProvider
-        : mainnetInfura;
+      ? scaffoldEthProvider
+      : mainnetInfura;
 
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
@@ -470,7 +470,7 @@ function App(props) {
         />
       </Layout>
       <BrowserRouter>
-        {(targetNetwork.name == "localhost") && (
+        {targetNetwork.name == "localhost" && (
           <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
             <Menu.Item key="/">
               <Link
@@ -602,7 +602,7 @@ function App(props) {
         </main>
       </BrowserRouter>
 
-      {/*<ThemeSwitch /> */}
+      <ThemeSwitch />
 
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
@@ -638,7 +638,7 @@ function App(props) {
           </Col>
         </Row>
       </div> */}
-      
+
       {/* <Menu
             mode="inline"
             openKeys={openKeys}
@@ -657,7 +657,6 @@ function App(props) {
         <Menu.Item key="USDC">USDC</Menu.Item>
       </SubMenu>
     </Menu> */}
-
     </div>
   );
 }

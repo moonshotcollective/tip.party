@@ -331,7 +331,7 @@ export default function Rooms({
                 <h2>Sign In</h2>
               </div> */}
               <div style={{ marginBottom: 20 }}>
-                <Button type="primary" shape="round" onClick={handleSignIn}  disabled={isSignedIn} loading={isSigning}>
+                <Button type="primary" shape="round" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
                   Sign Into "{room}" Room
                 </Button>
               </div>
