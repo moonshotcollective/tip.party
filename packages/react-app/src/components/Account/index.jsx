@@ -52,6 +52,7 @@ export default function Account({
   logoutOfWeb3Modal,
   blockExplorer,
   isOwner,
+  width,
 }) {
   const { currentTheme } = useThemeSwitcher();
 
@@ -97,7 +98,7 @@ export default function Account({
       modalButtons.push(
         <Button
           key="loginbutton"
-          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
+          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4, width: width }}
           size="medium"
           onClick={loadWeb3Modal}
           key="second"
