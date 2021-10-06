@@ -6,7 +6,7 @@ module.exports = functions.https.onCall((data, context) => {
   const { room, signature } = data;
 
   // recover address from signature
-  const recovered = ethers.utils.verifyMessage(room, signature).toLowerCase();
+  const recovered = ethers.utils.verifyMessage(room, signature);
 
   // validate address
   if (!ethers.utils.isAddress(recovered)) {
