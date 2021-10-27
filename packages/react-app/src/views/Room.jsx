@@ -64,10 +64,10 @@ export default function Rooms({
   };
 
   const handleConfetti = e => {
-    setNumberOfConfettiPieces(300);
+    setNumberOfConfettiPieces(200);
     setTimeout(() => {
       setNumberOfConfettiPieces(0);
-    }, 5000);
+    }, 4000);
   };
 
   const handleListUpdate = list => {
@@ -322,7 +322,7 @@ export default function Rooms({
         paddingBottom: 40,
       }}
     >
-      <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={5000} />
+      <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
       <div style={{ marginTop: "10px", marginBottom: "10px" }}>
         <Tabs defaultActiveKey="1" centered>
           <Tabs.TabPane tab="Room" key="1">
