@@ -424,7 +424,7 @@ function App(props) {
       <Layout style={{ fixed: "top" }}>
         <PageHeader
           title={
-            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }} class="navbar-title">
+            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }} className="navbar-title">
               Tip Party
               <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -445,7 +445,7 @@ function App(props) {
                   fill="#FFCC00"
                 />
               </svg>
-              <p class="navbar-subtitle">by MOONSHOT COLLECTIVE</p>
+              <p className="navbar-subtitle">by MOONSHOT COLLECTIVE</p>
             </a>
           }
           style={{ cursor: "pointer", margin: 10, padding: 0 }}
