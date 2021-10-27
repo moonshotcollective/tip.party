@@ -261,7 +261,7 @@ export const NETWORKS = {
     name: "rinkeby",
     color: "#e0d068",
     chainId: 4,
-    rpcUrl: "https://eth-rinkeby.alchemyapi.io/v2/fID6cMjjYBgDubU3zev16EbGXmnfbdz5",
+    rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_ID}`,
     faucet: "https://faucet.rinkeby.io/",
     blockExplorer: "https://rinkeby.etherscan.io/",
   },
