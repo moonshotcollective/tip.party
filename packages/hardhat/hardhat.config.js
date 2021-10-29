@@ -87,7 +87,7 @@ module.exports = {
       },
     },
     xdai: {
-      url: "https://rpc.xdaichain.com/",
+      url: "https://fragrant-cool-grass.xdai.quiknode.pro/d4420fccdfd3563761b2e6596ae33afd1c8b718d/",
       gasPrice: 1000000000,
       accounts: {
         mnemonic: mnemonic(),
