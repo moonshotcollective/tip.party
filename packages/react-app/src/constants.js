@@ -287,7 +287,7 @@ export const NETWORKS = {
     chainId: 100,
     price: 1,
     gasPrice: 1000000000,
-    rpcUrl: "https://dai.poa.network",
+    rpcUrl: "https://fragrant-cool-grass.xdai.quiknode.pro/d4420fccdfd3563761b2e6596ae33afd1c8b718d/",
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
   },
