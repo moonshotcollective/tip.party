@@ -19,7 +19,7 @@ import Authereum from "authereum";
 const { ethers } = require("ethers");
 
 // Add more networks as the dapp expands to more networks
-const configuredNetworks = ["rinkeby", "xdai"];
+const configuredNetworks = ["mainnet", "rinkeby", "xdai"];
 if (process.env.REACT_APP_NETWORK === "localhost") {
   configuredNetworks.push("localhost");
 }
