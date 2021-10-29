@@ -377,7 +377,7 @@ function App(props) {
       size="large"
       defaultValue={targetNetwork.name}
       style={{ textAlign: "left", width: 140, fontSize: 30 }}
-      onChange={async value => {
+      onChange={value => {
         if (targetNetwork.chainId !== NETWORKS[value].chainId) {
           window.localStorage.setItem("network", value);
           setTimeout(async () => {
