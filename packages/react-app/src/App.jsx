@@ -18,21 +18,23 @@ import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 const { ethers } = require("ethers");
 
+// 😬 Sorry for all the console logging
+const DEBUG = true;
+const NETWORKCHECK = true;
+
 // Add more networks as the dapp expands to more networks
 const configuredNetworks = ["mainnet", "rinkeby", "xdai"];
-if (process.env.REACT_APP_NETWORK === "localhost") {
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
 
 const cachedNetwork = window.localStorage.getItem("network");
+if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
 /// 📡 What chain are your contracts deployed to?
 let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 if (!targetNetwork) {
   targetNetwork = NETWORKS.rinkeby;
 }
-// 😬 Sorry for all the console logging
-const DEBUG = true;
-const NETWORKCHECK = true;
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -54,10 +56,8 @@ const mainnetInfura = navigator.onLine
   : null;
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I )
 
-// 🏠 Your local provider is usually pointed at your local blockchain
-const localProviderUrl = targetNetwork.rpcUrl;
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
-const localProviderUrlFromEnv = localProviderUrl;
+const localProviderUrlFromEnv = targetNetwork.rpcUrl;
 if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrlFromEnv);
 
