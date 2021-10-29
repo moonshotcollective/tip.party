@@ -32,9 +32,6 @@ const cachedNetwork = window.localStorage.getItem("network");
 if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
 /// 📡 What chain are your contracts deployed to?
 let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-if (!targetNetwork) {
-  targetNetwork = NETWORKS.rinkeby;
-}
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -380,12 +377,43 @@ function App(props) {
       size="large"
       defaultValue={targetNetwork.name}
       style={{ textAlign: "left", width: 140, fontSize: 30 }}
-      onChange={value => {
+      onChange={async value => {
         if (targetNetwork.chainId !== NETWORKS[value].chainId) {
           window.localStorage.setItem("network", value);
-          setTimeout(() => {
+          setTimeout(async () => {
+            targetNetwork = NETWORKS[value];
+            const ethereum = window.ethereum;
+            const data = [
+              {
+                chainId: "0x" + targetNetwork.chainId.toString(16),
+                chainName: targetNetwork.name,
+                nativeCurrency: targetNetwork.nativeCurrency,
+                rpcUrls: [targetNetwork.rpcUrl],
+                blockExplorerUrls: [targetNetwork.blockExplorer],
+              },
+            ];
+            console.log("data", data);
+            // try to add new chain
+            try {
+              await ethereum.request({ method: "wallet_addEthereumChain", params: data });
+            } catch (error) {
+              // if failed, try a network switch instead
+              await ethereum
+                .request({
+                  method: "wallet_switchEthereumChain",
+                  params: [
+                    {
+                      chainId: "0x" + targetNetwork.chainId.toString(16),
+                    },
+                  ],
+                })
+                .catch();
+              if (tx) {
+                console.log(tx);
+              }
+            }
             window.location.reload();
-          }, 1);
+          }, 1000);
         }
       }}
     >
