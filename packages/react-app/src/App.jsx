@@ -1,13 +1,13 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Menu, Layout, PageHeader, Space, Row, Col } from "antd";
+import { Alert, Button, Menu, Layout, PageHeader, Space, Select } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, ThemeSwitch, Ramp, GasGauge, Faucet } from "./components";
+import { Account, Contract, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
@@ -18,11 +18,20 @@ import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 const { ethers } = require("ethers");
 
-/// 📡 What chain are your contracts deployed to?
-const targetNetwork = process.env.REACT_APP_NETWORK ? NETWORKS[process.env.REACT_APP_NETWORK] : NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+// Add more networks as the dapp expands to more networks
+const configuredNetworks = ["rinkeby", "xdai"];
+if (process.env.REACT_APP_NETWORK === "localhost") {
+  configuredNetworks.push("localhost");
+}
 
+const cachedNetwork = window.localStorage.getItem("network");
+/// 📡 What chain are your contracts deployed to?
+let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+if (!targetNetwork) {
+  targetNetwork = NETWORKS.rinkeby;
+}
 // 😬 Sorry for all the console logging
-const DEBUG = false;
+const DEBUG = true;
 const NETWORKCHECK = true;
 
 // 🛰 providers
@@ -48,7 +57,7 @@ const mainnetInfura = navigator.onLine
 // 🏠 Your local provider is usually pointed at your local blockchain
 const localProviderUrl = targetNetwork.rpcUrl;
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
-const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
+const localProviderUrlFromEnv = localProviderUrl;
 if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrlFromEnv);
 
@@ -355,6 +364,35 @@ function App(props) {
     networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
   }
 
+  const options = [];
+  for (const id in NETWORKS) {
+    if (configuredNetworks.indexOf(id) > -1) {
+      options.push(
+        <Select.Option key={id} value={NETWORKS[id].name}>
+          <span style={{ color: NETWORKS[id].color, fontSize: 14 }}>{NETWORKS[id].name}</span>
+        </Select.Option>,
+      );
+    }
+  }
+
+  const networkSelect = (
+    <Select
+      size="large"
+      defaultValue={targetNetwork.name}
+      style={{ textAlign: "left", width: 140, fontSize: 30 }}
+      onChange={value => {
+        if (targetNetwork.chainId !== NETWORKS[value].chainId) {
+          window.localStorage.setItem("network", value);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1);
+        }
+      }}
+    >
+      {options}
+    </Select>
+  );
+
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
@@ -417,8 +455,6 @@ function App(props) {
     );
   }
 
-  const [res, setRes] = useState("");
-
   return (
     <div className="App">
       <Layout style={{ fixed: "top" }}>
@@ -465,6 +501,7 @@ function App(props) {
                 blockExplorer={blockExplorer}
                 isOwner={admin}
               />
+              {networkSelect}
             </Space>,
           ]}
         />
