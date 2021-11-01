@@ -5,7 +5,7 @@ import slugify from "slugify";
 import { ethers } from "ethers";
 import "./Home.css";
 
-export default function Admin({ writeContracts, readContracts, admin, isWalletConnected, tx }) {
+export default function Admin({ writeContracts, readContracts, admin, isWalletConnected, tx, nativeCurrency }) {
   let history = useHistory();
   const [tipstaCost, setTipstaCost] = useState("...");
 
@@ -76,7 +76,7 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
               <div style={{ marginTop: 10, marginBottom: 10 }}>OR</div>
               <div>
                 <Button id="button2" block onClick={becomeDistributor} loading={tipstaCost === "..."}>
-                  Become A Distributor for {tipstaCost} ETH
+                  Become A Distributor for {tipstaCost + " " +  nativeCurrency } 
                 </Button>
               </div>
             </>

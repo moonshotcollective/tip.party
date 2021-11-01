@@ -610,6 +610,7 @@ function App(props) {
                     mainnetProvider={mainnetProvider}
                     tx={tx}
                     isWalletConnected={isWalletConnected}
+                    nativeCurrency= {targetNetwork.nativeCurrency}
                   />
                 </Route>
                 <Route path="/room/:room">
@@ -627,6 +628,7 @@ function App(props) {
                     chainId={localChainId || selectedChainId}
                     selectedChainId={selectedChainId}
                     tx={tx}
+                    nativeCurrency= {targetNetwork.nativeCurrency}
                   />
                 </Route>
                 <Route exact path="/contracts">

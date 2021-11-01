@@ -27,12 +27,13 @@ export default function Rooms({
   chainId,
   selectedChainId,
   tx,
+  nativeCurrency
 }) {
   const { room } = useParams();
   //const { width, height } = useWindowSize()
 
   const [amount, setAmount] = useState(0);
-  const [token, setToken] = useState("ETH");
+  const [token, setToken] = useState(nativeCurrency);
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
@@ -428,8 +429,8 @@ export default function Rooms({
                       value={amount}
                       addonBefore="Total Amount to Distribute"
                       addonAfter={
-                        <Select defaultValue="ETH" value={token} onChange={value => setToken(value)}>
-                          <Select.Option value="ETH">ETH</Select.Option>
+                        <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
+                          <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
                           {availableTokens.map(name => (
                             <Select.Option key={name} value={name}>
                               {name}
@@ -474,6 +475,7 @@ export default function Rooms({
                       writeContracts={writeContracts}
                       ethPayHandler={ethPayHandler}
                       tokenPayHandler={tokenPayHandler}
+                      nativeCurrency={nativeCurrency}
                     />
                   </div>
                 )}

@@ -19,6 +19,7 @@ export default function PayButton({
   tokenListHandler,
   ethPayHandler,
   tokenPayHandler,
+  nativeCurrency
 }) {
   const [tokenInfo, setTokenInfo] = useState({});
   const [status, setStatus] = useState(0); // loading | lowAllowance | approving | ready | distributing | noBalance
@@ -59,7 +60,7 @@ export default function PayButton({
   };
 
   const isETH = () => {
-    return token.toUpperCase() === "ETH";
+    return token.toUpperCase() === nativeCurrency;
   };
 
   const handlePay = async () => {
