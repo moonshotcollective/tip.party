@@ -248,6 +248,7 @@ export const NETWORKS = {
     // rpcUrl: "https://speedy-nodes-nyc.moralis.io/43d22b430189c5a5c63506a7/eth/mainnet",
     rpcUrl: "https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs",
     blockExplorer: "https://etherscan.io/",
+    nativeCurrency: "ETH"
   },
   kovan: {
     name: "kovan",
@@ -256,6 +257,7 @@ export const NETWORKS = {
     rpcUrl: `https://kovan.infura.io/v3/${INFURA_ID}`,
     blockExplorer: "https://kovan.etherscan.io/",
     faucet: "https://gitter.im/kovan-testnet/faucet", // https://faucet.kovan.network/
+    nativeCurrency: "ETH"
   },
   rinkeby: {
     name: "rinkeby",
@@ -264,6 +266,7 @@ export const NETWORKS = {
     rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_ID}`,
     faucet: "https://faucet.rinkeby.io/",
     blockExplorer: "https://rinkeby.etherscan.io/",
+    nativeCurrency: "ETH"
   },
   ropsten: {
     name: "ropsten",
@@ -272,6 +275,7 @@ export const NETWORKS = {
     faucet: "https://faucet.ropsten.be/",
     blockExplorer: "https://ropsten.etherscan.io/",
     rpcUrl: `https://ropsten.infura.io/v3/${INFURA_ID}`,
+    nativeCurrency: "ETH"
   },
   goerli: {
     name: "goerli",
@@ -280,6 +284,7 @@ export const NETWORKS = {
     faucet: "https://goerli-faucet.slock.it/",
     blockExplorer: "https://goerli.etherscan.io/",
     rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
+    nativeCurrency: "ETH"
   },
   xdai: {
     name: "xdai",
@@ -290,6 +295,7 @@ export const NETWORKS = {
     rpcUrl: process.env.REACT_APP_XDAI_NETWORK,
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
+    nativeCurrency: "XDAI"
   },
   matic: {
     name: "matic",
@@ -300,6 +306,7 @@ export const NETWORKS = {
     rpcUrl: "https://rpc-mainnet.maticvigil.com",
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://explorer-mainnet.maticvigil.com//",
+    nativeCurrency: "MATIC"
   },
   mumbai: {
     name: "mumbai",
@@ -310,6 +317,7 @@ export const NETWORKS = {
     rpcUrl: "https://rpc-mumbai.maticvigil.com",
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://mumbai-explorer.matic.today/",
+    nativeCurrency: "MATIC"
   },
   localArbitrum: {
     name: "localArbitrum",
@@ -317,6 +325,7 @@ export const NETWORKS = {
     chainId: 153869338190755,
     blockExplorer: "",
     rpcUrl: `http://localhost:8547`,
+    nativeCurrency: "ETH"
   },
   localArbitrumL1: {
     name: "localArbitrumL1",
@@ -324,6 +333,7 @@ export const NETWORKS = {
     chainId: 44010,
     blockExplorer: "",
     rpcUrl: `http://localhost:7545`,
+    nativeCurrency: "ETH"
   },
   rinkebyArbitrum: {
     name: "Arbitrum Testnet",
@@ -331,6 +341,7 @@ export const NETWORKS = {
     chainId: 421611,
     blockExplorer: "https://rinkeby-explorer.arbitrum.io/#/",
     rpcUrl: `https://rinkeby.arbitrum.io/rpc`,
+    nativeCurrency: "ETH"
   },
   arbitrum: {
     name: "Arbitrum",

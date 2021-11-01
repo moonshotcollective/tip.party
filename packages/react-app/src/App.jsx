@@ -23,7 +23,7 @@ const DEBUG = true;
 const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
-const configuredNetworks = ["mainnet", "rinkeby", "xdai"];
+const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic"];
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
@@ -610,6 +610,7 @@ function App(props) {
                     mainnetProvider={mainnetProvider}
                     tx={tx}
                     isWalletConnected={isWalletConnected}
+                    nativeCurrency= {targetNetwork.nativeCurrency}
                   />
                 </Route>
                 <Route path="/room/:room">
@@ -627,6 +628,7 @@ function App(props) {
                     chainId={localChainId || selectedChainId}
                     selectedChainId={selectedChainId}
                     tx={tx}
+                    nativeCurrency= {targetNetwork.nativeCurrency}
                   />
                 </Route>
                 <Route exact path="/contracts">
