@@ -1,4 +1,4 @@
-import { Badge, Button, Space, Menu, Dropdown, Card, Avatar } from "antd";
+import { Button, Menu, Dropdown } from "antd";
 import React from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import Address from "../Address";
@@ -80,7 +80,7 @@ export default function Account({
       modalButtons.push(
         <div key="first">
           {isValidAddress(address) ? (
-            <Dropdown.Button block ghost overlay={menu} icon={<DownOutlined />} trigger="click" size={"large"}>
+            <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click" size={"large"}>
               <Address
                 address={address}
                 ensProvider={mainnetProvider}
