@@ -1,13 +1,13 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Menu, Layout, PageHeader, Space, Row, Col } from "antd";
+import { Alert, Button, Menu, Layout, PageHeader, Space, Select } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, ThemeSwitch, Ramp, GasGauge, Faucet } from "./components";
+import { Account, Contract, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
@@ -18,12 +18,20 @@ import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 const { ethers } = require("ethers");
 
-/// 📡 What chain are your contracts deployed to?
-const targetNetwork = process.env.REACT_APP_NETWORK ? NETWORKS[process.env.REACT_APP_NETWORK] : NETWORKS.rinkeby; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-
 // 😬 Sorry for all the console logging
-const DEBUG = false;
+const DEBUG = true;
 const NETWORKCHECK = true;
+
+// Add more networks as the dapp expands to more networks
+const configuredNetworks = ["mainnet", "rinkeby", "xdai"];
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  configuredNetworks.push("localhost");
+}
+
+const cachedNetwork = window.localStorage.getItem("network");
+if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
+/// 📡 What chain are your contracts deployed to?
+let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -45,10 +53,8 @@ const mainnetInfura = navigator.onLine
   : null;
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I )
 
-// 🏠 Your local provider is usually pointed at your local blockchain
-const localProviderUrl = targetNetwork.rpcUrl;
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
-const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
+const localProviderUrlFromEnv = targetNetwork.rpcUrl;
 if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrlFromEnv);
 
@@ -355,6 +361,66 @@ function App(props) {
     networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
   }
 
+  const options = [];
+  for (const id in NETWORKS) {
+    if (configuredNetworks.indexOf(id) > -1) {
+      options.push(
+        <Select.Option key={id} value={NETWORKS[id].name}>
+          <span style={{ color: NETWORKS[id].color, fontSize: 14 }}>{NETWORKS[id].name}</span>
+        </Select.Option>,
+      );
+    }
+  }
+
+  const networkSelect = (
+    <Select
+      size="large"
+      defaultValue={targetNetwork.name}
+      style={{ textAlign: "left", width: 140, fontSize: 30 }}
+      onChange={value => {
+        if (targetNetwork.chainId !== NETWORKS[value].chainId) {
+          window.localStorage.setItem("network", value);
+          setTimeout(async () => {
+            targetNetwork = NETWORKS[value];
+            const ethereum = window.ethereum;
+            const data = [
+              {
+                chainId: "0x" + targetNetwork.chainId.toString(16),
+                chainName: targetNetwork.name,
+                nativeCurrency: targetNetwork.nativeCurrency,
+                rpcUrls: [targetNetwork.rpcUrl],
+                blockExplorerUrls: [targetNetwork.blockExplorer],
+              },
+            ];
+            console.log("data", data);
+            // try to add new chain
+            try {
+              await ethereum.request({ method: "wallet_addEthereumChain", params: data });
+            } catch (error) {
+              // if failed, try a network switch instead
+              await ethereum
+                .request({
+                  method: "wallet_switchEthereumChain",
+                  params: [
+                    {
+                      chainId: "0x" + targetNetwork.chainId.toString(16),
+                    },
+                  ],
+                })
+                .catch();
+              if (tx) {
+                console.log(tx);
+              }
+            }
+            window.location.reload();
+          }, 1000);
+        }
+      }}
+    >
+      {options}
+    </Select>
+  );
+
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
@@ -417,14 +483,12 @@ function App(props) {
     );
   }
 
-  const [res, setRes] = useState("");
-
   return (
     <div className="App">
       <Layout style={{ fixed: "top" }}>
         <PageHeader
           title={
-            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }} class="navbar-title">
+            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }} className="navbar-title">
               Tip Party
               <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -445,7 +509,7 @@ function App(props) {
                   fill="#FFCC00"
                 />
               </svg>
-              <p class="navbar-subtitle">by MOONSHOT COLLECTIVE</p>
+              <p className="navbar-subtitle">by MOONSHOT COLLECTIVE</p>
             </a>
           }
           style={{ cursor: "pointer", margin: 10, padding: 0 }}
@@ -465,6 +529,7 @@ function App(props) {
                 blockExplorer={blockExplorer}
                 isOwner={admin}
               />
+              {networkSelect}
             </Space>,
           ]}
         />

@@ -287,7 +287,7 @@ export const NETWORKS = {
     chainId: 100,
     price: 1,
     gasPrice: 1000000000,
-    rpcUrl: "https://dai.poa.network",
+    rpcUrl: process.env.REACT_APP_XDAI_NETWORK,
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
   },
