@@ -3,7 +3,7 @@
 ## About
 Tip Party allows you to easily drop any ERC-20 token to contributors of a DAO. You can become a distributor, and load up a Tip Party room, where contributors can sign into with their Ethereum wallets to receive tokens.
 
-Tip Party works best when rewarding members on community calls! Please check out [our landing page](tip.party) for more info. 
+Tip Party works best when rewarding members on community calls! Please check out [our landing page](https://tip.party) for more info. 
 
 ## Getting Started
 
