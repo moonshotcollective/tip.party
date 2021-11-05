@@ -45,3 +45,9 @@ export const registerTransactionForRoom = (room, hash, network) => {
 
   return addRoomTxFunction({ room, hash, network });
 };
+
+export const addAddress = async (room, address) =>{
+  const addAddressFunction = httpsCallable(functions, "addAddress"); 
+
+  return addAddressFunction({room, address});
+}

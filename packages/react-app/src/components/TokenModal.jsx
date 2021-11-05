@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { AddressInput } from ".";
 
 function ImportModal({ handleAddress, ...props }) {
-  const [address, setAddress] = useState("");
+  const [tokenAddress, setTokenAddress] = useState("");
 
   const onOk = () => {
     setTokenAddress("");
@@ -11,8 +11,8 @@ function ImportModal({ handleAddress, ...props }) {
   };
 
   return (
-    <Modal title="Add Address" centered {...props} onOk={onOk}>
-      <AddressInput value={address} onChange={setAddress} />
+    <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
+      <AddressInput value={tokenAddress} onChange={setTokenAddress} />
     </Modal>
   );
 }

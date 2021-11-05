@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
-import { Address, PayButton, TransactionHash, AddressModal } from "../components";
+import { Address, PayButton, TransactionHash, TokenModal, AddressModal } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
@@ -43,6 +43,7 @@ export default function Rooms({
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
   const [importToken, setImportToken] = useState(false);
+  const [importAddress, setImportAddress] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
 
@@ -63,6 +64,26 @@ export default function Rooms({
     setToken(tokenSymbol);
     setImportToken(false);
   };
+  const handleAddressImport = async address => {
+
+    try {
+      // sign into room
+      await storage.addAddress(room, address);
+
+      // notify user of signIn
+      notification.success({
+        message: "Successfully added address",
+        placement: "bottomRight",
+      });
+    } catch (error) {
+
+      return notification.error({
+        message: "Failed to Add Address",
+        description: "Address may have already been added",
+        placement: "bottomRight",
+      });
+    }
+  };
 
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
@@ -77,7 +98,7 @@ export default function Rooms({
     setAddresses([...updatedList]);
   };
 
-  const hanndleTransactionUpdate = newTx => {
+  const handleTransactionUpdate = newTx => {
     const update = new Set([...newTx, ...txHash]);
     setTxHash([...update]);
   };
@@ -95,7 +116,7 @@ export default function Rooms({
     // start new subscriptions
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, chainId, hanndleTransactionUpdate));
+      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
     }
   }, [room, chainId]);
 
@@ -351,6 +372,26 @@ export default function Rooms({
                       </div>
                     }
                   >
+
+                    <AddressModal
+                      visible={importAddress}
+                      handleAddress={handleAddressImport}
+                      onCancel={() => setImportAddress(false)}
+                      okText="Add Address"
+                    /> 
+                  <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                      <a
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+
+                          setImportAddress(true);
+                        }}
+                      >
+                        Add Address +
+                      </a>
+                    </div>
+
                     <List
                       bordered
                       dataSource={addresses}
@@ -376,6 +417,7 @@ export default function Rooms({
                         </List.Item>
                       )}
                     />
+
                   </Collapse.Panel>
                   {admin && (
                     <Collapse.Panel header="Blacklist" key="2">
@@ -442,9 +484,9 @@ export default function Rooms({
                       onChange={amountChangeHandler}
                     />
 
-                    <AddressModal
+                    <TokenModal
                       visible={importToken}
-                      handleAddress={handleTokenImport}
+                      handleAddress={handleAddressImport}
                       onCancel={() => setImportToken(false)}
                       okText="Import Token"
                     />
