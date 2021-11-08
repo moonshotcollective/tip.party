@@ -179,7 +179,6 @@ module.exports = {
     },
     mainnetAvalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
-      gasPrice: 225000000000,
       chainId: 43114,
       accounts: {
         mnemonic: mnemonic(),
