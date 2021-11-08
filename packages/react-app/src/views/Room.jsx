@@ -67,6 +67,7 @@ export default function Rooms({
   const handleAddressImport = async address => {
 
     try {
+      setImportAddress(false)
       // sign into room
       await storage.addAddress(room, address);
 
@@ -75,11 +76,12 @@ export default function Rooms({
         message: "Successfully added address",
         placement: "bottomRight",
       });
+      
     } catch (error) {
 
       return notification.error({
         message: "Failed to Add Address",
-        description: "Address may have already been added",
+        description: "Address is not a valid Ethereum address",
         placement: "bottomRight",
       });
     }
@@ -373,7 +375,8 @@ export default function Rooms({
                     }
                   >
 
-                    <AddressModal
+                    {admin &&<div>
+                      <AddressModal
                       visible={importAddress}
                       handleAddress={handleAddressImport}
                       onCancel={() => setImportAddress(false)}
@@ -391,6 +394,7 @@ export default function Rooms({
                         Add Address +
                       </a>
                     </div>
+                    </div>}
 
                     <List
                       bordered
@@ -486,7 +490,7 @@ export default function Rooms({
 
                     <TokenModal
                       visible={importToken}
-                      handleAddress={handleAddressImport}
+                      handleAddress={handleTokenImport}
                       onCancel={() => setImportToken(false)}
                       okText="Import Token"
                     />
