@@ -339,7 +339,7 @@ export default function Rooms({
     <div
       className="Room"
       style={{
-        margin: "20px auto",
+        margin: "auto",
         marginBottom: 30,
         width: 500,
         padding: 20,
