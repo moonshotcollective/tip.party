@@ -350,6 +350,7 @@ export const NETWORKS = {
     blockExplorer: "https://explorer.arbitrum.io/#/",
     rpcUrl: `https://arb1.arbitrum.io/rpc`,
     gasPrice: 0,
+    nativeCurrency: "ETH"
   },
   localOptimismL1: {
     name: "localOptimismL1",
@@ -388,6 +389,7 @@ export const NETWORKS = {
     blockExplorer: "",
     rpcUrl: `http://localhost:9650/ext/bc/C/rpc`,
     gasPrice: 225000000000,
+    nativeCurrency: "AVAX",
   },
   fujiAvalanche: {
     name: "fujiAvalanche",
@@ -396,6 +398,7 @@ export const NETWORKS = {
     blockExplorer: "https://cchain.explorer.avax-test.network/",
     rpcUrl: `https://api.avax-test.network/ext/bc/C/rpc`,
     gasPrice: 225000000000,
+    nativeCurrency: "AVAX",
   },
   mainnetAvalanche: {
     name: "mainnetAvalanche",
@@ -404,6 +407,7 @@ export const NETWORKS = {
     blockExplorer: "https://cchain.explorer.avax.network/",
     rpcUrl: `https://api.avax.network/ext/bc/C/rpc`,
     gasPrice: 225000000000,
+    nativeCurrency: "AVAX",
   },
 };
 
