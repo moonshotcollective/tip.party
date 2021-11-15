@@ -246,7 +246,7 @@ export const NETWORKS = {
     chainId: 1,
     // rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
     // rpcUrl: "https://speedy-nodes-nyc.moralis.io/43d22b430189c5a5c63506a7/eth/mainnet",
-    rpcUrl: "https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs",
+    rpcUrl: process.env.REACT_APP_MAINNET_NETWORK,
     blockExplorer: "https://etherscan.io/",
     nativeCurrency: "ETH"
   },
