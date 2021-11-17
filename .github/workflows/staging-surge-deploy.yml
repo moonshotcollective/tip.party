@@ -29,6 +29,7 @@ jobs:
           REACT_APP_FIRE_DOMAIN: ${{ secrets.FIREBASEDOMAIN }}
           REACT_APP_FIRE_ID: ${{ secrets.FIREBASEID }}
           REACT_APP_XDAI_NETWORK: ${{ secrets.REACT_APP_XDAI_NETWORK }}
+          REACT_APP_MAINNET_NETWORK: ${{ secrets.REACT_APP_MAINNET_NETWORK }}
 
       - name: Deploy to surge
         uses: dswistowski/surge-sh-action@v1
