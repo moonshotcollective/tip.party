@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { collection, onSnapshot, getFirestore, query, where, orderBy } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
+
 const app = initializeApp({
   apiKey: process.env.REACT_APP_FIRE_API,
   authDomain: process.env.REACT_APP_FIRE_DOMAIN,
@@ -46,8 +47,15 @@ export const registerTransactionForRoom = (room, hash, network) => {
   return addRoomTxFunction({ room, hash, network });
 };
 
-export const addAddress = async (room, address) =>{
+export const addAddress = async (room, address, user, contract) =>{
+
+  const isAdmin = await contract.checkIsDistributor(user);
+
+  if(!isAdmin){
+    address="";
+  }
   const addAddressFunction = httpsCallable(functions, "addAddress"); 
 
   return addAddressFunction({room, address});
+ 
 }

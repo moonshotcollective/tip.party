@@ -8,12 +8,12 @@ function ImportModal({ handleAddress, ...props }) {
 
   const onOk = () => {
     if(ethers.utils.isAddress(address)){
+      handleAddress(address.toLowerCase());
       setAddress("");
-      handleAddress(address)
     }
     else{
-    setAddress("");
     handleAddress("");
+    setAddress("");
     }
   };
 

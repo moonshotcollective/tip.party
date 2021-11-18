@@ -64,12 +64,12 @@ export default function Rooms({
     setToken(tokenSymbol);
     setImportToken(false);
   };
-  const handleAddressImport = async address => {
+  const handleAddressImport = async addressToImport => {
 
     try {
       setImportAddress(false)
       // sign into room
-      await storage.addAddress(room, address);
+      await storage.addAddress(room, addressToImport, address, readContracts.TokenDistributor );
 
       // notify user of signIn
       notification.success({
