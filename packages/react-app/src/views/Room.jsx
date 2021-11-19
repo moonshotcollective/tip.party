@@ -76,6 +76,7 @@ export default function Rooms({
         message: "Successfully added address",
         placement: "bottomRight",
       });
+      setAddresses([...addresses, addressToImport])
       
     } catch (error) {
 
@@ -165,6 +166,7 @@ export default function Rooms({
         placement: "bottomRight",
       });
       handleConfetti();
+      setAddresses([...addresses, address])
     } catch (error) {
       setIsSigning(false);
 
