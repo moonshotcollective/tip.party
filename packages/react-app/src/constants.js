@@ -246,7 +246,7 @@ export const NETWORKS = {
     chainId: 1,
     // rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
     // rpcUrl: "https://speedy-nodes-nyc.moralis.io/43d22b430189c5a5c63506a7/eth/mainnet",
-    rpcUrl: "https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs",
+    rpcUrl: process.env.REACT_APP_MAINNET_NETWORK,
     blockExplorer: "https://etherscan.io/",
     nativeCurrency: "ETH"
   },
@@ -350,6 +350,7 @@ export const NETWORKS = {
     blockExplorer: "https://explorer.arbitrum.io/#/",
     rpcUrl: `https://arb1.arbitrum.io/rpc`,
     gasPrice: 0,
+    nativeCurrency: "ETH"
   },
   localOptimismL1: {
     name: "localOptimismL1",
@@ -388,6 +389,7 @@ export const NETWORKS = {
     blockExplorer: "",
     rpcUrl: `http://localhost:9650/ext/bc/C/rpc`,
     gasPrice: 225000000000,
+    nativeCurrency: "AVAX",
   },
   fujiAvalanche: {
     name: "fujiAvalanche",
@@ -396,6 +398,7 @@ export const NETWORKS = {
     blockExplorer: "https://cchain.explorer.avax-test.network/",
     rpcUrl: `https://api.avax-test.network/ext/bc/C/rpc`,
     gasPrice: 225000000000,
+    nativeCurrency: "AVAX",
   },
   mainnetAvalanche: {
     name: "mainnetAvalanche",
@@ -404,6 +407,7 @@ export const NETWORKS = {
     blockExplorer: "https://cchain.explorer.avax.network/",
     rpcUrl: `https://api.avax.network/ext/bc/C/rpc`,
     gasPrice: 225000000000,
+    nativeCurrency: "AVAX",
   },
 };
 
