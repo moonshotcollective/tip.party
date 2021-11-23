@@ -640,7 +640,7 @@ function App(props) {
                     blockExplorer={blockExplorer}
                   />
                   <Contract
-                    name="DummyToken"
+                    name="dGTC"
                     signer={userSigner}
                     provider={localProvider}
                     address={address}
