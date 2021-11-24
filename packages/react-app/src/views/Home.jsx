@@ -5,7 +5,7 @@ import slugify from "slugify";
 import { ethers } from "ethers";
 import "./Home.css";
 
-export default function Admin({ writeContracts, readContracts, admin, isWalletConnected, tx, nativeCurrency }) {
+export default function Admin() {
   let history = useHistory();
   const [tipstaCost, setTipstaCost] = useState("...");
 
@@ -15,38 +15,7 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
     history.push(`/room/${slugifiedRoom}`);
   };
 
-  const becomeDistributor = async () => {
-    if (!isWalletConnected) {
-      return notification.error({
-        message: "Access request failed",
-        description: "Please connect your wallet to proceed.",
-        placement: "bottomRight",
-      });
-    }
-    const value = ethers.utils.parseEther(tipstaCost);
-    const result = tx(writeContracts.Tipsta.becomeATipsta({ value }), update => {
-      console.log("📡 Admin Update:", update);
-      if (update && (update.status === "confirmed" || update.status === 1)) {
-        console.log(" 🍾 Transaction " + update.hash + " finished!");
-        notification.success({
-          message: "You just became a tipsta! Thanks for supporting the platform",
-          description: "successful",
-          placement: "bottomRight",
-        });
-      }
-    });
-  };
 
-  const initialize = async () => {
-    if (readContracts?.Tipsta) {
-      const cost = (await readContracts.Tipsta.tipperCost()) || 0;
-      setTipstaCost(ethers.utils.formatEther(ethers.BigNumber.from(cost)).toString());
-    }
-  };
-
-  useEffect(() => {
-    initialize();
-  }, [readContracts]);
 
   return (
     <div className="Home" style={{ margin: "20px auto", width: 500, padding: 60 }}>
@@ -68,19 +37,6 @@ export default function Admin({ writeContracts, readContracts, admin, isWalletCo
               </Form.Item>
             </Form>
           </div>
-        </div>
-
-        <div>
-          {!admin && (
-            <>
-              <div style={{ marginTop: 10, marginBottom: 10 }}>OR</div>
-              <div>
-                <Button id="button2" block onClick={becomeDistributor} loading={tipstaCost === "..."}>
-                  Become A Distributor for {tipstaCost + " " +  nativeCurrency } 
-                </Button>
-              </div>
-            </>
-          )}
         </div>
       </div>
     </div>
