@@ -514,7 +514,7 @@ function App(props) {
           }
           style={{ cursor: "pointer", margin: 10, padding: 0 }}
           extra={[
-            <Space>
+            <Space size="large">
               <span>{faucetHint}</span>
               <span>{networkDisplay}</span>
               <Account
@@ -529,7 +529,10 @@ function App(props) {
                 blockExplorer={blockExplorer}
                 isOwner={admin}
               />
+              <Space direction="vertical" size={0}>
+              <label>Select Network:</label>
               {networkSelect}
+              </Space>
             </Space>,
           ]}
         />
