@@ -104,8 +104,9 @@ export default function NoDistributorRoom({
 
       // notify user of signIn
       setIsSignedIn(true);
+      const recovered = ethers.utils.verifyMessage(room, signature).toLowerCase();
 
-      handleDistributorState(address);
+      handleDistributorState(recovered);
 
     } catch (error) {
       setIsSigning(false);

@@ -58,7 +58,7 @@ export default function Rooms({
     }
   }, [oldWriteContracts]);
 
-  const handleDistributorState = async distributor => {
+  const handleDistributorState = distributor => {
     setDistributors(...distributors,distributor);
     notification.success({
       message: "Signed in successfully",
