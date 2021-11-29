@@ -14,3 +14,4 @@ admin.initializeApp();
 
 exports.signRoom = handlers.signRoom;
 exports.addRoomTx = handlers.addRoomTx;
+exports.signRoomDistributor = handlers.signRoomDistributor;

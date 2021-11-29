@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown, Space } from "antd";
+import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal } from "../components";
 import { useParams } from "react-router-dom";
@@ -9,12 +9,11 @@ import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
 import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
-import { NoDistributorRoom, DistributorRoom } from ".";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
-import "./Room.css";
+import "./DistributorRoom.css";
 
-export default function Rooms({
+export default function DistributorRoom({
   appServer,
   web3Modal,
   address,
@@ -27,7 +26,7 @@ export default function Rooms({
   chainId,
   selectedChainId,
   tx,
-  nativeCurrency,
+  nativeCurrency
 }) {
   const { room } = useParams();
   //const { width, height } = useWindowSize()
@@ -45,7 +44,6 @@ export default function Rooms({
   const [importToken, setImportToken] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const [distributors, setDistributors] = useState([]);
 
   const { readContracts, writeContracts } = contracts;
 
@@ -58,12 +56,11 @@ export default function Rooms({
     }
   }, [oldWriteContracts]);
 
-  const handleDistributorState = async distributor => {
-    setDistributors(...distributors,distributor);
-    notification.success({
-      message: "Signed in successfully",
-      placement: "bottomRight",
-    });
+  const handleTokenImport = async tokenAddress => {
+    // load the contract to the scaffold variables
+    const tokenSymbol = await loadContracts(tokenAddress);
+    setToken(tokenSymbol);
+    setImportToken(false);
   };
 
   const handleConfetti = e => {
@@ -78,11 +75,6 @@ export default function Rooms({
     // update addresses list
     setAddresses([...updatedList]);
   };
-  const handleDistributorUpdate = list => {
-    const updatedList = new Set([...addresses, ...list]);
-    // update addresses list
-    setDistributors([...updatedList]);
-  };
 
   const handleTransactionUpdate = newTx => {
     const update = new Set([...newTx, ...txHash]);
@@ -95,12 +87,6 @@ export default function Rooms({
     }
   }, [addresses, address]);
 
-  // useEffect(() => {
-  //   const dist =  storage.getRoomDistributor(room);
-  //   setDistributor(dist);
-  //   console.log("Distributor: " + dist)
-  // }, [room] );
-
   useEffect(() => {
     // clear existing subscriptions
     subs.current.map(sub => sub());
@@ -109,7 +95,6 @@ export default function Rooms({
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
       subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
-      subs.current.push(storage.watchRoomDistributor(room, handleDistributorUpdate));
     }
   }, [room, chainId]);
 
@@ -156,7 +141,7 @@ export default function Rooms({
         placement: "bottomRight",
       });
       handleConfetti();
-      setAddresses([...addresses, address]);
+      setAddresses([...addresses, address])
     } catch (error) {
       setIsSigning(false);
 
@@ -329,121 +314,92 @@ export default function Rooms({
 
   return (
     <div>
-      {!(distributors.length>0) && ( 
-        <div>
-          <NoDistributorRoom
-                    address={address}
-                    appServer={appServer}
-                    web3Modal={web3Modal}
-                    userSigner={userSigner}
-                    mainnetProvider={mainnetProvider}
-                    readContracts={readContracts}
-                    writeContracts={writeContracts}
-                    localProvider={localProvider}
-                    yourLocalBalance={yourLocalBalance}
-                    chainId={chainId}
-                    selectedChainId={selectedChainId}
-                    tx={tx}
-                    nativeCurrency= {nativeCurrency}
-                    handleDistributorState={handleDistributorState}
-                  />
-        </div>
-      )}
-      {distributors.length>0 && address.toLowerCase() == distributors[0] && ( 
-        <div>
-          <DistributorRoom
-                    address={address}
-                    appServer={appServer}
-                    web3Modal={web3Modal}
-                    userSigner={userSigner}
-                    mainnetProvider={mainnetProvider}
-                    readContracts={readContracts}
-                    writeContracts={writeContracts}
-                    localProvider={localProvider}
-                    yourLocalBalance={yourLocalBalance}
-                    chainId={chainId}
-                    selectedChainId={selectedChainId}
-                    tx={tx}
-                    nativeCurrency= {nativeCurrency}
-                  />
-        </div>
-      )}
-      {distributors.length > 0 && address.toLowerCase() != distributors[0] &&(
-      <div>
-        <h2 id="title">Welcome to the Tip Party!</h2>
+    <h2 id="title">Tip Your Party!</h2>
+    <h3> You are the Distributor for "<b>{room}</b>" room </h3>
+    <div
+      className="Room"
+      style={{
+        margin: "20px auto",
+        marginBottom: 30,
+        width: 500,
+        padding: 20,
+        paddingBottom: 40,
+      }}
+    >
+      <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+      
+      <div >
+        <Tabs defaultActiveKey="1" centered>
+          <Tabs.TabPane tab="Room" key="1">
+            <div style={{ marginTop: 10 }}>
 
-          <Space>
-            <h3>The host of this party is : </h3> <Address address={distributors[0]} ensProvider={mainnetProvider} />{" "}
-          </Space>
 
-        <div
-          className="Room"
-          style={{
-            margin: "20px auto",
-            marginBottom: 30,
-            width: 500,
-            padding: 20,
-            paddingBottom: 40,
-          }}
-        >
-          <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
 
-          <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-            <Tabs defaultActiveKey="1" centered>
-              <Tabs.TabPane tab="Room" key="1">
-                <div style={{ marginTop: 10 }}>
-                  {/* <div style={{ marginBottom: 20 }}>
-                <h2>Sign In</h2>
-              </div> */}
-                  <div style={{ marginBottom: 20 }}>
-                    <Button
-                      type="primary"
-                      shape="round"
-                      onClick={handleSignIn}
-                      disabled={isSignedIn}
-                      loading={isSigning}
-                    >
-                      Sign Into "{room}" Room
-                    </Button>
-                  </div>
-                  {/* <Divider /> */}
-
-                  <div style={{ flex: 1 }}>
-                    <Collapse defaultActiveKey={["1"]}>
-                      <Collapse.Panel
-                        header={`Signed In - ${addresses.length}`}
-                        key="1"
-                        extra={
-                          <div onClick={e => e.stopPropagation()}>
-                            <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
-                              <ExportOutlined />
-                            </Dropdown>
+              <div style={{ flex: 1 }}>
+                <Collapse defaultActiveKey={["1"]}>
+                  <Collapse.Panel
+                    header={`Pay List - ${addresses.length}`}
+                    key="1"
+                    extra={
+                      <div onClick={e => e.stopPropagation()}>
+                        <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <ExportOutlined />
+                        </Dropdown>
+                      </div>
+                    }
+                  >
+                    <List
+                      bordered
+                      dataSource={addresses}
+                      renderItem={(item, index) => (
+                        <List.Item key={item.toLowerCase()}>
+                          <div
+                            style={{
+                              width: "100%",
+                              flex: 1,
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                              <Button onClick={() => unList(index)} size="medium">
+                                <CloseOutlined />
+                              </Button>
+                            
                           </div>
-                        }
-                      >
-                        <List
-                          bordered
-                          dataSource={addresses}
-                          renderItem={(item, index) => (
-                            <List.Item key={item.toLowerCase()}>
-                              <div
-                                style={{
-                                  width: "100%",
-                                  flex: 1,
-                                  display: "flex",
-                                  flexDirection: "row",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                              </div>
-                            </List.Item>
-                          )}
-                        />
-                      </Collapse.Panel>
-                    </Collapse>
-                    {/* {canRenderAdminComponents && (
+                        </List.Item>
+                      )}
+                    />
+                  </Collapse.Panel>
+                    <Collapse.Panel header="Blacklist" key="2">
+                      <List
+                        bordered
+                        dataSource={blacklist}
+                        renderItem={(item, index) => (
+                          <List.Item>
+                            <div
+                              style={{
+                                width: "100%",
+                                flex: 1,
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                                <Button onClick={() => reList(index)} size="medium">
+                                  <CloseOutlined />
+                                </Button>
+                            </div>
+                          </List.Item>
+                        )}
+                      />
+                    </Collapse.Panel>
+                </Collapse>
+                {/* {canRenderAdminComponents && (
                 <div style={{ marginTop: 10 }}>
                   <Button
                     disabled={isFiltering}
@@ -455,41 +411,94 @@ export default function Rooms({
                   </Button>
                 </div>
               )} */}
-                  </div>
-                </div>
-              </Tabs.TabPane>
-              <Tabs.TabPane tab="Payouts" key="2">
-                {/* Transactions */}
-                <div style={{ marginBottom: 25, flex: 1 }}>
-                  <Card title="Payout Transactions" style={{ width: "100%" }}>
-                    <List
-                      bordered
-                      dataSource={txHash}
-                      renderItem={(item, index) => (
-                        <List.Item>
-                          <div
-                            style={{
-                              width: "100%",
-                            }}
-                          >
-                            <TransactionHash
-                              localProvider={localProvider}
-                              chainId={chainId}
-                              hash={item}
-                              fontSize={14}
-                            />
-                          </div>
-                        </List.Item>
-                      )}
+              </div>
+
+              <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>
+                {canRenderComponents && (
+                  <div>
+                    {/* TODO : disable input until ERC-20 token is selected */}
+                    <Input
+                      value={amount}
+                      addonBefore="Total Amount to Distribute"
+                      addonAfter={
+                        <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
+                          <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
+                          {availableTokens.map(name => (
+                            <Select.Option key={name} value={name}>
+                              {name}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      }
+                      style={{ marginTop: "10px" }}
+                      onChange={amountChangeHandler}
                     />
-                  </Card>
-                </div>
-              </Tabs.TabPane>
-            </Tabs>
-          </div>
-        </div>
+
+                    <AddressModal
+                      visible={importToken}
+                      handleAddress={handleTokenImport}
+                      onCancel={() => setImportToken(false)}
+                      okText="Import Token"
+                    />
+
+                    <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
+                      <a
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+
+                          setImportToken(true);
+                        }}
+                      >
+                        import ERC20 token...
+                      </a>
+                    </div>
+                    <PayButton
+                      style={{ marginTop: 20 }}
+                      token={token}
+                      appName="Tip.party"
+                      tokenListHandler={tokens => setAvailableTokens(tokens)}
+                      callerAddress={address}
+                      maxApproval={amount}
+                      amount={amount}
+                      spender={spender}
+                      yourLocalBalance={yourLocalBalance}
+                      readContracts={readContracts}
+                      writeContracts={writeContracts}
+                      ethPayHandler={ethPayHandler}
+                      tokenPayHandler={tokenPayHandler}
+                      nativeCurrency={nativeCurrency}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Payouts" key="2">
+            {/* Transactions */}
+            <div style={{ marginBottom: 25, flex: 1 }}>
+              <Card title="Payout Transactions" style={{ width: "100%" }}>
+                <List
+                  bordered
+                  dataSource={txHash}
+                  renderItem={(item, index) => (
+                    <List.Item>
+                      <div
+                        style={{
+                          width: "100%",
+                        }}
+                      >
+                        <TransactionHash localProvider={localProvider} chainId={chainId} hash={item} fontSize={14} />
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </div>
+          </Tabs.TabPane>
+        </Tabs>
       </div>
-      )}
+    </div>
     </div>
   );
 }

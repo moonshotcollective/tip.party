@@ -27,6 +27,12 @@ export const watchRoom = (room, cb) => {
   return watchCollection(getCollection(room, "signs"), cb);
 };
 
+export const watchRoomDistributor = (room , cb) => {
+  return watchCollection(getCollection(room, "distributor"), cb);
+};
+
+
+
 export const watchRoomTx = (room, network, cb) => {
   return watchCollection(
     query(getCollection(room, "tx"), where("network", "==", network), orderBy("createdAt", "desc")),
@@ -44,4 +50,10 @@ export const registerTransactionForRoom = (room, hash, network) => {
   const addRoomTxFunction = httpsCallable(functions, "addRoomTx");
 
   return addRoomTxFunction({ room, hash, network });
+};
+
+export const signIntoRoomDistributor = async (room, signature) => {
+  const signRoomFunction = httpsCallable(functions, "signRoomDistributor");
+
+  return signRoomFunction({ room, signature });
 };

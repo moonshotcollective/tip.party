@@ -51,7 +51,6 @@ export default function Account({
   loadWeb3Modal,
   logoutOfWeb3Modal,
   blockExplorer,
-  isOwner,
   width,
 }) {
   const { currentTheme } = useThemeSwitcher();
@@ -86,7 +85,6 @@ export default function Account({
                 ensProvider={mainnetProvider}
                 blockExplorer={blockExplorer}
                 blockieSize={10}
-                extra={isOwner ? <p style={{ color: "#ff0000" }}>Admin</p> : <p style={{ color: "#52c41a" }}>User</p>}
               />
             </Dropdown.Button>
           ) : (

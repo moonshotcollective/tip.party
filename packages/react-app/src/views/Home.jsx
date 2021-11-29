@@ -7,8 +7,7 @@ import "./Home.css";
 
 export default function Admin() {
   let history = useHistory();
-  const [tipstaCost, setTipstaCost] = useState("...");
-
+  
   const handleJoinRoom = ({ room }) => {
     const slugifiedRoom = slugify(room.toLowerCase(), "_");
 
