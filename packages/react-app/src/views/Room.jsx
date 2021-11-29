@@ -59,7 +59,7 @@ export default function Rooms({
   }, [oldWriteContracts]);
 
   const handleDistributorState = distributor => {
-    setDistributors(...distributors,distributor);
+    setDistributors([distributor]);
     notification.success({
       message: "Signed in successfully",
       placement: "bottomRight",
