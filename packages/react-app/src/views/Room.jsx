@@ -13,7 +13,7 @@ import { useTokenImport } from "../hooks";
 import Confetti from "react-confetti";
 import "./Room.css";
 
-export default function Rooms({
+export default function Room({
   appServer,
   web3Modal,
   address,
@@ -21,13 +21,12 @@ export default function Rooms({
   mainnetProvider,
   writeContracts: oldWriteContracts,
   readContracts: oldReadContracts,
-  admin,
   yourLocalBalance,
   localProvider,
   chainId,
   selectedChainId,
   tx,
-  nativeCurrency
+  nativeCurrency,
 }) {
   const { room } = useParams();
   //const { width, height } = useWindowSize()
@@ -310,8 +309,6 @@ export default function Rooms({
     </Menu>
   );
 
-  const canRenderAdminComponents = admin && addresses && addresses.length > 0;
-
   return (
     <div
       className="Room"
@@ -341,7 +338,7 @@ export default function Rooms({
               <div style={{ flex: 1 }}>
                 <Collapse defaultActiveKey={["1"]}>
                   <Collapse.Panel
-                    header={admin ? `Pay List - ${addresses.length}` : `Signed In - ${addresses.length}`}
+                    header={`Pay List - ${addresses.length}`}
                     key="1"
                     extra={
                       <div onClick={e => e.stopPropagation()}>
@@ -367,45 +364,39 @@ export default function Rooms({
                             }}
                           >
                             <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                            {admin && (
-                              <Button onClick={() => unList(index)} size="medium">
-                                <CloseOutlined />
-                              </Button>
-                            )}
+                            <Button onClick={() => unList(index)} size="medium">
+                              <CloseOutlined />
+                            </Button>
                           </div>
                         </List.Item>
                       )}
                     />
                   </Collapse.Panel>
-                  {admin && (
-                    <Collapse.Panel header="Blacklist" key="2">
-                      <List
-                        bordered
-                        dataSource={blacklist}
-                        renderItem={(item, index) => (
-                          <List.Item>
-                            <div
-                              style={{
-                                width: "100%",
-                                flex: 1,
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                              }}
-                            >
-                              <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                              {admin && (
-                                <Button onClick={() => reList(index)} size="medium">
-                                  <CloseOutlined />
-                                </Button>
-                              )}
-                            </div>
-                          </List.Item>
-                        )}
-                      />
-                    </Collapse.Panel>
-                  )}
+                  <Collapse.Panel header="Blacklist" key="2">
+                    <List
+                      bordered
+                      dataSource={blacklist}
+                      renderItem={(item, index) => (
+                        <List.Item>
+                          <div
+                            style={{
+                              width: "100%",
+                              flex: 1,
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                            <Button onClick={() => reList(index)} size="medium">
+                              <CloseOutlined />
+                            </Button>
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+                  </Collapse.Panel>
                 </Collapse>
                 {/* {canRenderAdminComponents && (
                 <div style={{ marginTop: 10 }}>
@@ -422,63 +413,61 @@ export default function Rooms({
               </div>
 
               <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>
-                {canRenderAdminComponents && (
-                  <div>
-                    {/* TODO : disable input until ERC-20 token is selected */}
-                    <Input
-                      value={amount}
-                      addonBefore="Total Amount to Distribute"
-                      addonAfter={
-                        <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
-                          <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
-                          {availableTokens.map(name => (
-                            <Select.Option key={name} value={name}>
-                              {name}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      }
-                      style={{ marginTop: "10px" }}
-                      onChange={amountChangeHandler}
-                    />
+                <div>
+                  {/* TODO : disable input until ERC-20 token is selected */}
+                  <Input
+                    value={amount}
+                    addonBefore="Total Amount to Distribute"
+                    addonAfter={
+                      <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
+                        <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
+                        {availableTokens.map(name => (
+                          <Select.Option key={name} value={name}>
+                            {name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    }
+                    style={{ marginTop: "10px" }}
+                    onChange={amountChangeHandler}
+                  />
 
-                    <AddressModal
-                      visible={importToken}
-                      handleAddress={handleTokenImport}
-                      onCancel={() => setImportToken(false)}
-                      okText="Import Token"
-                    />
+                  <AddressModal
+                    visible={importToken}
+                    handleAddress={handleTokenImport}
+                    onCancel={() => setImportToken(false)}
+                    okText="Import Token"
+                  />
 
-                    <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
+                  <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
+                    <a
+                      href="#"
+                      onClick={e => {
+                        e.preventDefault();
 
-                          setImportToken(true);
-                        }}
-                      >
-                        import ERC20 token...
-                      </a>
-                    </div>
-                    <PayButton
-                      style={{ marginTop: 20 }}
-                      token={token}
-                      appName="Tip.party"
-                      tokenListHandler={tokens => setAvailableTokens(tokens)}
-                      callerAddress={address}
-                      maxApproval={amount}
-                      amount={amount}
-                      spender={spender}
-                      yourLocalBalance={yourLocalBalance}
-                      readContracts={readContracts}
-                      writeContracts={writeContracts}
-                      ethPayHandler={ethPayHandler}
-                      tokenPayHandler={tokenPayHandler}
-                      nativeCurrency={nativeCurrency}
-                    />
+                        setImportToken(true);
+                      }}
+                    >
+                      import ERC20 token...
+                    </a>
                   </div>
-                )}
+                  <PayButton
+                    style={{ marginTop: 20 }}
+                    token={token}
+                    appName="Tip.party"
+                    tokenListHandler={tokens => setAvailableTokens(tokens)}
+                    callerAddress={address}
+                    maxApproval={amount}
+                    amount={amount}
+                    spender={spender}
+                    yourLocalBalance={yourLocalBalance}
+                    readContracts={readContracts}
+                    writeContracts={writeContracts}
+                    ethPayHandler={ethPayHandler}
+                    tokenPayHandler={tokenPayHandler}
+                    nativeCurrency={nativeCurrency}
+                  />
+                </div>
               </div>
             </div>
           </Tabs.TabPane>

@@ -1,19 +1,15 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.6.0 <0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @title Token Distributor Contract
 /// @author
 /// @notice distributes donations or tips
-contract TokenDistributor is Ownable, AccessControl {
+contract TokenDistributor{
     using SafeMath for uint256;
 
-    /// @notice bytes32 of the distributor role
-    bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
 
     /// @notice Emitted when a token share has been distributed
     event tokenShareCompleted(uint256 amount, uint256 share, address from);
@@ -21,21 +17,6 @@ contract TokenDistributor is Ownable, AccessControl {
     /// @notice Emitted when an ETH share has been distributed
     event ethShareCompleted(uint256 share);
 
-    modifier isPermittedDistributor() {
-        require(
-            hasRole(DISTRIBUTOR_ROLE, msg.sender) || owner() == msg.sender,
-            "Not an approved distributor"
-        );
-        _;
-    }
-
-    modifier isAdminOrOwner() {
-        require(
-            hasRole(DEFAULT_ADMIN_ROLE, msg.sender) || owner() == msg.sender,
-            "You can't perform admin actions"
-        );
-        _;
-    }
 
     modifier hasValidUsers(address[] memory users) {
         require(users.length > 0 && users.length < 256, "Invalid users array");
@@ -47,20 +28,12 @@ contract TokenDistributor is Ownable, AccessControl {
         _;
     }
 
-    constructor(address admin) public {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(DISTRIBUTOR_ROLE, msg.sender);
-        // in case of deploying with a different account
-        _setupRole(DEFAULT_ADMIN_ROLE, admin);
-        _setupRole(DISTRIBUTOR_ROLE, admin);
-    }
 
     /// @notice Splits ETH that is 'Tipped'
     /// @param users an ordered list of users addresses
     function splitEth(address[] memory users)
         public
         payable
-        isPermittedDistributor
         hasValidUsers(users)
     {
         uint256 share = _handleDistribution(
@@ -74,30 +47,7 @@ contract TokenDistributor is Ownable, AccessControl {
         emit ethShareCompleted(share);
     }
 
-    /// @notice Splits contracts own token
-    /// @param users an ordered list of users addresses
-    /// @param amount the total amount to be split
-    /// @param token the token to be split
-    function splitTokenBalance(
-        address[] memory users,
-        uint256 amount,
-        ERC20 token
-    )
-        public
-        isPermittedDistributor
-        hasValidUsers(users)
-        hasEnoughBalance(token.balanceOf(address(this)), amount)
-    {
-        uint256 share = _handleDistribution(
-            users,
-            amount,
-            address(this),
-            address(token),
-            true
-        );
 
-        emit tokenShareCompleted(amount, share, address(token));
-    }
 
     /// @notice Splits token from user
     /// @param users an ordered list of users addresses
@@ -109,7 +59,6 @@ contract TokenDistributor is Ownable, AccessControl {
         ERC20 token
     )
         public
-        isPermittedDistributor
         hasValidUsers(users)
         hasEnoughBalance(token.balanceOf(msg.sender), amount)
     {
@@ -149,26 +98,5 @@ contract TokenDistributor is Ownable, AccessControl {
                 payable(users[i]).transfer(share); // else split eth
             }
         }
-    }
-
-    /// @notice Grants DISTRIBUTOR_ROLE to a new user
-    /// @dev have to be admin/owner to call this function
-    /// @param user the user to assign the new role to
-    function addNewDistributor(address user) public isAdminOrOwner {
-        grantRole(DISTRIBUTOR_ROLE, user);
-    }
-
-    /// @notice Revokes DISTRIBUTOR_ROLE to a new user
-    /// @dev have to be admin/owner to call this function
-    /// @param user the user to revoke the role from
-    function revokeDistributor(address user) public isAdminOrOwner {
-        revokeRole(DISTRIBUTOR_ROLE, user);
-    }
-
-    /// @notice check if user has DISTRIBUTOR_ROLE
-    /// @dev have to be admin/owner to call this function
-    /// @param user the user to revoke the role from
-    function checkIsDistributor(address user) public view returns (bool) {
-        return hasRole(DISTRIBUTOR_ROLE, user) || owner() == user;
     }
 }
