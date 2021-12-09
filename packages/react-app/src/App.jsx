@@ -11,7 +11,7 @@ import { Account, Contract, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Admin, Room, Home, WalletNotConnected,} from "./views";
+import { Admin, Rooms, Home, WalletNotConnected,} from "./views";
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -253,6 +253,7 @@ function App(props) {
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("🔐 writeContracts", writeContracts);
+      console.log(yourLocalBalance);
     }
 
     if (readContracts) {
@@ -571,7 +572,7 @@ function App(props) {
                   />
                 </Route>
                 <Route path="/room/:room">
-                  <Room
+                  <Rooms
                     address={address}
                     appServer={appServer}
                     web3Modal={web3Modal}

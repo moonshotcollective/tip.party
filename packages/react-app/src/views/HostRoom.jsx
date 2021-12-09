@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
+import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown} from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal } from "../components";
 import { useParams } from "react-router-dom";
@@ -11,9 +11,9 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
-import "./Room.css";
+import "./HostRoom.css";
 
-export default function Room({
+export default function HostRoom({
   appServer,
   web3Modal,
   address,
@@ -310,6 +310,9 @@ export default function Room({
   );
 
   return (
+    <div>
+        <h2 id="title">Tip Your Party!</h2>
+        <h3> You are the Host for "<b>{room}</b>" room </h3>
     <div
       className="Room"
       style={{
@@ -495,6 +498,7 @@ export default function Room({
           </Tabs.TabPane>
         </Tabs>
       </div>
+    </div>
     </div>
   );
 }
