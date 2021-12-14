@@ -253,7 +253,6 @@ function App(props) {
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("🔐 writeContracts", writeContracts);
-      console.log(yourLocalBalance);
     }
 
     if (readContracts) {

@@ -324,18 +324,13 @@ export default function HostRoom({
       }}
     >
       <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
-      <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+      <div>
         <Tabs defaultActiveKey="1" centered>
           <Tabs.TabPane tab="Room" key="1">
             <div style={{ marginTop: 10 }}>
               {/* <div style={{ marginBottom: 20 }}>
                 <h2>Sign In</h2>
               </div> */}
-              <div style={{ marginBottom: 20 }}>
-                <Button type="primary" shape="round" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                  Sign Into "{room}" Room
-                </Button>
-              </div>
               {/* <Divider /> */}
 
               <div style={{ flex: 1 }}>
@@ -368,31 +363,6 @@ export default function HostRoom({
                           >
                             <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
                             <Button onClick={() => unList(index)} size="medium">
-                              <CloseOutlined />
-                            </Button>
-                          </div>
-                        </List.Item>
-                      )}
-                    />
-                  </Collapse.Panel>
-                  <Collapse.Panel header="Blacklist" key="2">
-                    <List
-                      bordered
-                      dataSource={blacklist}
-                      renderItem={(item, index) => (
-                        <List.Item>
-                          <div
-                            style={{
-                              width: "100%",
-                              flex: 1,
-                              display: "flex",
-                              flexDirection: "row",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                            <Button onClick={() => reList(index)} size="medium">
                               <CloseOutlined />
                             </Button>
                           </div>
