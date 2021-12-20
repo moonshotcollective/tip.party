@@ -12,6 +12,7 @@ import {
   Menu,
   Dropdown,
   Popover,
+  Tag
 } from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal } from "../components";
@@ -48,6 +49,7 @@ export default function HostRoom({
   const [token, setToken] = useState(nativeCurrency);
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
+  const [importedAddresses, setImportedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
   const [blacklist, setBlacklist] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
@@ -55,7 +57,7 @@ export default function HostRoom({
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
   const [importToken, setImportToken] = useState(false);
-  const [importAddress, setImportAddress] = useState(false);
+  const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
 
@@ -79,8 +81,9 @@ export default function HostRoom({
 
   const handleAddressImport = addressToImport => {
     if(ethers.utils.isAddress(addressToImport)){
-      setAddresses([...addresses, addressToImport]);
-      setImportAddress(false);
+      setImportedAddresses([...importedAddresses, addressToImport]);
+      //localStorage.setItem("importedAddresses",[importedAddresses]);
+      setImportAddressModal(false);
       // sign into room
       // notify user of signIn
       notification.success({
@@ -109,7 +112,7 @@ export default function HostRoom({
     setAddresses([...updatedList]);
   };
 
-  const hanndleTransactionUpdate = newTx => {
+  const handleTransactionUpdate = newTx => {
     const update = new Set([...newTx, ...txHash]);
     setTxHash([...update]);
   };
@@ -120,6 +123,12 @@ export default function HostRoom({
     }
   }, [addresses, address]);
 
+  // useEffect(() => {
+  //   console.log("imported addresses: " + localStorage.getItem("importedAddresses"));
+  //   const imports = localStorage.getItem("importedAddresses")
+  //   setImportedAddresses([imports]);
+  // }, []);
+
   useEffect(() => {
     // clear existing subscriptions
     subs.current.map(sub => sub());
@@ -127,10 +136,9 @@ export default function HostRoom({
     // start new subscriptions
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, chainId, hanndleTransactionUpdate));
+      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
     }
   }, [room, chainId]);
-
   const handleSignIn = async () => {
     if (typeof appServer == "undefined") {
       return notification.error({
@@ -369,9 +377,9 @@ export default function HostRoom({
               </div> */}
                 {/* <Divider /> */}
                 <AddressModal
-                  visible={importAddress}
+                  visible={importAddressModal}
                   handleAddress={handleAddressImport}
-                  onCancel={() => setImportAddress(false)}
+                  onCancel={() => setImportAddressModal(false)}
                   okText="Add Address"
                 />
                 <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
@@ -380,7 +388,7 @@ export default function HostRoom({
                     onClick={e => {
                       e.preventDefault();
 
-                      setImportAddress(true);
+                      setImportAddressModal(true);
                     }}
                   >
                     Add Address +
@@ -402,7 +410,7 @@ export default function HostRoom({
                     >
                       <List
                         bordered
-                        dataSource={addresses}
+                        dataSource={[...addresses,...importedAddresses]}
                         renderItem={(item, index) => (
                           <List.Item key={item.toLowerCase()}>
                             <div
@@ -416,9 +424,13 @@ export default function HostRoom({
                               }}
                             >
                               <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                              {importedAddresses.includes(item) && (
+                                    <Tag color="grey">imported</Tag>
+                        )}
                               <Button onClick={() => unList(index)} size="medium">
                                 <CloseOutlined />
                               </Button>
+
                             </div>
                           </List.Item>
                         )}
@@ -426,7 +438,7 @@ export default function HostRoom({
                     </Collapse.Panel>
                    
                     {blacklist.length > 0 && (
-                      <Collapse.Panel header="Blacklist" key="3">
+                      <Collapse.Panel header="Blacklist" key="2">
                         <List
                           bordered
                           dataSource={blacklist}
