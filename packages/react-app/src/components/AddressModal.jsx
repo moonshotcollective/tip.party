@@ -1,20 +1,18 @@
 import { Modal } from "antd";
 import React, { useState } from "react";
 import { AddressInput } from ".";
-import { ethers, utils } from "ethers";
-
 
 function ImportModal({ handleAddress, ...props }) {
-  const [address, setAddress] = useState("");
+  const [tokenAddress, setTokenAddress] = useState("");
 
   const onOk = () => {
-      handleAddress(address);
-      setAddress("");
+    setTokenAddress("");
+    handleAddress(tokenAddress);
   };
+
   return (
-    <Modal title="Add Address" centered {...props} onOk={onOk}>
-      <p>Note: Addresses added can only be used by the current host</p>
-      <AddressInput value={address} onChange={setAddress} />
+    <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
+      <AddressInput value={tokenAddress} onChange={setTokenAddress} />
     </Modal>
   );
 }

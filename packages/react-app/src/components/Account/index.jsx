@@ -86,6 +86,7 @@ export default function Account({
                 ensProvider={mainnetProvider}
                 blockExplorer={blockExplorer}
                 blockieSize={10}
+                extra={isOwner ? <p style={{ color: "#ff0000" }}>Admin</p> : <p style={{ color: "#52c41a" }}>User</p>}
               />
             </Dropdown.Button>
           ) : (
