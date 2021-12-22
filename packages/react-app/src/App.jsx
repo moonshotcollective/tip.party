@@ -487,16 +487,16 @@ function App(props) {
 
   return (
     <div className="App p-10 pb-20">
-      <div className="flex flex-wrap">
-        <div className="flex flex-wrap w-1/2 float-left">
+      <footer class="body-font">
+        <div class="container mx-auto flex flex-wrap">
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 navbar-title"
+            className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 navbar-title"
           >
             <div class="flex flex-col">
-              <div class="flex flex-row text-3xl lg:text-4xl">
+              <div class="flex flex-row text-3xl lg:text-6xl">
                 Tip Party
                 <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path
@@ -519,14 +519,10 @@ function App(props) {
                 </svg>
               </div>
 
-              <p className="navbar-subtitle">by MOONSHOT COLLECTIVE</p>
+              <p className="navbar-subtitle lg:text-3xl">by MOONSHOT COLLECTIVE</p>
             </div>
           </a>
-        </div>
-        <div className="flex flex-wrap w-1/2">
-          <div className="flex flex-wrap w-full float-right">
-            <span>{faucetHint}</span>
-            <span>{networkDisplay}</span>
+          <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row">
             <Account
               address={address}
               localProvider={localProvider}
@@ -543,11 +539,11 @@ function App(props) {
               <label>Select Network:</label>
               {networkSelect}
             </div>
-          </div>
+          </span>
         </div>
-      </div>
+      </footer>
       <BrowserRouter>
-        {targetNetwork.name == "localhost" && (
+        {targetNetwork.name === "localhost" && (
           <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
             <Menu.Item key="/">
               <Link
@@ -559,7 +555,7 @@ function App(props) {
                 App
               </Link>
             </Menu.Item>
-            {targetNetwork.name == "localhost" && (
+            {targetNetwork.name === "localhost" && (
               <Menu.Item key="/contracts">
                 <Link
                   onClick={() => {
@@ -680,7 +676,6 @@ function App(props) {
           </Switch>
         </main>
       </BrowserRouter>
-
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
         <Row align="middle" gutter={[4, 4]}>
@@ -715,7 +710,6 @@ function App(props) {
           </Col>
         </Row>
       </div> */}
-
       {/* <Menu
             mode="inline"
             openKeys={openKeys}
