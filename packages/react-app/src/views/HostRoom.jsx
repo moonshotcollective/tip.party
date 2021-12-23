@@ -165,7 +165,7 @@ export default function HostRoom({
 
   const ethPayHandler = async () => {
     const result = tx(
-      writeContracts.TokenDistributor.splitEth(addresses, {
+      writeContracts.TokenDistributor.splitEth(addresses, room, {
         value: ethers.utils.parseEther(amount),
       }),
       async update => {
@@ -202,6 +202,7 @@ export default function HostRoom({
         addresses,
         ethers.utils.parseUnits(amount, opts.decimals),
         opts.address,
+        room
       ),
       async update => {
         await handleResponseHash(update);
@@ -370,7 +371,7 @@ export default function HostRoom({
                       )}
                     />
                   </Collapse.Panel>
-                  {blacklist.lenght>0 && (<Collapse.Panel header="Blacklist" key="2">
+                  {blacklist.length>0 && (<Collapse.Panel header="Blacklist" key="2">
                     <List
                       bordered
                       dataSource={blacklist}
