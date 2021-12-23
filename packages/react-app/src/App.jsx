@@ -596,7 +596,7 @@ function App(props) {
                     blockExplorer={blockExplorer}
                   />
                   <Contract
-                    name="dGTC"
+                    name="GTC"
                     signer={userSigner}
                     provider={localProvider}
                     address={address}

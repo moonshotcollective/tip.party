@@ -76,7 +76,7 @@ export default function HostRoom({
     setAddresses([...updatedList]);
   };
 
-  const hanndleTransactionUpdate = newTx => {
+  const handleTransactionUpdate = newTx => {
     const update = new Set([...newTx, ...txHash]);
     setTxHash([...update]);
   };
@@ -94,65 +94,10 @@ export default function HostRoom({
     // start new subscriptions
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, chainId, hanndleTransactionUpdate));
+      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
     }
   }, [room, chainId]);
 
-  const handleSignIn = async () => {
-    if (typeof appServer == "undefined") {
-      return notification.error({
-        message: "Setup Error",
-        description: "Missing REACT_APP_SERVER environment variable in localhost environment",
-        placement: "bottomRight",
-      });
-    }
-
-    if (web3Modal.cachedProvider == "") {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Please Connect a wallet before Signing in",
-        placement: "bottomRight",
-      });
-    }
-
-    const messageLength = room && room.split(" ").length;
-    if (typeof room == "undefined" || room === "" || messageLength > 1) {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Message should be one word",
-        placement: "bottomRight",
-      });
-    }
-
-    setIsSigning(true);
-
-    // sign roomId using wallet
-    let signature = await userSigner.signMessage(room);
-
-    try {
-      // sign into room
-      await storage.signIntoRoom(room, signature);
-
-      // notify user of signIn
-      setIsSignedIn(true);
-
-      notification.success({
-        message: "Signed in successfully",
-        placement: "bottomRight",
-      });
-      handleConfetti();
-    } catch (error) {
-      setIsSigning(false);
-
-      return notification.error({
-        message: "Failed to Sign!",
-        description: `Connection issue ${error}`,
-        placement: "bottomRight",
-      });
-    }
-
-    setIsSigning(false);
-  };
 
   const amountChangeHandler = e => {
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
@@ -397,18 +342,7 @@ export default function HostRoom({
                     />
                   </Collapse.Panel>)}
                 </Collapse>
-                {/* {canRenderAdminComponents && (
-                <div style={{ marginTop: 10 }}>
-                  <Button
-                    disabled={isFiltering}
-                    loading={isFiltering}
-                    style={{ marginLeft: "10px" }}
-                    onClick={filterAddresses}
-                  >
-                    Filter Out Non ENS Names
-                  </Button>
-                </div>
-              )} */}
+
               </div>
 
               <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>

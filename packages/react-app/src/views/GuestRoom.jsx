@@ -311,8 +311,6 @@ export default function GuestRoom({
     </Menu>
   );
 
-  const canRenderComponents = addresses && addresses.length > 0;
-
   return (
     <div>
       <div>
@@ -386,18 +384,6 @@ export default function GuestRoom({
                         />
                       </Collapse.Panel>
                     </Collapse>
-                    {/* {canRenderAdminComponents && (
-                <div style={{ marginTop: 10 }}>
-                  <Button
-                    disabled={isFiltering}
-                    loading={isFiltering}
-                    style={{ marginLeft: "10px" }}
-                    onClick={filterAddresses}
-                  >
-                    Filter Out Non ENS Names
-                  </Button>
-                </div>
-              )} */}
                   </div>
                 </div>
               </Tabs.TabPane>
