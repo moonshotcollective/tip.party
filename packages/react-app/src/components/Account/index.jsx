@@ -51,7 +51,6 @@ export default function Account({
   loadWeb3Modal,
   logoutOfWeb3Modal,
   blockExplorer,
-  isOwner,
   width,
   networkSelect,
 }) {
