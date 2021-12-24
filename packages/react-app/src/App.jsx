@@ -23,6 +23,7 @@ const DEBUG = true;
 const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
+//const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
 const configuredNetworks = ["rinkeby"];
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
@@ -31,6 +32,7 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 const cachedNetwork = window.localStorage.getItem("network");
 if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
 /// 📡 What chain are your contracts deployed to?
+//let targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
 let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 🛰 providers
