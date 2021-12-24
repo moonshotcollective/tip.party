@@ -11,7 +11,7 @@ import { Account, Contract, ThemeSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Admin, Room, Home, WalletNotConnected } from "./views";
+import { Admin, Rooms, Home, WalletNotConnected,} from "./views";
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -23,7 +23,8 @@ const DEBUG = true;
 const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
-const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
+//const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
+const configuredNetworks = ["rinkeby"];
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
@@ -31,7 +32,8 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 const cachedNetwork = window.localStorage.getItem("network");
 if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
 /// 📡 What chain are your contracts deployed to?
-let targetNetwork = NETWORKS[cachedNetwork || "mainnet"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+//let targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
+let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 🛰 providers
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -152,8 +154,6 @@ function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [owner, setOwner] = useState("");
-  const [admin, setAdmin] = useState(false);
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -220,19 +220,10 @@ function App(props) {
     console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
   });
 
-  const title = admin ? "Pay your contributors" : "Sign in with your message";
 
   const appServer = process.env.REACT_APP_SERVER;
 
-  const updateOwner = async () => {
-    const o = await readContracts?.TokenDistributor?.owner();
-    setOwner(o);
-  };
 
-  const updateAdmin = async () => {
-    const isAdmin = await readContracts?.TokenDistributor?.checkIsDistributor(address);
-    setAdmin(isAdmin);
-  };
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -264,12 +255,10 @@ function App(props) {
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("🔐 writeContracts", writeContracts);
-      console.log("owner: ", owner);
     }
 
     if (readContracts) {
-      updateOwner();
-      updateAdmin();
+
       setIsWalletConnected(AddressHelper.isValidAddress(address));
     }
   }, [
@@ -527,7 +516,6 @@ function App(props) {
                 loadWeb3Modal={loadWeb3Modal}
                 logoutOfWeb3Modal={logoutOfWeb3Modal}
                 blockExplorer={blockExplorer}
-                isOwner={admin}
               />
               <Space direction="vertical" size={0}>
               <label>Select Network:</label>
@@ -562,42 +550,11 @@ function App(props) {
                 </Link>
               </Menu.Item>
             )}
-            {admin && (
-              <Menu.Item key="/adminpanel">
-                <Link
-                  onClick={() => {
-                    setRoute("/adminpanel");
-                  }}
-                  to="/adminpanel"
-                >
-                  Admin Panel
-                </Link>
-              </Menu.Item>
-            )}
           </Menu>
         )}
 
         <main>
           <Switch>
-            {!isWalletConnected ? (
-              <WalletNotConnected
-                connector={
-                  <Account
-                    address={address}
-                    localProvider={localProvider}
-                    userSigner={userSigner}
-                    mainnetProvider={mainnetProvider}
-                    price={price}
-                    web3Modal={web3Modal}
-                    loadWeb3Modal={loadWeb3Modal}
-                    logoutOfWeb3Modal={logoutOfWeb3Modal}
-                    blockExplorer={blockExplorer}
-                    isOwner={admin}
-                    width={300}
-                  />
-                }
-              />
-            ) : (
               <>
                 <Route exact path="/">
                   {/*
@@ -608,7 +565,6 @@ function App(props) {
                   <Home
                     writeContracts={writeContracts}
                     readContracts={readContracts}
-                    admin={admin}
                     address={address}
                     mainnetProvider={mainnetProvider}
                     tx={tx}
@@ -617,7 +573,7 @@ function App(props) {
                   />
                 </Route>
                 <Route path="/room/:room">
-                  <Room
+                  <Rooms
                     address={address}
                     appServer={appServer}
                     web3Modal={web3Modal}
@@ -627,7 +583,6 @@ function App(props) {
                     writeContracts={writeContracts}
                     localProvider={localProvider}
                     yourLocalBalance={yourLocalBalance}
-                    admin={admin}
                     chainId={localChainId || selectedChainId}
                     selectedChainId={selectedChainId}
                     tx={tx}
@@ -643,31 +598,16 @@ function App(props) {
                     blockExplorer={blockExplorer}
                   />
                   <Contract
-                    name="DummyToken"
+                    name="GTC"
                     signer={userSigner}
                     provider={localProvider}
                     address={address}
                     blockExplorer={blockExplorer}
                   />
                 </Route>
-                {admin && (
-                  <Route exact path="/adminpanel">
-                    <Admin
-                      readContracts={readContracts}
-                      writeContracts={writeContracts}
-                      mainnetProvider={mainnetProvider}
-                      localProvider={localProvider}
-                      yourLocalBalance={yourLocalBalance}
-                      title={title}
-                      appServer={appServer}
-                      tx={tx}
-                      address={address}
-                      admin={admin}
-                    />
-                  </Route>
-                )}
+
               </>
-            )}
+            
           </Switch>
         </main>
       </BrowserRouter>

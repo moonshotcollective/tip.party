@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
+import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown} from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal } from "../components";
 import { useParams } from "react-router-dom";
@@ -11,9 +11,9 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
-import "./Room.css";
+import "./HostRoom.css";
 
-export default function Rooms({
+export default function HostRoom({
   appServer,
   web3Modal,
   address,
@@ -21,13 +21,12 @@ export default function Rooms({
   mainnetProvider,
   writeContracts: oldWriteContracts,
   readContracts: oldReadContracts,
-  admin,
   yourLocalBalance,
   localProvider,
   chainId,
   selectedChainId,
   tx,
-  nativeCurrency
+  nativeCurrency,
 }) {
   const { room } = useParams();
   //const { width, height } = useWindowSize()
@@ -77,7 +76,7 @@ export default function Rooms({
     setAddresses([...updatedList]);
   };
 
-  const hanndleTransactionUpdate = newTx => {
+  const handleTransactionUpdate = newTx => {
     const update = new Set([...newTx, ...txHash]);
     setTxHash([...update]);
   };
@@ -95,65 +94,10 @@ export default function Rooms({
     // start new subscriptions
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, chainId, hanndleTransactionUpdate));
+      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
     }
   }, [room, chainId]);
 
-  const handleSignIn = async () => {
-    if (typeof appServer == "undefined") {
-      return notification.error({
-        message: "Setup Error",
-        description: "Missing REACT_APP_SERVER environment variable in localhost environment",
-        placement: "bottomRight",
-      });
-    }
-
-    if (web3Modal.cachedProvider == "") {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Please Connect a wallet before Signing in",
-        placement: "bottomRight",
-      });
-    }
-
-    const messageLength = room && room.split(" ").length;
-    if (typeof room == "undefined" || room === "" || messageLength > 1) {
-      return notification.error({
-        message: "Failed to Sign In!",
-        description: "Message should be one word",
-        placement: "bottomRight",
-      });
-    }
-
-    setIsSigning(true);
-
-    // sign roomId using wallet
-    let signature = await userSigner.signMessage(room);
-
-    try {
-      // sign into room
-      await storage.signIntoRoom(room, signature);
-
-      // notify user of signIn
-      setIsSignedIn(true);
-
-      notification.success({
-        message: "Signed in successfully",
-        placement: "bottomRight",
-      });
-      handleConfetti();
-    } catch (error) {
-      setIsSigning(false);
-
-      return notification.error({
-        message: "Failed to Sign!",
-        description: `Connection issue ${error}`,
-        placement: "bottomRight",
-      });
-    }
-
-    setIsSigning(false);
-  };
 
   const amountChangeHandler = e => {
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
@@ -166,7 +110,7 @@ export default function Rooms({
 
   const ethPayHandler = async () => {
     const result = tx(
-      writeContracts.TokenDistributor.splitEth(addresses, {
+      writeContracts.TokenDistributor.splitEth(addresses, room, {
         value: ethers.utils.parseEther(amount),
       }),
       async update => {
@@ -203,6 +147,7 @@ export default function Rooms({
         addresses,
         ethers.utils.parseUnits(amount, opts.decimals),
         opts.address,
+        room
       ),
       async update => {
         await handleResponseHash(update);
@@ -310,9 +255,10 @@ export default function Rooms({
     </Menu>
   );
 
-  const canRenderAdminComponents = admin && addresses && addresses.length > 0;
-
   return (
+    <div>
+        <h2 id="title">Tip Your Party!</h2>
+        <h3> You are the Host for "<b>{room}</b>" room </h3>
     <div
       className="Room"
       style={{
@@ -324,24 +270,19 @@ export default function Rooms({
       }}
     >
       <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
-      <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+      <div>
         <Tabs defaultActiveKey="1" centered>
           <Tabs.TabPane tab="Room" key="1">
             <div style={{ marginTop: 10 }}>
               {/* <div style={{ marginBottom: 20 }}>
                 <h2>Sign In</h2>
               </div> */}
-              <div style={{ marginBottom: 20 }}>
-                <Button type="primary" shape="round" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                  Sign Into "{room}" Room
-                </Button>
-              </div>
               {/* <Divider /> */}
 
               <div style={{ flex: 1 }}>
                 <Collapse defaultActiveKey={["1"]}>
                   <Collapse.Panel
-                    header={admin ? `Pay List - ${addresses.length}` : `Signed In - ${addresses.length}`}
+                    header={`Pay List - ${addresses.length}`}
                     key="1"
                     extra={
                       <div onClick={e => e.stopPropagation()}>
@@ -367,118 +308,99 @@ export default function Rooms({
                             }}
                           >
                             <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                            {admin && (
-                              <Button onClick={() => unList(index)} size="medium">
-                                <CloseOutlined />
-                              </Button>
-                            )}
+                            <Button onClick={() => unList(index)} size="medium">
+                              <CloseOutlined />
+                            </Button>
                           </div>
                         </List.Item>
                       )}
                     />
                   </Collapse.Panel>
-                  {admin && (
-                    <Collapse.Panel header="Blacklist" key="2">
-                      <List
-                        bordered
-                        dataSource={blacklist}
-                        renderItem={(item, index) => (
-                          <List.Item>
-                            <div
-                              style={{
-                                width: "100%",
-                                flex: 1,
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                              }}
-                            >
-                              <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                              {admin && (
-                                <Button onClick={() => reList(index)} size="medium">
-                                  <CloseOutlined />
-                                </Button>
-                              )}
-                            </div>
-                          </List.Item>
-                        )}
-                      />
-                    </Collapse.Panel>
-                  )}
+                  {blacklist.length>0 && (<Collapse.Panel header="Blacklist" key="2">
+                    <List
+                      bordered
+                      dataSource={blacklist}
+                      renderItem={(item, index) => (
+                        <List.Item>
+                          <div
+                            style={{
+                              width: "100%",
+                              flex: 1,
+                              display: "flex",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                            <Button onClick={() => reList(index)} size="medium">
+                              <CloseOutlined />
+                            </Button>
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+                  </Collapse.Panel>)}
                 </Collapse>
-                {/* {canRenderAdminComponents && (
-                <div style={{ marginTop: 10 }}>
-                  <Button
-                    disabled={isFiltering}
-                    loading={isFiltering}
-                    style={{ marginLeft: "10px" }}
-                    onClick={filterAddresses}
-                  >
-                    Filter Out Non ENS Names
-                  </Button>
-                </div>
-              )} */}
+
               </div>
 
               <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>
-                {canRenderAdminComponents && (
-                  <div>
-                    {/* TODO : disable input until ERC-20 token is selected */}
-                    <Input
-                      value={amount}
-                      addonBefore="Total Amount to Distribute"
-                      addonAfter={
-                        <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
-                          <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
-                          {availableTokens.map(name => (
-                            <Select.Option key={name} value={name}>
-                              {name}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      }
-                      style={{ marginTop: "10px" }}
-                      onChange={amountChangeHandler}
-                    />
+                <div>
+                  {/* TODO : disable input until ERC-20 token is selected */}
+                  <Input
+                    value={amount}
+                    addonBefore="Total Amount to Distribute"
+                    addonAfter={
+                      <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
+                        <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
+                        {availableTokens.map(name => (
+                          <Select.Option key={name} value={name}>
+                            {name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    }
+                    style={{ marginTop: "10px" }}
+                    onChange={amountChangeHandler}
+                  />
 
-                    <AddressModal
-                      visible={importToken}
-                      handleAddress={handleTokenImport}
-                      onCancel={() => setImportToken(false)}
-                      okText="Import Token"
-                    />
+                  <AddressModal
+                    visible={importToken}
+                    handleAddress={handleTokenImport}
+                    onCancel={() => setImportToken(false)}
+                    okText="Import Token"
+                  />
 
-                    <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
+                  <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
+                    <a
+                      href="#"
+                      onClick={e => {
+                        e.preventDefault();
 
-                          setImportToken(true);
-                        }}
-                      >
-                        import ERC20 token...
-                      </a>
-                    </div>
-                    <PayButton
-                      style={{ marginTop: 20 }}
-                      token={token}
-                      appName="Tip.party"
-                      tokenListHandler={tokens => setAvailableTokens(tokens)}
-                      callerAddress={address}
-                      maxApproval={amount}
-                      amount={amount}
-                      spender={spender}
-                      yourLocalBalance={yourLocalBalance}
-                      readContracts={readContracts}
-                      writeContracts={writeContracts}
-                      ethPayHandler={ethPayHandler}
-                      tokenPayHandler={tokenPayHandler}
-                      nativeCurrency={nativeCurrency}
-                    />
+                        setImportToken(true);
+                      }}
+                    >
+                      import ERC20 token...
+                    </a>
                   </div>
-                )}
+                  <PayButton
+                    style={{ marginTop: 20 }}
+                    token={token}
+                    appName="Tip.party"
+                    tokenListHandler={tokens => setAvailableTokens(tokens)}
+                    callerAddress={address}
+                    maxApproval={amount}
+                    amount={amount}
+                    spender={spender}
+                    yourLocalBalance={yourLocalBalance}
+                    readContracts={readContracts}
+                    writeContracts={writeContracts}
+                    ethPayHandler={ethPayHandler}
+                    tokenPayHandler={tokenPayHandler}
+                    nativeCurrency={nativeCurrency}
+                  />
+                </div>
               </div>
             </div>
           </Tabs.TabPane>
@@ -506,6 +428,7 @@ export default function Rooms({
           </Tabs.TabPane>
         </Tabs>
       </div>
+    </div>
     </div>
   );
 }

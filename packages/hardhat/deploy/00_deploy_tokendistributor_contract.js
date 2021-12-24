@@ -54,15 +54,15 @@ module.exports = async ({ getNamedAccounts, getChainId, deployments }) => {
 
   // Verify your contracts with Etherscan
   // You don't want to verify on localhost
-  if (chainId !== localChainId) {
-    // wait for etherscan to be ready to verify
-    await sleep(15000);
-    await run("verify:verify", {
-      address: TokenDistributor.address,
-      contract: "contracts/TokenDistributor.sol:TokenDistributor",
-      contractArguments: [],
-    });
-  }
+  // if (chainId !== localChainId) {
+  //   // wait for etherscan to be ready to verify
+  //   await sleep(15000);
+  //   await run("verify:verify", {
+  //     address: TokenDistributor.address,
+  //     contract: "contracts/TokenDistributor.sol:TokenDistributor",
+  //     contractArguments: [],
+  //   });
+  // }
 };
 
 module.exports.tags = ["TokenDistributor", "GTC"];
