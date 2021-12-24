@@ -27,7 +27,7 @@ export default function Rooms({
   chainId,
   selectedChainId,
   tx,
-  nativeCurrency
+  nativeCurrency,
 }) {
   const { room } = useParams();
   //const { width, height } = useWindowSize()
@@ -355,7 +355,7 @@ export default function Rooms({
                       bordered
                       dataSource={addresses}
                       renderItem={(item, index) => (
-                        <List.Item key={item.toLowerCase()}>
+                        <List.Item key={`${item.toLowerCase()}-${index}`}>
                           <div
                             style={{
                               width: "100%",

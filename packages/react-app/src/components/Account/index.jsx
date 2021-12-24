@@ -53,9 +53,8 @@ export default function Account({
   blockExplorer,
   isOwner,
   width,
+  networkSelect,
 }) {
-  const { currentTheme } = useThemeSwitcher();
-
   function isValidAddress(address) {
     return address && address !== "0x0000000000000000000000000000000000000000";
   }
@@ -80,15 +79,20 @@ export default function Account({
       modalButtons.push(
         <div key="first">
           {isValidAddress(address) ? (
-            <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click" size={"large"}>
-              <Address
-                address={address}
-                ensProvider={mainnetProvider}
-                blockExplorer={blockExplorer}
-                blockieSize={10}
-                extra={isOwner ? <p style={{ color: "#ff0000" }}>Admin</p> : <p style={{ color: "#52c41a" }}>User</p>}
-              />
-            </Dropdown.Button>
+            <div className="flex flex-row">
+              <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click" size={"medium"}>
+                <Address
+                  address={address}
+                  ensProvider={mainnetProvider}
+                  blockExplorer={blockExplorer}
+                  blockieSize={10}
+                />
+              </Dropdown.Button>
+              <div class="flex flex-col ml-10">
+                <label className="text-base">Select Network:</label>
+                {networkSelect}
+              </div>
+            </div>
           ) : (
             ""
           )}
