@@ -10,18 +10,12 @@
 }
 
 a.navbar-title {
-  font-style: normal;
-  font-weight: normal;
-  font-size: 40px;
   line-height: 71px;
   color: #FFCC00;
 }
 
 p.navbar-subtitle {
   font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 600;
-  font-size: 20px;
   line-height: 150%;
   color: #6F3FF5;
 }

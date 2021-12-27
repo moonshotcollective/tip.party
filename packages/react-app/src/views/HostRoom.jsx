@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown} from "antd";
+import { Button, List, notification, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal } from "../components";
 import { useParams } from "react-router-dom";
@@ -98,12 +98,11 @@ export default function HostRoom({
     }
   }, [room, chainId]);
 
-
   const amountChangeHandler = e => {
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
     const re = /^\d*\.?\d*$/;
 
-    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value != ".") {
+    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value !== ".") {
       setAmount(e.target.value);
     }
   };
@@ -147,7 +146,7 @@ export default function HostRoom({
         addresses,
         ethers.utils.parseUnits(amount, opts.decimals),
         opts.address,
-        room
+        room,
       ),
       async update => {
         await handleResponseHash(update);
@@ -257,178 +256,182 @@ export default function HostRoom({
 
   return (
     <div>
-        <h2 id="title">Tip Your Party!</h2>
-        <h3> You are the Host for "<b>{room}</b>" room </h3>
-    <div
-      className="Room"
-      style={{
-        margin: "20px auto",
-        marginBottom: 30,
-        width: 500,
-        padding: 20,
-        paddingBottom: 40,
-      }}
-    >
-      <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
-      <div>
-        <Tabs defaultActiveKey="1" centered>
-          <Tabs.TabPane tab="Room" key="1">
-            <div style={{ marginTop: 10 }}>
-              {/* <div style={{ marginBottom: 20 }}>
+      <h2 id="title">Tip Your Party!</h2>
+      <h3>
+        {" "}
+        You are the Host for "<b>{room}</b>" room{" "}
+      </h3>
+      <div
+        className="Room"
+        style={{
+          margin: "20px auto",
+          marginBottom: 30,
+          width: 500,
+          padding: 20,
+          paddingBottom: 40,
+        }}
+      >
+        <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <div>
+          <Tabs defaultActiveKey="1" centered>
+            <Tabs.TabPane tab="Room" key="1">
+              <div style={{ marginTop: 10 }}>
+                {/* <div style={{ marginBottom: 20 }}>
                 <h2>Sign In</h2>
               </div> */}
-              {/* <Divider /> */}
+                {/* <Divider /> */}
 
-              <div style={{ flex: 1 }}>
-                <Collapse defaultActiveKey={["1"]}>
-                  <Collapse.Panel
-                    header={`Pay List - ${addresses.length}`}
-                    key="1"
-                    extra={
-                      <div onClick={e => e.stopPropagation()}>
-                        <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
-                          <ExportOutlined />
-                        </Dropdown>
-                      </div>
-                    }
-                  >
-                    <List
-                      bordered
-                      dataSource={addresses}
-                      renderItem={(item, index) => (
-                        <List.Item key={item.toLowerCase()}>
-                          <div
-                            style={{
-                              width: "100%",
-                              flex: 1,
-                              display: "flex",
-                              flexDirection: "row",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                            <Button onClick={() => unList(index)} size="medium">
-                              <CloseOutlined />
-                            </Button>
-                          </div>
-                        </List.Item>
-                      )}
-                    />
-                  </Collapse.Panel>
-                  {blacklist.length>0 && (<Collapse.Panel header="Blacklist" key="2">
-                    <List
-                      bordered
-                      dataSource={blacklist}
-                      renderItem={(item, index) => (
-                        <List.Item>
-                          <div
-                            style={{
-                              width: "100%",
-                              flex: 1,
-                              display: "flex",
-                              flexDirection: "row",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
-                            <Button onClick={() => reList(index)} size="medium">
-                              <CloseOutlined />
-                            </Button>
-                          </div>
-                        </List.Item>
-                      )}
-                    />
-                  </Collapse.Panel>)}
-                </Collapse>
-
-              </div>
-
-              <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>
-                <div>
-                  {/* TODO : disable input until ERC-20 token is selected */}
-                  <Input
-                    value={amount}
-                    addonBefore="Total Amount to Distribute"
-                    addonAfter={
-                      <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
-                        <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
-                        {availableTokens.map(name => (
-                          <Select.Option key={name} value={name}>
-                            {name}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    }
-                    style={{ marginTop: "10px" }}
-                    onChange={amountChangeHandler}
-                  />
-
-                  <AddressModal
-                    visible={importToken}
-                    handleAddress={handleTokenImport}
-                    onCancel={() => setImportToken(false)}
-                    okText="Import Token"
-                  />
-
-                  <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
-                    <a
-                      href="#"
-                      onClick={e => {
-                        e.preventDefault();
-
-                        setImportToken(true);
-                      }}
+                <div style={{ flex: 1 }}>
+                  <Collapse defaultActiveKey={["1"]}>
+                    <Collapse.Panel
+                      header={`Pay List - ${addresses.length}`}
+                      key="1"
+                      extra={
+                        <div onClick={e => e.stopPropagation()}>
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                            <ExportOutlined />
+                          </Dropdown>
+                        </div>
+                      }
                     >
-                      import ERC20 token...
-                    </a>
-                  </div>
-                  <PayButton
-                    style={{ marginTop: 20 }}
-                    token={token}
-                    appName="Tip.party"
-                    tokenListHandler={tokens => setAvailableTokens(tokens)}
-                    callerAddress={address}
-                    maxApproval={amount}
-                    amount={amount}
-                    spender={spender}
-                    yourLocalBalance={yourLocalBalance}
-                    readContracts={readContracts}
-                    writeContracts={writeContracts}
-                    ethPayHandler={ethPayHandler}
-                    tokenPayHandler={tokenPayHandler}
-                    nativeCurrency={nativeCurrency}
-                  />
+                      <List
+                        bordered
+                        dataSource={addresses}
+                        renderItem={(item, index) => (
+                          <List.Item key={`${item.toLowerCase()}-${index}`}>
+                            <div
+                              style={{
+                                width: "100%",
+                                flex: 1,
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                              <Button onClick={() => unList(index)} size="medium">
+                                <CloseOutlined />
+                              </Button>
+                            </div>
+                          </List.Item>
+                        )}
+                      />
+                    </Collapse.Panel>
+                    {blacklist.length > 0 && (
+                      <Collapse.Panel header="Blacklist" key="2">
+                        <List
+                          bordered
+                          dataSource={blacklist}
+                          renderItem={(item, index) => (
+                            <List.Item>
+                              <div
+                                style={{
+                                  width: "100%",
+                                  flex: 1,
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                                <Button onClick={() => reList(index)} size="medium">
+                                  <CloseOutlined />
+                                </Button>
+                              </div>
+                            </List.Item>
+                          )}
+                        />
+                      </Collapse.Panel>
+                    )}
+                  </Collapse>
                 </div>
-              </div>
-            </div>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Payouts" key="2">
-            {/* Transactions */}
-            <div style={{ marginBottom: 25, flex: 1 }}>
-              <Card title="Payout Transactions" style={{ width: "100%" }}>
-                <List
-                  bordered
-                  dataSource={txHash}
-                  renderItem={(item, index) => (
-                    <List.Item>
-                      <div
-                        style={{
-                          width: "100%",
+
+                <div style={{ width: "100%", display: "flex", margin: "10px auto" }}>
+                  <div>
+                    {/* TODO : disable input until ERC-20 token is selected */}
+                    <Input
+                      value={amount}
+                      addonBefore="Total Amount to Distribute"
+                      addonAfter={
+                        <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
+                          <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
+                          {availableTokens.map(name => (
+                            <Select.Option key={name} value={name}>
+                              {name}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      }
+                      style={{ marginTop: "10px" }}
+                      onChange={amountChangeHandler}
+                    />
+
+                    <AddressModal
+                      visible={importToken}
+                      handleAddress={handleTokenImport}
+                      onCancel={() => setImportToken(false)}
+                      okText="Import Token"
+                    />
+
+                    <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
+                      <a
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+
+                          setImportToken(true);
                         }}
                       >
-                        <TransactionHash localProvider={localProvider} chainId={chainId} hash={item} fontSize={14} />
-                      </div>
-                    </List.Item>
-                  )}
-                />
-              </Card>
-            </div>
-          </Tabs.TabPane>
-        </Tabs>
+                        import ERC20 token...
+                      </a>
+                    </div>
+                    <PayButton
+                      style={{ marginTop: 20 }}
+                      token={token}
+                      appName="Tip.party"
+                      tokenListHandler={tokens => setAvailableTokens(tokens)}
+                      callerAddress={address}
+                      maxApproval={amount}
+                      amount={amount}
+                      spender={spender}
+                      yourLocalBalance={yourLocalBalance}
+                      readContracts={readContracts}
+                      writeContracts={writeContracts}
+                      ethPayHandler={ethPayHandler}
+                      tokenPayHandler={tokenPayHandler}
+                      nativeCurrency={nativeCurrency}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Payouts" key="2">
+              {/* Transactions */}
+              <div style={{ marginBottom: 25, flex: 1 }}>
+                <Card title="Payout Transactions" style={{ width: "100%" }}>
+                  <List
+                    bordered
+                    dataSource={txHash}
+                    renderItem={(item, index) => (
+                      <List.Item>
+                        <div
+                          style={{
+                            width: "100%",
+                          }}
+                        >
+                          <TransactionHash localProvider={localProvider} chainId={chainId} hash={item} fontSize={14} />
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </Card>
+              </div>
+            </Tabs.TabPane>
+          </Tabs>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Divider, Card, Input, Select, Collapse, Tabs, Menu, Dropdown, Space} from "antd";
-import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
-import { Address, PayButton, TransactionHash, AddressModal } from "../components";
+import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown } from "antd";
+import { ExportOutlined } from "@ant-design/icons";
+import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
-import { ethers, utils } from "ethers";
-import { filterLimit } from "async";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
 import { useTokenImport } from "../hooks";
@@ -32,17 +30,11 @@ export default function GuestRoom({
   const { room } = useParams();
   //const { width, height } = useWindowSize()
 
-  const [amount, setAmount] = useState(0);
-  const [token, setToken] = useState(nativeCurrency);
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
-  const [blacklist, setBlacklist] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [availableTokens, setAvailableTokens] = useState([]);
-  const [isFiltering, setIsFiltering] = useState(false);
-  const [importToken, setImportToken] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
 
@@ -56,7 +48,6 @@ export default function GuestRoom({
       addContracts({ writeContracts: oldWriteContracts, readContracts: oldReadContracts });
     }
   }, [oldWriteContracts]);
-
 
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
@@ -156,135 +147,6 @@ export default function GuestRoom({
     setIsSigning(false);
   };
 
-  const amountChangeHandler = e => {
-    // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
-    const re = /^\d*\.?\d*$/;
-
-    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value != ".") {
-      setAmount(e.target.value);
-    }
-  };
-
-  const ethPayHandler = async () => {
-    const result = tx(
-      writeContracts.TokenDistributor.splitEth(addresses, {
-        value: ethers.utils.parseEther(amount),
-      }),
-      async update => {
-        await handleResponseHash(update);
-        console.log("📡 Transaction Update:", update);
-        if (update && (update.status === "confirmed" || update.status === 1)) {
-          console.log(" 🍾 Transaction " + update.hash + " finished!");
-          console.log(
-            " ⛽️ " +
-              update.gasUsed +
-              "/" +
-              (update.gasLimit || update.gas) +
-              " @ " +
-              parseFloat(update.gasPrice) / 1000000000 +
-              " gwei",
-          );
-          notification.success({
-            message: "Payout successful",
-            description: "Each user received " + amount / addresses.length + " " + token,
-            placement: "topRight",
-          });
-          handleConfetti();
-        }
-      },
-    );
-    console.log("awaiting metamask/web3 confirm result...", result);
-    console.log(await result);
-    setAmount(0);
-  };
-
-  const tokenPayHandler = async opts => {
-    const result = tx(
-      writeContracts.TokenDistributor.splitTokenFromUser(
-        addresses,
-        ethers.utils.parseUnits(amount, opts.decimals),
-        opts.address,
-      ),
-      async update => {
-        await handleResponseHash(update);
-        console.log("📡 Transaction Update:", update);
-        if (update && (update.status === "confirmed" || update.status === 1)) {
-          console.log(" 🍾 Transaction " + update.hash + " finished!");
-          console.log(
-            " ⛽️ " +
-              update.gasUsed +
-              "/" +
-              (update.gasLimit || update.gas) +
-              " @ " +
-              parseFloat(update.gasPrice) / 1000000000 +
-              " gwei",
-          );
-          notification.success({
-            message: "Payout successful",
-            description: "Each user received " + amount / addresses.length + " " + token,
-            placement: "topRight",
-          });
-          handleConfetti();
-        }
-      },
-    );
-    console.log("awaiting metamask/web3 confirm result...", result);
-    console.log(await result);
-    setAmount(0);
-  };
-
-  const handleResponseHash = async result => {
-    if (result.hash && selectedChainId && room) {
-      await storage.registerTransactionForRoom(room, result.hash, selectedChainId);
-    }
-  };
-
-  const reList = index => {
-    const addressChanged = blacklist[index];
-    const updatedAddressesList = [...blacklist];
-    updatedAddressesList.splice(index, 1);
-    setBlacklist([...updatedAddressesList]);
-    setAddresses([...addresses, addressChanged]);
-  };
-
-  const unList = index => {
-    const addressChanged = addresses[index];
-    const updatedAddressesList = [...addresses];
-    updatedAddressesList.splice(index, 1);
-    setAddresses([...updatedAddressesList]);
-    setBlacklist([...blacklist, addressChanged]);
-  };
-
-  const lookupAddress = async (provider, address) => {
-    if (address && utils.isAddress(address)) {
-      // console.log(`looking up ${address}`)
-      try {
-        // Accuracy of reverse resolution is not enforced.
-        // We then manually ensure that the reported ens name resolves to address
-        const reportedName = await provider.lookupAddress(address);
-        const resolvedAddress = await provider.resolveName(reportedName);
-
-        if (address && utils.getAddress(address) === utils.getAddress(resolvedAddress)) {
-          return reportedName;
-        }
-        return utils.getAddress(address);
-      } catch (e) {
-        return utils.getAddress(address);
-      }
-    }
-    return 0;
-  };
-
-  const filterAddresses = async () => {
-    setIsFiltering(true);
-    const output = await filterLimit(addresses, 10, async address => {
-      const ens = await lookupAddress(mainnetProvider, address).then(name => name);
-      return ens && ens.indexOf("0x") < 0;
-    });
-    setAddresses(output);
-    setIsFiltering(false);
-  };
-
   const copyToClipBoard = () => {
     copy(addresses, {
       debug: true,
@@ -315,7 +177,6 @@ export default function GuestRoom({
     <div>
       <div>
         <h2 id="title">Welcome to the Tip Party!</h2>
-
 
         <div
           className="Room"
@@ -366,7 +227,7 @@ export default function GuestRoom({
                           bordered
                           dataSource={addresses}
                           renderItem={(item, index) => (
-                            <List.Item key={item.toLowerCase()}>
+                            <List.Item key={`${item.toLowerCase()}-${index}`}>
                               <div
                                 style={{
                                   width: "100%",

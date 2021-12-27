@@ -1,17 +1,17 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Menu, Layout, PageHeader, Space, Select } from "antd";
+import { Alert, Button, Menu, Select } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, ThemeSwitch } from "./components";
+import { Account, Contract } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Admin, Rooms, Home, WalletNotConnected,} from "./views";
+import { Rooms, Home } from "./views";
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -25,18 +25,20 @@ const NETWORKCHECK = true;
 // Add more networks as the dapp expands to more networks
 //const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
 const configuredNetworks = ["rinkeby"];
-if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
 
 const cachedNetwork = window.localStorage.getItem("network");
 if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
+
 /// 📡 What chain are your contracts deployed to?
 //let targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
 let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 🛰 providers
-if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
+if (DEBUG) console.log(`Connecting to ${cachedNetwork || "mainnet"}`);
+if (DEBUG) console.log(`Network info: ${targetNetwork}`);
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
@@ -220,10 +222,7 @@ function App(props) {
     console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
   });
 
-
   const appServer = process.env.REACT_APP_SERVER;
-
-
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -258,7 +257,6 @@ function App(props) {
     }
 
     if (readContracts) {
-
       setIsWalletConnected(AddressHelper.isValidAddress(address));
     }
   }, [
@@ -355,7 +353,7 @@ function App(props) {
     if (configuredNetworks.indexOf(id) > -1) {
       options.push(
         <Select.Option key={id} value={NETWORKS[id].name}>
-          <span style={{ color: NETWORKS[id].color, fontSize: 14 }}>{NETWORKS[id].name}</span>
+          <span style={{ color: NETWORKS[id].color, fontSize: 20 }}>{NETWORKS[id].name}</span>
         </Select.Option>,
       );
     }
@@ -473,11 +471,16 @@ function App(props) {
   }
 
   return (
-    <div className="App">
-      <Layout style={{ fixed: "top" }}>
-        <PageHeader
-          title={
-            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }} className="navbar-title">
+    <div className="App pb-20">
+      <div class="p-10 mx-auto flex flex-wrap">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 navbar-title"
+        >
+          <div class="flex flex-col">
+            <div class="flex flex-row text-2xl lg:text-5xl">
               Tip Party
               <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -498,35 +501,28 @@ function App(props) {
                   fill="#FFCC00"
                 />
               </svg>
-              <p className="navbar-subtitle">by MOONSHOT COLLECTIVE</p>
-            </a>
-          }
-          style={{ cursor: "pointer", margin: 10, padding: 0 }}
-          extra={[
-            <Space size="large">
-              <span>{faucetHint}</span>
-              <span>{networkDisplay}</span>
-              <Account
-                address={address}
-                localProvider={localProvider}
-                userSigner={userSigner}
-                mainnetProvider={mainnetProvider}
-                price={price}
-                web3Modal={web3Modal}
-                loadWeb3Modal={loadWeb3Modal}
-                logoutOfWeb3Modal={logoutOfWeb3Modal}
-                blockExplorer={blockExplorer}
-              />
-              <Space direction="vertical" size={0}>
-              <label>Select Network:</label>
-              {networkSelect}
-              </Space>
-            </Space>,
-          ]}
-        />
-      </Layout>
+            </div>
+
+            <p className="navbar-subtitle text-base lg:text-2xl">by MOONSHOT COLLECTIVE</p>
+          </div>
+        </a>
+        <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
+          <Account
+            address={address}
+            localProvider={localProvider}
+            userSigner={userSigner}
+            mainnetProvider={mainnetProvider}
+            price={price}
+            web3Modal={web3Modal}
+            loadWeb3Modal={loadWeb3Modal}
+            logoutOfWeb3Modal={logoutOfWeb3Modal}
+            blockExplorer={blockExplorer}
+            networkSelect={networkSelect}
+          />
+        </span>
+      </div>
       <BrowserRouter>
-        {targetNetwork.name == "localhost" && (
+        {targetNetwork.name === "localhost" && (
           <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
             <Menu.Item key="/">
               <Link
@@ -538,7 +534,7 @@ function App(props) {
                 App
               </Link>
             </Menu.Item>
-            {targetNetwork.name == "localhost" && (
+            {targetNetwork.name === "localhost" && (
               <Menu.Item key="/contracts">
                 <Link
                   onClick={() => {
@@ -555,64 +551,60 @@ function App(props) {
 
         <main>
           <Switch>
-              <>
-                <Route exact path="/">
-                  {/*
+            <>
+              <Route exact path="/">
+                {/*
                     🎛 this scaffolding is full of commonly used components
                     this <Contract/> component will automatically parse your ABI
                     and give you a form to interact with it locally
                 */}
-                  <Home
-                    writeContracts={writeContracts}
-                    readContracts={readContracts}
-                    address={address}
-                    mainnetProvider={mainnetProvider}
-                    tx={tx}
-                    isWalletConnected={isWalletConnected}
-                    nativeCurrency= {targetNetwork.nativeCurrency}
-                  />
-                </Route>
-                <Route path="/room/:room">
-                  <Rooms
-                    address={address}
-                    appServer={appServer}
-                    web3Modal={web3Modal}
-                    userSigner={userSigner}
-                    mainnetProvider={mainnetProvider}
-                    readContracts={readContracts}
-                    writeContracts={writeContracts}
-                    localProvider={localProvider}
-                    yourLocalBalance={yourLocalBalance}
-                    chainId={localChainId || selectedChainId}
-                    selectedChainId={selectedChainId}
-                    tx={tx}
-                    nativeCurrency= {targetNetwork.nativeCurrency}
-                  />
-                </Route>
-                <Route exact path="/contracts">
-                  <Contract
-                    name="TokenDistributor"
-                    signer={userSigner}
-                    provider={localProvider}
-                    address={address}
-                    blockExplorer={blockExplorer}
-                  />
-                  <Contract
-                    name="GTC"
-                    signer={userSigner}
-                    provider={localProvider}
-                    address={address}
-                    blockExplorer={blockExplorer}
-                  />
-                </Route>
-
-              </>
-            
+                <Home
+                  writeContracts={writeContracts}
+                  readContracts={readContracts}
+                  address={address}
+                  mainnetProvider={mainnetProvider}
+                  tx={tx}
+                  isWalletConnected={isWalletConnected}
+                  nativeCurrency={targetNetwork.nativeCurrency}
+                />
+              </Route>
+              <Route path="/room/:room">
+                <Rooms
+                  address={address}
+                  appServer={appServer}
+                  web3Modal={web3Modal}
+                  userSigner={userSigner}
+                  mainnetProvider={mainnetProvider}
+                  readContracts={readContracts}
+                  writeContracts={writeContracts}
+                  localProvider={localProvider}
+                  yourLocalBalance={yourLocalBalance}
+                  chainId={localChainId || selectedChainId}
+                  selectedChainId={selectedChainId}
+                  tx={tx}
+                  nativeCurrency={targetNetwork.nativeCurrency}
+                />
+              </Route>
+              <Route exact path="/contracts">
+                <Contract
+                  name="TokenDistributor"
+                  signer={userSigner}
+                  provider={localProvider}
+                  address={address}
+                  blockExplorer={blockExplorer}
+                />
+                <Contract
+                  name="GTC"
+                  signer={userSigner}
+                  provider={localProvider}
+                  address={address}
+                  blockExplorer={blockExplorer}
+                />
+              </Route>
+            </>
           </Switch>
         </main>
       </BrowserRouter>
-
-
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
         <Row align="middle" gutter={[4, 4]}>
@@ -647,7 +639,6 @@ function App(props) {
           </Col>
         </Row>
       </div> */}
-
       {/* <Menu
             mode="inline"
             openKeys={openKeys}

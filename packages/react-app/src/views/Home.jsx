@@ -1,20 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Input, Button, notification, Form } from "antd";
+import React from "react";
+import { Input, Button, Form } from "antd";
 import { useHistory } from "react-router";
 import slugify from "slugify";
-import { ethers } from "ethers";
 import "./Home.css";
 
 export default function Admin() {
   let history = useHistory();
-  
+
   const handleJoinRoom = ({ room }) => {
     const slugifiedRoom = slugify(room.toLowerCase(), "_");
 
     history.push(`/room/${slugifiedRoom}`);
   };
-
-
 
   return (
     <div className="Home" style={{ margin: "20px auto", width: 500, padding: 60 }}>
