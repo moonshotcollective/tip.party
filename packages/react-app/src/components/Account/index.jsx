@@ -1,6 +1,5 @@
 import { Button, Menu, Dropdown } from "antd";
 import React from "react";
-import { useThemeSwitcher } from "react-css-theme-switcher";
 import Address from "../Address";
 import Balance from "../Balance";
 import { DownOutlined, LogoutOutlined } from "@ant-design/icons";
