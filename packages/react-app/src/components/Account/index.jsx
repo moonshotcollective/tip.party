@@ -73,11 +73,15 @@ export default function Account({
 
   const modalButtons = [];
   if (web3Modal) {
-    if (web3Modal.cachedProvider) {
+    if (web3Modal?.cachedProvider || web3Modal?.provider?.safe) {
       modalButtons.push(
         <div key="first">
           {isValidAddress(address) ? (
             <div className="flex flex-row">
+              <div className="flex flex-col mr-4">
+                <label className="text-base">Select Network:</label>
+                {networkSelect}
+              </div>
               <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click" size={"medium"}>
                 <Address
                   address={address}
@@ -86,10 +90,6 @@ export default function Account({
                   blockieSize={10}
                 />
               </Dropdown.Button>
-              <div class="flex flex-col ml-10">
-                <label className="text-base">Select Network:</label>
-                {networkSelect}
-              </div>
             </div>
           ) : (
             ""

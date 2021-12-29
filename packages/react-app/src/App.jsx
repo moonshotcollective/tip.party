@@ -5,7 +5,7 @@ import { Alert, Button, Menu, Select } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
-import Web3Modal from "web3modal";
+import { SafeAppWeb3Modal } from "@gnosis.pm/safe-apps-web3modal";
 import "./App.css";
 import { Account, Contract } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
@@ -80,7 +80,7 @@ const walletLinkProvider = walletLink.makeWeb3Provider(
 /*
   Web3 modal helps us "connect" external wallets:
 */
-const web3Modal = new Web3Modal({
+const web3Modal = new SafeAppWeb3Modal({
   network: "mainnet", // Optional. If using WalletConnect on xDai, change network to "xdai" and add RPC info below for xDai chain.
   cacheProvider: true, // optional
   theme: "light", // optional. Change to "dark" for a dark theme.
@@ -94,6 +94,7 @@ const web3Modal = new Web3Modal({
           1: "https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs", // mainnet // For more WalletConnect providers: https://docs.walletconnect.org/quick-start/dapps/web3-provider#required
           42: `https://kovan.infura.io/v3/${INFURA_ID}`,
           100: "https://dai.poa.network", // xDai
+          4: "https://eth-rinkeby.alchemyapi.io/v2/3ywW5DoY2uKjixRdtVTxTFMEiOHdxQUR",
         },
       },
     },
@@ -409,7 +410,7 @@ function App(props) {
   );
 
   const loadWeb3Modal = useCallback(async () => {
-    const provider = await web3Modal.connect();
+    const provider = await web3Modal.requestProvider();
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
 
     provider.on("chainChanged", chainId => {
@@ -472,15 +473,15 @@ function App(props) {
 
   return (
     <div className="App pb-20">
-      <div class="p-10 mx-auto flex flex-wrap">
+      <div className="p-10 mx-auto flex flex-wrap">
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
           className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 navbar-title"
         >
-          <div class="flex flex-col">
-            <div class="flex flex-row text-2xl lg:text-5xl">
+          <div className="flex flex-col">
+            <div className="flex flex-row text-2xl lg:text-5xl">
               Tip Party
               <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path

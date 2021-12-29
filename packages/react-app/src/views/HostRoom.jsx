@@ -108,11 +108,13 @@ export default function HostRoom({
   };
 
   const ethPayHandler = async () => {
+    console.log("Beginning ethPayHandler ", tx);
     const result = tx(
       writeContracts.TokenDistributor.splitEth(addresses, room, {
         value: ethers.utils.parseEther(amount),
       }),
       async update => {
+        console.log("into ethPayHandler update", update);
         await handleResponseHash(update);
         console.log("📡 Transaction Update:", update);
         if (update && (update.status === "confirmed" || update.status === 1)) {
@@ -177,6 +179,7 @@ export default function HostRoom({
   };
 
   const handleResponseHash = async result => {
+    console.log("handleResponseHash ", result);
     if (result.hash && selectedChainId && room) {
       await storage.registerTransactionForRoom(room, result.hash, selectedChainId);
     }
@@ -380,7 +383,6 @@ export default function HostRoom({
                         href="#"
                         onClick={e => {
                           e.preventDefault();
-
                           setImportToken(true);
                         }}
                       >
