@@ -81,6 +81,11 @@ export default function HostRoom({
     setTxHash([...update]);
   };
 
+  const handleTokenListUpdate = newTx => {
+    const update = new Set([...newTx, ...txHash]);
+    setTxHash([...update]);
+  };
+
   useEffect(() => {
     if (addresses.includes(address.toLowerCase())) {
       setIsSignedIn(true);
@@ -95,6 +100,7 @@ export default function HostRoom({
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
       subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
+      subs.current.push(storage.watchRoomTokens(room, chainId, handleTokenListUpdate));
     }
   }, [room, chainId]);
 

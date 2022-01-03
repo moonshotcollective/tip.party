@@ -34,6 +34,13 @@ export const watchRoomTx = (room, network, cb) => {
   );
 };
 
+export const watchRoomTokens = (room, network, cb) => {
+  return watchCollection(
+    query(getCollection(room, "tokens"), where("network", "==", network), orderBy("createdAt", "desc")),
+    cb,
+  );
+};
+
 export const signIntoRoom = async (room, signature) => {
   const signRoomFunction = httpsCallable(functions, "signRoom");
 
