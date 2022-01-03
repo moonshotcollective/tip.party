@@ -44,6 +44,7 @@ export default function HostRoom({
 }) {
   const { room } = useParams();
   //const { width, height } = useWindowSize()
+  //test
 
   const [amount, setAmount] = useState(0);
   const [token, setToken] = useState(nativeCurrency);
@@ -372,10 +373,7 @@ export default function HostRoom({
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
               <div>
-                {/* <div style={{ marginBottom: 20 }}>
-                <h2>Sign In</h2>
-              </div> */}
-                {/* <Divider /> */}
+
                 <AddressModal
                   visible={importAddressModal}
                   handleAddress={handleAddressImport}
