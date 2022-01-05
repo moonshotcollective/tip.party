@@ -15,6 +15,9 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
   if (typeof providerOrSigner !== "undefined") {
     // eslint-disable-next-line consistent-return
     return async (tx, callback) => {
+      console.log("Transactor tx ", tx);
+      console.log("Transactor callback ", callback);
+      console.log("providerOrSigner callback ", providerOrSigner);
       let signer;
       let network;
       let provider;
@@ -62,6 +65,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
         if (tx instanceof Promise) {
           if (DEBUG) console.log("AWAITING TX", tx);
           result = await tx;
+          console.log("callback result ", result);
         } else {
           if (!tx.gasPrice) {
             tx.gasPrice = gasPrice || ethers.utils.parseUnits("4.1", "gwei");
@@ -78,7 +82,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
         if (callback) {
           callbacks[result.hash] = callback;
         }
-
+        console.log("callback result view callbacks ", callbacks);
         // if it is a valid Notify.js network, use that, if not, just send a default notification
         if (notify && [1, 3, 4, 5, 42, 100].indexOf(network.chainId) >= 0) {
           const { emitter } = notify.hash(result.hash);
@@ -114,6 +118,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
 
         return result;
       } catch (e) {
+        console.log("main error ", e);
         if (DEBUG) console.log(e);
         // Accounts for Metamask and default signer on all networks
         let message =

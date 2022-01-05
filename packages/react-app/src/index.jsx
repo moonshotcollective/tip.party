@@ -2,6 +2,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import React from "react";
 import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import ReactDOM from "react-dom";
+import SafeProvider from "@gnosis.pm/safe-apps-react-sdk";
 import App from "./App";
 import "./index.css";
 
@@ -22,7 +23,9 @@ const client = new ApolloClient({
 ReactDOM.render(
   <ApolloProvider client={client}>
     <ThemeSwitcherProvider themeMap={themes} defaultTheme={"dark"}>
-      <App subgraphUri={subgraphUri} />
+      <SafeProvider>
+        <App subgraphUri={subgraphUri} />
+      </SafeProvider>
     </ThemeSwitcherProvider>
   </ApolloProvider>,
   document.getElementById("root"),

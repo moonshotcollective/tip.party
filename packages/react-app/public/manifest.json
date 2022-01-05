@@ -1,7 +1,8 @@
 {
-  "short_name": "🏗 Scaffold-Eth App",
+  "short_name": "Tip party",
   "start_url": ".",
-  "name": "🏗 Scaffold-Eth App",
+  "name": "Tip party",
+  "iconPath": "favicon.ico",
   "icons": [
     {
       "src": "favicon.ico",

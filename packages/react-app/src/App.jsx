@@ -19,7 +19,7 @@ import Authereum from "authereum";
 const { ethers } = require("ethers");
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
@@ -94,7 +94,6 @@ const web3Modal = new SafeAppWeb3Modal({
           1: "https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs", // mainnet // For more WalletConnect providers: https://docs.walletconnect.org/quick-start/dapps/web3-provider#required
           42: `https://kovan.infura.io/v3/${INFURA_ID}`,
           100: "https://dai.poa.network", // xDai
-          4: "https://eth-rinkeby.alchemyapi.io/v2/3ywW5DoY2uKjixRdtVTxTFMEiOHdxQUR",
         },
       },
     },
@@ -428,6 +427,8 @@ function App(props) {
       console.log(code, reason);
       logoutOfWeb3Modal();
     });
+
+    console.log("Checking URLS: ", provider, injectedProvider);
   }, [setInjectedProvider]);
 
   useEffect(() => {

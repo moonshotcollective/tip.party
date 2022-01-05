@@ -82,7 +82,7 @@ export default function Account({
                 <label className="text-base">Select Network:</label>
                 {networkSelect}
               </div>
-              <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click" size={"medium"}>
+              <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click">
                 <Address
                   address={address}
                   ensProvider={mainnetProvider}

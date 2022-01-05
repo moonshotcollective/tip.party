@@ -17,9 +17,10 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@apollo/react-hooks": "^4.0.0",
-    "@gnosis.pm/safe-apps-sdk": "^6.0.0",
-    "@gnosis.pm/safe-apps-web3modal": "^5.0.0",
     "@craco/craco": "^6.3.0",
+    "@gnosis.pm/safe-apps-react-sdk": "^4.0.8",
+    "@gnosis.pm/safe-apps-sdk": "^6.1.1",
+    "@gnosis.pm/safe-apps-web3modal": "^6.0.1",
     "@portis/web3": "^4.0.5",
     "@ramp-network/ramp-instant-sdk": "^2.2.0",
     "@testing-library/jest-dom": "^5.11.4",
