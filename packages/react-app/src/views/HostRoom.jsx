@@ -1,7 +1,21 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
+import {
+  Button,
+  List,
+  notification,
+  Divider,
+  Card,
+  Input,
+  Select,
+  Collapse,
+  Tabs,
+  Menu,
+  Dropdown,
+  Popover,
+  Tag
+} from "antd";
 import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
-import { Address, PayButton, TransactionHash, AddressModal } from "../components";
+import { Address, PayButton, TransactionHash, AddressModal, TokenModal } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
@@ -12,6 +26,7 @@ import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
 import "./HostRoom.css";
+import { unmountComponentAtNode } from "react-dom";
 
 export default function HostRoom({
   appServer,
@@ -35,6 +50,7 @@ export default function HostRoom({
   const [token, setToken] = useState(nativeCurrency);
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
+  const [importedAddresses, setImportedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
   const [blacklist, setBlacklist] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
@@ -42,8 +58,10 @@ export default function HostRoom({
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
   const [importToken, setImportToken] = useState(false);
+  const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+  const allAddresses = [...addresses,...importedAddresses];
 
   const { readContracts, writeContracts } = contracts;
 
@@ -61,6 +79,27 @@ export default function HostRoom({
     const tokenSymbol = await loadContracts(tokenAddress);
     setToken(tokenSymbol);
     setImportToken(false);
+  };
+
+  const handleAddressImport = addressToImport => {
+    if(ethers.utils.isAddress(addressToImport)){ 
+      localStorage.setItem(room, JSON.stringify([...importedAddresses, addressToImport]));
+      setImportedAddresses([...importedAddresses, addressToImport]);
+      console.log("imported addresses: " + localStorage.getItem(room))
+      setImportAddressModal(false);
+      // sign into room
+      // notify user of signIn
+      notification.success({
+        message: "Successfully added address",
+        placement: "bottomRight",
+      });
+    } else{
+      return notification.error({
+        message: "Failed to Add Address",
+        description: addressToImport + " is not a valid Ethereum address",
+        placement: "bottomRight",
+      });
+    }
   };
 
   const handleConfetti = e => {
@@ -88,6 +127,15 @@ export default function HostRoom({
   }, [addresses, address]);
 
   useEffect(() => {
+    //console.log("imported addresses: " + localStorage.getItem("importedAddresses"));
+    const imports = localStorage.getItem(room);
+    if(imports){
+    const parsedImports = JSON.parse(imports);
+    setImportedAddresses(parsedImports);
+    }
+  }, [room]);
+
+  useEffect(() => {
     // clear existing subscriptions
     subs.current.map(sub => sub());
 
@@ -109,7 +157,7 @@ export default function HostRoom({
 
   const ethPayHandler = async () => {
     const result = tx(
-      writeContracts.TokenDistributor.splitEth(addresses, room, {
+      writeContracts.TokenDistributor.splitEth(allAddresses, room, {
         value: ethers.utils.parseEther(amount),
       }),
       async update => {
@@ -128,7 +176,7 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / addresses.length + " " + token,
+            description: "Each user received " + amount / allAddresses.length + " " + token,
             placement: "topRight",
           });
           handleConfetti();
@@ -143,7 +191,7 @@ export default function HostRoom({
   const tokenPayHandler = async opts => {
     const result = tx(
       writeContracts.TokenDistributor.splitTokenFromUser(
-        addresses,
+        allAddresses,
         ethers.utils.parseUnits(amount, opts.decimals),
         opts.address,
         room,
@@ -164,7 +212,7 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / addresses.length + " " + token,
+            description: "Each user received " + amount / allAddresses.length + " " + token,
             placement: "topRight",
           });
           handleConfetti();
@@ -197,6 +245,13 @@ export default function HostRoom({
     setAddresses([...updatedAddressesList]);
     setBlacklist([...blacklist, addressChanged]);
   };
+  const removeImportedAddress = index => {
+    const updatedImportList = [...importedAddresses];
+    updatedImportList.splice(index, 1);
+    setImportedAddresses([...updatedImportList]);
+    localStorage.setItem(room, JSON.stringify([...updatedImportList]));
+
+  }
 
   const lookupAddress = async (provider, address) => {
     if (address && utils.isAddress(address)) {
@@ -275,11 +330,27 @@ export default function HostRoom({
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
-              <div style={{ marginTop: 10 }}>
-                {/* <div style={{ marginBottom: 20 }}>
-                <h2>Sign In</h2>
-              </div> */}
-                {/* <Divider /> */}
+              <div>
+
+                  <AddressModal
+                    visible={importAddressModal}
+                    handleAddress={handleAddressImport}
+                    onCancel={() => setImportAddressModal(false)}
+                    okText="Add Address"
+                  />
+                  <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                    <a
+                      href="#"
+                      onClick={e => {
+                        e.preventDefault();
+
+                        setImportAddressModal(true);
+                      }}
+                    >
+                      Add Address +
+                    </a>
+                  </div>
+
 
                 <div style={{ flex: 1 }}>
                   <Collapse defaultActiveKey={["1"]}>
@@ -296,7 +367,7 @@ export default function HostRoom({
                     >
                       <List
                         bordered
-                        dataSource={addresses}
+                        dataSource={allAddresses}
                         renderItem={(item, index) => (
                           <List.Item key={`${item.toLowerCase()}-${index}`}>
                             <div
@@ -310,7 +381,16 @@ export default function HostRoom({
                               }}
                             >
                               <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                              <Button onClick={() => unList(index)} size="medium">
+                              {importedAddresses.includes(item) && (
+                                    <Tag color="grey">imported</Tag>
+                                )}
+                              <Button onClick={() => {
+                                if (importedAddresses.includes(item))
+                                removeImportedAddress(index-addresses.length);
+                                
+                                else
+                                unList(index);                              }
+                                } size="medium">
                                 <CloseOutlined />
                               </Button>
                             </div>
@@ -368,7 +448,7 @@ export default function HostRoom({
                       onChange={amountChangeHandler}
                     />
 
-                    <AddressModal
+                    <TokenModal
                       visible={importToken}
                       handleAddress={handleTokenImport}
                       onCancel={() => setImportToken(false)}
