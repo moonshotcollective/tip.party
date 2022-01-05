@@ -12,9 +12,9 @@ import {
   Menu,
   Dropdown,
   Popover,
-  Tag
+  Tag,
 } from "antd";
-import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
@@ -61,7 +61,7 @@ export default function HostRoom({
   const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const allAddresses = [...addresses,...importedAddresses];
+  const allAddresses = [...addresses, ...importedAddresses];
 
   const { readContracts, writeContracts } = contracts;
 
@@ -82,10 +82,10 @@ export default function HostRoom({
   };
 
   const handleAddressImport = addressToImport => {
-    if(ethers.utils.isAddress(addressToImport)){ 
+    if (ethers.utils.isAddress(addressToImport)) {
       localStorage.setItem(room, JSON.stringify([...importedAddresses, addressToImport]));
       setImportedAddresses([...importedAddresses, addressToImport]);
-      console.log("imported addresses: " + localStorage.getItem(room))
+      console.log("imported addresses: " + localStorage.getItem(room));
       setImportAddressModal(false);
       // sign into room
       // notify user of signIn
@@ -93,7 +93,7 @@ export default function HostRoom({
         message: "Successfully added address",
         placement: "bottomRight",
       });
-    } else{
+    } else {
       return notification.error({
         message: "Failed to Add Address",
         description: addressToImport + " is not a valid Ethereum address",
@@ -129,9 +129,9 @@ export default function HostRoom({
   useEffect(() => {
     //console.log("imported addresses: " + localStorage.getItem("importedAddresses"));
     const imports = localStorage.getItem(room);
-    if(imports){
-    const parsedImports = JSON.parse(imports);
-    setImportedAddresses(parsedImports);
+    if (imports) {
+      const parsedImports = JSON.parse(imports);
+      setImportedAddresses(parsedImports);
     }
   }, [room]);
 
@@ -250,8 +250,7 @@ export default function HostRoom({
     updatedImportList.splice(index, 1);
     setImportedAddresses([...updatedImportList]);
     localStorage.setItem(room, JSON.stringify([...updatedImportList]));
-
-  }
+  };
 
   const lookupAddress = async (provider, address) => {
     if (address && utils.isAddress(address)) {
@@ -331,26 +330,24 @@ export default function HostRoom({
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
               <div>
+                <AddressModal
+                  visible={importAddressModal}
+                  handleAddress={handleAddressImport}
+                  onCancel={() => setImportAddressModal(false)}
+                  okText="Add Address"
+                />
+                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      e.preventDefault();
 
-                  <AddressModal
-                    visible={importAddressModal}
-                    handleAddress={handleAddressImport}
-                    onCancel={() => setImportAddressModal(false)}
-                    okText="Add Address"
-                  />
-                  <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
-                    <a
-                      href="#"
-                      onClick={e => {
-                        e.preventDefault();
-
-                        setImportAddressModal(true);
-                      }}
-                    >
-                      Add Address +
-                    </a>
-                  </div>
-
+                      setImportAddressModal(true);
+                    }}
+                  >
+                    Add Address +
+                  </a>
+                </div>
 
                 <div style={{ flex: 1 }}>
                   <Collapse defaultActiveKey={["1"]}>
@@ -381,16 +378,14 @@ export default function HostRoom({
                               }}
                             >
                               <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                              {importedAddresses.includes(item) && (
-                                    <Tag color="grey">imported</Tag>
-                                )}
-                              <Button onClick={() => {
-                                if (importedAddresses.includes(item))
-                                removeImportedAddress(index-addresses.length);
-                                
-                                else
-                                unList(index);                              }
-                                } size="medium">
+                              {importedAddresses.includes(item) && <Tag color="grey">imported</Tag>}
+                              <Button
+                                onClick={() => {
+                                  if (importedAddresses.includes(item)) removeImportedAddress(index - addresses.length);
+                                  else unList(index);
+                                }}
+                                size="medium"
+                              >
                                 <CloseOutlined />
                               </Button>
                             </div>
@@ -399,7 +394,18 @@ export default function HostRoom({
                       />
                     </Collapse.Panel>
                     {blacklist.length > 0 && (
-                      <Collapse.Panel header="Blacklist" key="2">
+                      <Collapse.Panel
+                        header="Blacklist"
+                        key="2"
+                        extra={
+                          <Popover
+                            title="Blacklist:"
+                            content="Addresses in the blacklist are temporarily removed from the pay list and will not be included in the payout."
+                          >
+                            <InfoCircleOutlined />
+                          </Popover>
+                        }
+                      >
                         <List
                           bordered
                           dataSource={blacklist}
