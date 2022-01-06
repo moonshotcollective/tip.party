@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HostRoom, GuestRoom } from ".";
 import { Space, Switch } from "antd";
+import { useParams } from "react-router-dom";
+
 
 export default function Rooms({
   appServer,
@@ -18,15 +20,32 @@ export default function Rooms({
   nativeCurrency,
 }) {
   const [isHost, setHost] = useState(false);
+  const { room } = useParams();
+
+
+  useEffect(() => {
+      const userType = localStorage.getItem(room+"userType");
+      console.log("userType: " + userType);
+      if(userType == "host"){
+        setHost(true)
+      }
+      
+  }, [room]);
 
   const toggleHost = checked => {
     setHost(checked);
+    if(checked){
+      localStorage.setItem(room+"userType","host");
+    }
+    else{
+      localStorage.setItem(room+"userType","guest");
+    }
   };
   return (
     <div>
       <Space style={{ position: "fixed", right: 8, bottom: 8 }}>
         <span> Toggle Host: </span>
-        <Switch checkedChildren="Host" unCheckedChildren="Guest" onChange={toggleHost} />
+        <Switch checkedChildren="Host" checked={isHost} unCheckedChildren="Guest" onChange={toggleHost} />
       </Space>
       <div>
         {isHost && (

@@ -127,7 +127,6 @@ export default function HostRoom({
   }, [addresses, address]);
 
   useEffect(() => {
-    //console.log("imported addresses: " + localStorage.getItem("importedAddresses"));
     const imports = localStorage.getItem(room);
     if (imports) {
       const parsedImports = JSON.parse(imports);
