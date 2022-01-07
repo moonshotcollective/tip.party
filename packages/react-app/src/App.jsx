@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract } from "./components";
+import { Account, Contract, NetworkSwitch, NetworkDisplay } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
@@ -346,7 +346,7 @@ function App(props) {
       );
     }
   } else {
-    networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
+    networkDisplay = <span></span>;
   }
 
   const options = [];
@@ -511,14 +511,14 @@ function App(props) {
           {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
             <div className="flex flex-col ml-10 px-7">
               <Space direction="vertical">
-              <label className="text-base">Toggle Host:</label>
-              <AntdSwitch
-                checkedChildren="Host"
-                unCheckedChildren="Guest"
-                onChange={checked => {
-                  setHost(checked);
-                }}
-              />
+                <label className="text-base">Toggle Host:</label>
+                <AntdSwitch
+                  checkedChildren="Host"
+                  unCheckedChildren="Guest"
+                  onChange={checked => {
+                    setHost(checked);
+                  }}
+                />
               </Space>
             </div>
           )}
@@ -532,7 +532,13 @@ function App(props) {
             loadWeb3Modal={loadWeb3Modal}
             logoutOfWeb3Modal={logoutOfWeb3Modal}
             blockExplorer={blockExplorer}
-            networkSelect={networkSelect}
+            networkSelect={
+              <NetworkSwitch
+                networkOptions={configuredNetworks}
+                selectedNetwork={selectedNetwork}
+                setSelectedNetwork={setSelectedNetwork}
+              />
+            }
           />
         </span>
       </div>
@@ -600,6 +606,7 @@ function App(props) {
                   nativeCurrency={targetNetwork.nativeCurrency}
                   isHost={isHost}
                   isWalletConnected={isWalletConnected}
+                  networkDisplay={networkDisplay}
                 />
               </Route>
               <Route exact path="/contracts">
