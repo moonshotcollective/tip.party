@@ -16,18 +16,10 @@ export default function Rooms({
   selectedChainId,
   tx,
   nativeCurrency,
+  isHost,
 }) {
-  const [isHost, setHost] = useState(false);
-
-  const toggleHost = checked => {
-    setHost(checked);
-  };
   return (
     <div>
-      <Space style={{ position: "fixed", right: 8, bottom: 8 }}>
-        <span> Toggle Host: </span>
-        <Switch checkedChildren="Host" unCheckedChildren="Guest" onChange={toggleHost} />
-      </Space>
       <div>
         {isHost && (
           <HostRoom
