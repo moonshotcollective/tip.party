@@ -509,7 +509,8 @@ function App(props) {
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
           {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
-            <div className="flex flex-col ml-10 px-4">
+            <div className="flex flex-col ml-10 px-7">
+              <Space direction="vertical">
               <label className="text-base">Toggle Host:</label>
               <AntdSwitch
                 checkedChildren="Host"
@@ -518,6 +519,7 @@ function App(props) {
                   setHost(checked);
                 }}
               />
+              </Space>
             </div>
           )}
           <Account
