@@ -213,6 +213,8 @@ function App(props) {
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
 
+  const room  = window.location.pathname.slice(6);
+
   // EXTERNAL CONTRACT EXAMPLE:
   //
   // If you want to bring in the mainnet DAI contract it would look like:
@@ -441,6 +443,22 @@ function App(props) {
     setRoute(window.location.pathname);
   }, [setRoute]);
 
+  useEffect(() => {
+    if(room){
+    const userType = localStorage.getItem(room+"userType");
+    if(userType == "host"){
+      setHost(true)
+    }
+  }
+
+    
+}, [room]);
+
+const toggleHost = checked => {
+  setHost(checked);
+  localStorage.setItem(room+"userType",checked ? "host" : "guest");
+};
+
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -515,9 +533,8 @@ function App(props) {
               <AntdSwitch
                 checkedChildren="Host"
                 unCheckedChildren="Guest"
-                onChange={checked => {
-                  setHost(checked);
-                }}
+                checked={isHost}
+                onChange={toggleHost}
               />
               </Space>
             </div>

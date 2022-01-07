@@ -22,9 +22,10 @@ export default function PayButton({
   nativeCurrency
 }) {
   const [tokenInfo, setTokenInfo] = useState({});
-  const [status, setStatus] = useState(0); // loading | lowAllowance | approving | ready | distributing | noBalance
+  const [status, setStatus] = useState(3); // loading | lowAllowance | approving | ready | distributing | noBalance
 
   const refreshETH = () => {
+    if(yourLocalBalance)
     setStatus(yourLocalBalance.gte(ethers.utils.parseEther(amount || "0")) ? 3 : 5);
   };
 
