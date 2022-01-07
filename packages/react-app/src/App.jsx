@@ -471,10 +471,6 @@ function App(props) {
     );
   }
 
-  const toggleHost = checked => {
-    setHost(checked);
-  };
-
   return (
     <div className="App pb-20">
       <div className="p-10 mx-auto flex flex-wrap">
@@ -515,7 +511,13 @@ function App(props) {
           {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
             <div className="flex flex-col ml-10 px-4">
               <label className="text-base">Toggle Host:</label>
-              <AntdSwitch checkedChildren="Host" unCheckedChildren="Guest" onChange={toggleHost} />
+              <AntdSwitch
+                checkedChildren="Host"
+                unCheckedChildren="Guest"
+                onChange={checked => {
+                  setHost(checked);
+                }}
+              />
             </div>
           )}
           <Account
