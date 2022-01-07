@@ -1,6 +1,7 @@
 import { notification } from "antd";
 import Notify from "bnc-notify";
 import { BLOCKNATIVE_DAPPID } from "../constants";
+import { useSafeAppsSDK } from "@gnosis.pm/safe-apps-react-sdk";
 
 const { ethers } = require("ethers");
 
@@ -12,6 +13,8 @@ const callbacks = {};
 const DEBUG = true;
 
 export default function Transactor(providerOrSigner, gasPrice, etherscan) {
+  const { sdk, safe } = useSafeAppsSDK();
+
   if (typeof providerOrSigner !== "undefined") {
     // eslint-disable-next-line consistent-return
     return async (tx, callback) => {
@@ -62,20 +65,41 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
 
       try {
         let result;
-        if (tx instanceof Promise) {
-          if (DEBUG) console.log("AWAITING TX", tx);
+        if (providerOrSigner?.provider?.provider?.wc?._peerMeta?.name === "Gnosis Safe Multisig") {
+          const accountData = providerOrSigner?.provider?.wc?._peerMeta?.accounts[0];
+          console.log("GNOSIS Safe TX", tx, callback);
           result = await tx;
-          console.log("callback result ", result);
+          console.log("result", result);
+          // Returns a hash to identify the Safe transaction
+          const safeTxHash = await sdk.txs.send({
+            txs: [
+              {
+                to: accountData,
+                value: "0x0",
+                data: result,
+              },
+            ],
+          });
+          console.log("safeTxHash ", safeTxHash);
+          const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash);
+          console.log("safeTx ", safeTx);
         } else {
-          if (!tx.gasPrice) {
-            tx.gasPrice = gasPrice || ethers.utils.parseUnits("4.1", "gwei");
+          if (tx instanceof Promise) {
+            if (DEBUG) console.log("AWAITING TX", tx);
+            result = await tx;
+            console.log("callback result ", result);
+          } else {
+            if (!tx.gasPrice) {
+              tx.gasPrice = gasPrice || ethers.utils.parseUnits("4.1", "gwei");
+            }
+            if (!tx.gasLimit) {
+              tx.gasLimit = ethers.utils.hexlify(120000);
+            }
+            if (DEBUG) console.log("RUNNING TX", tx);
+            result = await signer.sendTransaction(tx);
           }
-          if (!tx.gasLimit) {
-            tx.gasLimit = ethers.utils.hexlify(120000);
-          }
-          if (DEBUG) console.log("RUNNING TX", tx);
-          result = await signer.sendTransaction(tx);
         }
+
         if (DEBUG) console.log("RESULT:", result);
         // console.log("Notify", notify);
 

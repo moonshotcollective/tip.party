@@ -11,6 +11,7 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
+import { useSafeAppsSDK } from "@gnosis.pm/safe-apps-react-sdk";
 import "./HostRoom.css";
 
 export default function HostRoom({
@@ -46,6 +47,7 @@ export default function HostRoom({
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
 
   const { readContracts, writeContracts } = contracts;
+  const { sdk, safe } = useSafeAppsSDK();
 
   const subs = useRef([]);
 
@@ -108,7 +110,7 @@ export default function HostRoom({
   };
 
   const ethPayHandler = async () => {
-    console.log("Beginning ethPayHandler ", tx);
+    console.log("Beginning ethPayHandler ", tx, userSigner.provider);
     const result = tx(
       writeContracts.TokenDistributor.splitEth(addresses, room, {
         value: ethers.utils.parseEther(amount),
