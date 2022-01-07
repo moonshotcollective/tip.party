@@ -34,12 +34,7 @@ export default function Rooms({
 
   const toggleHost = checked => {
     setHost(checked);
-    if(checked){
-      localStorage.setItem(room+"userType","host");
-    }
-    else{
-      localStorage.setItem(room+"userType","guest");
-    }
+      localStorage.setItem(room+"userType",checked ? "host" : "guest");
   };
   return (
     <div>
