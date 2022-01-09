@@ -78,7 +78,11 @@ export default function Account({
         <div key="first">
           {isValidAddress(address) ? (
             <div className="flex flex-row">
-              <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click" size={"medium"}>
+              <div className="flex flex-col mr-4">
+                <label className="text-base">Select Network:</label>
+                {networkSelect}
+              </div>
+              <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click">
                 <Address
                   address={address}
                   ensProvider={mainnetProvider}
@@ -86,10 +90,6 @@ export default function Account({
                   blockieSize={10}
                 />
               </Dropdown.Button>
-              <div class="flex flex-col ml-10">
-                <label className="text-base">Select Network:</label>
-                {networkSelect}
-              </div>
             </div>
           ) : (
             ""

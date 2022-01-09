@@ -1,7 +1,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Menu, Select } from "antd";
+import { Alert, Button, Menu, Select, Space, Switch as AntdSwitch } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
@@ -156,6 +156,7 @@ function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isHost, setHost] = useState(false);
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -211,6 +212,8 @@ function App(props) {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
+
+  const room  = window.location.pathname.slice(6);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -440,6 +443,22 @@ function App(props) {
     setRoute(window.location.pathname);
   }, [setRoute]);
 
+  useEffect(() => {
+    if(room){
+    const userType = localStorage.getItem(room+"userType");
+    if(userType == "host"){
+      setHost(true)
+    }
+  }
+
+    
+}, [room]);
+
+const toggleHost = checked => {
+  setHost(checked);
+  localStorage.setItem(room+"userType",checked ? "host" : "guest");
+};
+
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -472,15 +491,15 @@ function App(props) {
 
   return (
     <div className="App pb-20">
-      <div class="p-10 mx-auto flex flex-wrap">
+      <div className="p-10 mx-auto flex flex-wrap">
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
           className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 navbar-title"
         >
-          <div class="flex flex-col">
-            <div class="flex flex-row text-2xl lg:text-5xl">
+          <div className="flex flex-col">
+            <div className="flex flex-row text-2xl lg:text-5xl">
               Tip Party
               <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -507,6 +526,19 @@ function App(props) {
           </div>
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
+          {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
+            <div className="flex flex-col ml-10 px-7">
+              <Space direction="vertical">
+              <label className="text-base">Toggle Host:</label>
+              <AntdSwitch
+                checkedChildren="Host"
+                unCheckedChildren="Guest"
+                checked={isHost}
+                onChange={toggleHost}
+              />
+              </Space>
+            </div>
+          )}
           <Account
             address={address}
             localProvider={localProvider}
@@ -583,6 +615,8 @@ function App(props) {
                   selectedChainId={selectedChainId}
                   tx={tx}
                   nativeCurrency={targetNetwork.nativeCurrency}
+                  isHost={isHost}
+                  isWalletConnected={isWalletConnected}
                 />
               </Route>
               <Route exact path="/contracts">
