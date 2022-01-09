@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, NetworkSwitch, NetworkDisplay } from "./components";
+import { Account, Contract } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
@@ -532,13 +532,8 @@ function App(props) {
             loadWeb3Modal={loadWeb3Modal}
             logoutOfWeb3Modal={logoutOfWeb3Modal}
             blockExplorer={blockExplorer}
-            networkSelect={
-              <NetworkSwitch
-                networkOptions={configuredNetworks}
-                selectedNetwork={selectedNetwork}
-                setSelectedNetwork={setSelectedNetwork}
-              />
-            }
+            networkSelect={networkSelect}
+            networkDisplay={networkDisplay}
           />
         </span>
       </div>
@@ -574,11 +569,6 @@ function App(props) {
           <Switch>
             <>
               <Route exact path="/">
-                {/*
-                    🎛 this scaffolding is full of commonly used components
-                    this <Contract/> component will automatically parse your ABI
-                    and give you a form to interact with it locally
-                */}
                 <Home
                   writeContracts={writeContracts}
                   readContracts={readContracts}
@@ -606,7 +596,6 @@ function App(props) {
                   nativeCurrency={targetNetwork.nativeCurrency}
                   isHost={isHost}
                   isWalletConnected={isWalletConnected}
-                  networkDisplay={networkDisplay}
                 />
               </Route>
               <Route exact path="/contracts">
