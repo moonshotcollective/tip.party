@@ -39,17 +39,15 @@ export default function AddressInput(props) {
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
   const ens = useLookupAddress(props.ensProvider, currentValue);
 
-  const scannerButton = (
+  const clearButton = (
     <div
       style={{ marginTop: 4, cursor: "pointer" }}
-      onClick={() => {
-        setScan(!scan);
-      }}
+      onClick={props.clear}
     >
-      <Badge count={<CameraOutlined style={{ fontSize: 9 }} />}>
+      {/* <Badge count={<CameraOutlined style={{ fontSize: 9 }} />}>
         <QrcodeOutlined style={{ fontSize: 18 }} />
-      </Badge>{" "}
-      Scan
+      </Badge>{" "} */}
+      Clear
     </div>
   );
 
@@ -125,8 +123,8 @@ export default function AddressInput(props) {
         autoFocus={props.autoFocus}
         placeholder={props.placeholder ? props.placeholder : "address"}
         prefix={<Blockie address={currentValue} size={8} scale={3} />}
-        value={ens || currentValue}
-        addonAfter={scannerButton}
+        value={currentValue}
+        addonAfter={clearButton}
         onChange={e => {
           updateAddress(e.target.value);
         }}
