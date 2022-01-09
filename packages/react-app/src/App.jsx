@@ -4,7 +4,7 @@ import WalletLink from "walletlink";
 import { Alert, Button, Menu, Select, Space, Switch as AntdSwitch } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Link, Route, Switch, useParams } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
 import { Account, Contract } from "./components";
@@ -213,7 +213,7 @@ function App(props) {
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
 
-  const room  = window.location.pathname.slice(6);
+  const room = window.location.pathname.slice(6);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -444,20 +444,18 @@ function App(props) {
   }, [setRoute]);
 
   useEffect(() => {
-    if(room){
-    const userType = localStorage.getItem(room+"userType");
-    if(userType == "host"){
-      setHost(true)
+    if (room) {
+      const userType = localStorage.getItem(room + "userType");
+      if (userType == "host") {
+        setHost(true);
+      }
     }
-  }
+  }, [room]);
 
-    
-}, [room]);
-
-const toggleHost = checked => {
-  setHost(checked);
-  localStorage.setItem(room+"userType",checked ? "host" : "guest");
-};
+  const toggleHost = () => {
+    localStorage.setItem(room + "userType", isHost ? "guest" : "host");
+    setHost(!isHost);
+  };
 
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
@@ -527,15 +525,27 @@ const toggleHost = checked => {
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
           {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
-            <div className="flex flex-col ml-10 px-7">
-              <Space direction="vertical">
-              <label className="text-base">Toggle Host:</label>
-              <AntdSwitch
+            <div className="flex flex-col mt-5 px-7">
+              <Space>
+                {/*<AntdSwitch
                 checkedChildren="Host"
                 unCheckedChildren="Guest"
                 checked={isHost}
                 onChange={toggleHost}
-              />
+              /> */}
+                <Button
+                  size="large"
+                  type="primary"
+                  style={
+                    isHost
+                      ? { borderColor: "#4b3ff5", backgroundColor: "#4b3ff5" }
+                      : { borderColor: "#6F3FF5", backgroundColor: "#6F3FF5" }
+                  }
+                  onClick={toggleHost}
+                >
+                  {" "}
+                  {isHost ? "Sign in as Guest" : "Become a Host"}
+                </Button>
               </Space>
             </div>
           )}

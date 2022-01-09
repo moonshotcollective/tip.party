@@ -5,12 +5,9 @@ import slugify from "slugify";
 import "./Home.css";
 
 export default function Admin() {
-  let history = useHistory();
 
   const handleJoinRoom = ({ room }) => {
-    const slugifiedRoom = slugify(room.toLowerCase(), "_");
-
-    history.push(`/room/${slugifiedRoom}`);
+    window.location.replace(window.location.href + "room/" + room);
   };
 
   return (
