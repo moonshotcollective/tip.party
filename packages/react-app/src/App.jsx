@@ -348,7 +348,7 @@ function App(props) {
       );
     }
   } else {
-    networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
+    networkDisplay = <span></span>;
   }
 
   const options = [];
@@ -560,6 +560,7 @@ function App(props) {
             logoutOfWeb3Modal={logoutOfWeb3Modal}
             blockExplorer={blockExplorer}
             networkSelect={networkSelect}
+            networkDisplay={networkDisplay}
           />
         </span>
       </div>
@@ -595,11 +596,6 @@ function App(props) {
           <Switch>
             <>
               <Route exact path="/">
-                {/*
-                    🎛 this scaffolding is full of commonly used components
-                    this <Contract/> component will automatically parse your ABI
-                    and give you a form to interact with it locally
-                */}
                 <Home
                   writeContracts={writeContracts}
                   readContracts={readContracts}
