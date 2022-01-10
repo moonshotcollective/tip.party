@@ -17,6 +17,7 @@ export default function Rooms({
   tx,
   nativeCurrency,
   isHost,
+  toggleSwitch,
 }) {
   return (
     <div>
@@ -36,6 +37,7 @@ export default function Rooms({
             selectedChainId={selectedChainId}
             tx={tx}
             nativeCurrency={nativeCurrency}
+            toggleSwitch={toggleSwitch}
           />
         )}
       </div>
@@ -55,6 +57,7 @@ export default function Rooms({
             selectedChainId={selectedChainId}
             tx={tx}
             nativeCurrency={nativeCurrency}
+            toggleSwitch={toggleSwitch}
           />
         </div>
       )}

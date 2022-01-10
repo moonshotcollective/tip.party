@@ -42,6 +42,7 @@ export default function HostRoom({
   selectedChainId,
   tx,
   nativeCurrency,
+  toggleSwitch,
 }) {
   const { room } = useParams();
   //const { width, height } = useWindowSize()
@@ -326,6 +327,7 @@ export default function HostRoom({
         }}
       >
         <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        {toggleSwitch}
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
