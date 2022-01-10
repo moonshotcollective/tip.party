@@ -524,7 +524,7 @@ function App(props) {
           </div>
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
-          {isWalletConnected && room && (
+          {room && (
             <div className="flex flex-col px-7">
               <Space direction="vertical">
                 <label className="text-base">Toggle Host:</label>
