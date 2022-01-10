@@ -52,3 +52,20 @@ export const registerTransactionForRoom = (room, hash, network) => {
 
   return addRoomTxFunction({ room, hash, network });
 };
+
+export const addTokenToRoom = (room, address, tokenSymbol, network) => {
+  const addRoomTxFunction = httpsCallable(functions, "addRoomToken");
+
+  return addRoomTxFunction({ room, address, tokenSymbol, network });
+};
+
+export const checkIfTokenInRoom = (room, tokenAddress, network, cb) => {
+  return watchCollection(
+    query(
+      getCollection(room, "tokens"),
+      where("network", "==", network, "tokenAddress", "==", tokenAddress),
+      orderBy("createdAt", "desc"),
+    ),
+    cb,
+  );
+};

@@ -1,19 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Button,
-  List,
-  notification,
-  Divider,
-  Card,
-  Input,
-  Select,
-  Collapse,
-  Tabs,
-  Menu,
-  Dropdown,
-  Popover,
-  Tag,
-} from "antd";
+import { Button, List, notification, Card, Input, Select, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
 import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal } from "../components";
 import { useParams } from "react-router-dom";
@@ -26,7 +12,6 @@ import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
 import "./HostRoom.css";
-import { unmountComponentAtNode } from "react-dom";
 
 export default function HostRoom({
   appServer,
@@ -62,6 +47,7 @@ export default function HostRoom({
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const allAddresses = [...addresses, ...importedAddresses];
+  const [tokenList, setTokenList] = useState([]);
 
   const { readContracts, writeContracts } = contracts;
 
@@ -76,9 +62,32 @@ export default function HostRoom({
 
   const handleTokenImport = async tokenAddress => {
     // load the contract to the scaffold variables
-    const tokenSymbol = await loadContracts(tokenAddress);
-    setToken(tokenSymbol);
-    setImportToken(false);
+    const querytokenAddress = await storage.checkIfTokenInRoom(room, tokenAddress, selectedChainId);
+    if (querytokenAddress) {
+      const tokenSymbol = await loadContracts(tokenAddress);
+      if (tokenSymbol) {
+        setToken(tokenSymbol);
+        await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
+        setImportToken(false);
+        notification.success({
+          message: "This ERC20 Token is already in the token dropdown",
+          description: "Try another address or select the option from the Token dropdown.",
+          placement: "topRight",
+        });
+      } else {
+        notification.error({
+          message: "This ERC20 Token was not found in the list",
+          description: "Try another address or select the option from the Token dropdown.",
+          placement: "topRight",
+        });
+      }
+    } else {
+      notification.error({
+        message: "This ERC20 Token is already in the token dropdown",
+        description: "Try another address or select the option from the Token dropdown.",
+        placement: "topRight",
+      });
+    }
   };
 
   const handleAddressImport = addressToImport => {
@@ -120,9 +129,9 @@ export default function HostRoom({
     setTxHash([...update]);
   };
 
-  const handleTokenListUpdate = newTx => {
-    const update = new Set([...newTx, ...txHash]);
-    setTxHash([...update]);
+  const handleTokenListUpdate = newToken => {
+    const update = new Set([...newToken, ...tokenList]);
+    setTokenList([...update]);
   };
 
   useEffect(() => {

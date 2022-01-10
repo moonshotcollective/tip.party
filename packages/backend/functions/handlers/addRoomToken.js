@@ -3,7 +3,7 @@ const admin = require("firebase-admin");
 const ethers = require("ethers");
 
 module.exports = functions.https.onCall((data, context) => {
-  const { room, address, hash, tokenSymbol, network } = data;
+  const { room, tokenAddress, tokenSymbol, network } = data;
 
   // recover address from signature
   const recovered = ethers.utils.verifyMessage(room, signature).toLowerCase();
@@ -16,8 +16,8 @@ module.exports = functions.https.onCall((data, context) => {
   // write the resulting address to storage
   admin
     .firestore()
-    .doc(`rooms/${room}/tokens/${hash}`)
-    .set({ address, network, tokenSymbol, createdAt: admin.firestore.FieldValue.serverTimestamp() });
+    .doc(`rooms/${room}/tokens/${tokenAddress}`)
+    .set({ tokenAddress, network, tokenSymbol, createdAt: admin.firestore.FieldValue.serverTimestamp() });
 
   return { signedIn: true };
 });
