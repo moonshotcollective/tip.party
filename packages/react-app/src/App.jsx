@@ -452,9 +452,9 @@ function App(props) {
     }
   }, [room]);
 
-  const toggleHost = checked => {
-    setHost(checked);
-    localStorage.setItem(room + "userType", checked ? "host" : "guest");
+  const toggleHost = () => {
+    localStorage.setItem(room + "userType", isHost ? "guest" : "host");
+    setHost(!isHost);
   };
 
   let faucetHint = "";
@@ -525,11 +525,29 @@ function App(props) {
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
           {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
-            <div className="flex flex-col ml-10 px-7">
+            <div className="flex flex-col px-7">
               <Space direction="vertical">
                 <label className="text-base">Toggle Host:</label>
-                <AntdSwitch checkedChildren="Host" unCheckedChildren="Guest" checked={isHost} onChange={toggleHost} />
-              </Space>
+                <AntdSwitch
+                checkedChildren="Host"
+                unCheckedChildren="Guest"
+                checked={isHost}
+                onChange={toggleHost}
+              />
+                {/* <Button
+                  size="large"
+                  type="primary"
+                  style={
+                    isHost
+                      ? { borderColor: "#4b3ff5", backgroundColor: "#4b3ff5" }
+                      : { borderColor: "#6F3FF5", backgroundColor: "#6F3FF5" }
+                  }
+                  onClick={toggleHost}
+                >
+                  {" "}
+                  {isHost ? "Sign in as Guest" : "Become a Host"}
+                </Button> */}
+                </Space>
             </div>
           )}
           <Account

@@ -335,6 +335,7 @@ export default function HostRoom({
                   handleAddress={handleAddressImport}
                   onCancel={() => setImportAddressModal(false)}
                   okText="Add Address"
+                  mainnetProvider={mainnetProvider}
                 />
                 <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
                   <a
