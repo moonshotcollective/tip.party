@@ -24,7 +24,7 @@ const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
 //const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-const configuredNetworks = ["rinkeby"];
+const configuredNetworks = ["matic", "rinkeby"];
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
@@ -213,7 +213,7 @@ function App(props) {
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
 
-  const room  = window.location.pathname.slice(6);
+  const room = window.location.pathname.slice(6);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -348,7 +348,7 @@ function App(props) {
       );
     }
   } else {
-    networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
+    networkDisplay = <span></span>;
   }
 
   const options = [];
@@ -444,20 +444,18 @@ function App(props) {
   }, [setRoute]);
 
   useEffect(() => {
-    if(room){
-    const userType = localStorage.getItem(room+"userType");
-    if(userType == "host"){
-      setHost(true)
+    if (room) {
+      const userType = localStorage.getItem(room + "userType");
+      if (userType == "host") {
+        setHost(true);
+      }
     }
-  }
+  }, [room]);
 
-    
-}, [room]);
-
-const toggleHost = checked => {
-  setHost(checked);
-  localStorage.setItem(room+"userType",checked ? "host" : "guest");
-};
+  const toggleHost = () => {
+    localStorage.setItem(room + "userType", isHost ? "guest" : "host");
+    setHost(!isHost);
+  };
 
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
@@ -527,16 +525,29 @@ const toggleHost = checked => {
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
           {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
-            <div className="flex flex-col ml-10 px-7">
+            <div className="flex flex-col px-7">
               <Space direction="vertical">
-              <label className="text-base">Toggle Host:</label>
-              <AntdSwitch
+                <label className="text-base">Toggle Host:</label>
+                <AntdSwitch
                 checkedChildren="Host"
                 unCheckedChildren="Guest"
                 checked={isHost}
                 onChange={toggleHost}
               />
-              </Space>
+                {/* <Button
+                  size="large"
+                  type="primary"
+                  style={
+                    isHost
+                      ? { borderColor: "#4b3ff5", backgroundColor: "#4b3ff5" }
+                      : { borderColor: "#6F3FF5", backgroundColor: "#6F3FF5" }
+                  }
+                  onClick={toggleHost}
+                >
+                  {" "}
+                  {isHost ? "Sign in as Guest" : "Become a Host"}
+                </Button> */}
+                </Space>
             </div>
           )}
           <Account
@@ -550,6 +561,7 @@ const toggleHost = checked => {
             logoutOfWeb3Modal={logoutOfWeb3Modal}
             blockExplorer={blockExplorer}
             networkSelect={networkSelect}
+            networkDisplay={networkDisplay}
           />
         </span>
       </div>
@@ -585,11 +597,6 @@ const toggleHost = checked => {
           <Switch>
             <>
               <Route exact path="/">
-                {/*
-                    🎛 this scaffolding is full of commonly used components
-                    this <Contract/> component will automatically parse your ABI
-                    and give you a form to interact with it locally
-                */}
                 <Home
                   writeContracts={writeContracts}
                   readContracts={readContracts}
