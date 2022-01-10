@@ -525,15 +525,16 @@ function App(props) {
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
           {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
-            <div className="flex flex-col mt-5 px-7">
-              <Space>
-                {/*<AntdSwitch
+            <div className="flex flex-col px-7">
+              <Space direction="vertical">
+                <label className="text-base">Toggle Host:</label>
+                <AntdSwitch
                 checkedChildren="Host"
                 unCheckedChildren="Guest"
                 checked={isHost}
                 onChange={toggleHost}
-              /> */}
-                <Button
+              />
+                {/* <Button
                   size="large"
                   type="primary"
                   style={
@@ -545,8 +546,8 @@ function App(props) {
                 >
                   {" "}
                   {isHost ? "Sign in as Guest" : "Become a Host"}
-                </Button>
-              </Space>
+                </Button> */}
+                </Space>
             </div>
           )}
           <Account
