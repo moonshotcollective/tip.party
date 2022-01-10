@@ -446,7 +446,7 @@ function App(props) {
   useEffect(() => {
     if (room) {
       const userType = localStorage.getItem(room + "userType");
-      if (userType == "host") {
+      if (userType === "host") {
         setHost(true);
       }
     }
@@ -524,16 +524,11 @@ function App(props) {
           </div>
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
-          {isWalletConnected && window.location.pathname.indexOf("/room/") > -1 && (
+          {isWalletConnected && room && (
             <div className="flex flex-col px-7">
               <Space direction="vertical">
                 <label className="text-base">Toggle Host:</label>
-                <AntdSwitch
-                checkedChildren="Host"
-                unCheckedChildren="Guest"
-                checked={isHost}
-                onChange={toggleHost}
-              />
+                <AntdSwitch checkedChildren="Host" unCheckedChildren="Guest" checked={isHost} onChange={toggleHost} />
                 {/* <Button
                   size="large"
                   type="primary"
@@ -547,7 +542,7 @@ function App(props) {
                   {" "}
                   {isHost ? "Sign in as Guest" : "Become a Host"}
                 </Button> */}
-                </Space>
+              </Space>
             </div>
           )}
           <Account
