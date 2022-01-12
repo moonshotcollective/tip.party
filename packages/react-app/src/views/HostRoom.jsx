@@ -81,25 +81,59 @@ export default function HostRoom({
     setImportToken(false);
   };
 
-  const handleAddressImport = addressToImport => {
-    if (ethers.utils.isAddress(addressToImport)) {
-      localStorage.setItem(room, JSON.stringify([...importedAddresses, addressToImport]));
-      setImportedAddresses([...importedAddresses, addressToImport]);
-      console.log("imported addresses: " + localStorage.getItem(room));
-      setImportAddressModal(false);
-      // sign into room
-      // notify user of signIn
-      notification.success({
-        message: "Successfully added address",
-        placement: "bottomRight",
-      });
-    } else {
+  const handleAddressImport = async addressesToImport => {
+    //removes all of the spaces
+    const str = addressesToImport.replace(/\s/g, '');
+
+    //Splits the string into an array of addresses
+    let arr = str.split(",");
+
+   arr.forEach(async (element, index) =>{
+     if(!ethers.utils.isAddress(element)){
+      try{
+      let addr = await mainnetProvider.resolveName(element);
+        if(addr){
+          if(allAddresses.includes(addr)){
+            return notification.error({
+              message: "Failed to Add Address",
+              description: element + " is already included!",
+              placement: "bottomRight",
+            });
+           }
+          //changes ens in arr to address
+          arr[index] = addr;
+        }
+
+    
+      } catch(e){
+        return notification.error({
+          message: "Failed to Add Address",
+          description: element + " is not a valid Ethereum address",
+          placement: "bottomRight",
+        });
+      }
+     }
+     if(allAddresses.includes(element)){
       return notification.error({
         message: "Failed to Add Address",
-        description: addressToImport + " is not a valid Ethereum address",
+        description: element + " is already included!",
         placement: "bottomRight",
       });
-    }
+     }
+     
+   })
+
+   localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
+   setImportedAddresses([...importedAddresses, ...arr]);
+   setImportAddressModal(false);
+
+
+   return notification.success({
+    message: "Successfully added address",
+    placement: "bottomRight",
+  });
+   
+
   };
 
   const handleConfetti = e => {
