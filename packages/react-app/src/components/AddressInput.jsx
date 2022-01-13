@@ -126,7 +126,6 @@ export default function AddressInput(props) {
         placeholder={props.placeholder ? props.placeholder : "address"}
         prefix={<Blockie address={currentValue} size={8} scale={3} />}
         value={currentValue}
-        addonAfter={clearButton}
         onChange={e => {
           updateAddress(e.target.value);
         }}

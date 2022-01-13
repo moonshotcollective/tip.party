@@ -88,7 +88,8 @@ export default function HostRoom({
     //Splits the string into an array of addresses
     let arr = str.split(",");
 
-   arr.forEach(async (element, index) =>{
+   for(let index=0; index< arr.length;index++){
+     const element = arr[index];
      if(!ethers.utils.isAddress(element)){
       try{
       let addr = await mainnetProvider.resolveName(element);
@@ -102,6 +103,13 @@ export default function HostRoom({
            }
           //changes ens in arr to address
           arr[index] = addr;
+        }
+        else {
+          return notification.error({
+            message: "Failed to Add Address",
+            description: element + " is not a valid Ethereum address",
+            placement: "bottomRight",
+          });
         }
 
     
@@ -121,17 +129,21 @@ export default function HostRoom({
       });
      }
      
-   })
+   }
 
-   localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
-   setImportedAddresses([...importedAddresses, ...arr]);
-   setImportAddressModal(false);
-
-
-   return notification.success({
-    message: "Successfully added address",
-    placement: "bottomRight",
+    Promise.all(arr).then(arr =>{
+    localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
+    setImportedAddresses([...importedAddresses, ...arr]);
+    setImportAddressModal(false);
+ 
+ 
+    return notification.success({
+     message: "Successfully added address",
+     placement: "bottomRight",
+   });
   });
+
+
    
 
   };
