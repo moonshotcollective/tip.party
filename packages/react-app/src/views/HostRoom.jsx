@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Input, Select, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
 import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { Address, PayButton, TransactionHash, AddressModal, TokenModal } from "../components";
+import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers, utils } from "ethers";
 import { filterLimit } from "async";
@@ -29,7 +29,6 @@ export default function HostRoom({
   nativeCurrency,
 }) {
   const { room } = useParams();
-  //const { width, height } = useWindowSize()
 
   const [amount, setAmount] = useState(0);
   const [token, setToken] = useState(nativeCurrency);
@@ -48,6 +47,7 @@ export default function HostRoom({
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const allAddresses = [...addresses, ...importedAddresses];
   const [tokenList, setTokenList] = useState([]);
+  const [loadedTokenList, setLoadedTokenList] = useState([]);
 
   const { readContracts, writeContracts } = contracts;
 
@@ -62,28 +62,23 @@ export default function HostRoom({
 
   const handleTokenImport = async tokenAddress => {
     // load the contract to the scaffold variables
-    const querytokenAddress = await storage.checkIfTokenInRoom(room, tokenAddress, selectedChainId);
-    if (querytokenAddress) {
-      const tokenSymbol = await loadContracts(tokenAddress);
-      if (tokenSymbol) {
-        setToken(tokenSymbol);
-        await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
-        setImportToken(false);
-        notification.success({
-          message: "This ERC20 Token is already in the token dropdown",
-          description: "Try another address or select the option from the Token dropdown.",
-          placement: "topRight",
-        });
-      } else {
-        notification.error({
-          message: "This ERC20 Token was not found in the list",
-          description: "Try another address or select the option from the Token dropdown.",
-          placement: "topRight",
-        });
-      }
+
+    console.log("availableTokens ", availableTokens);
+
+    const tokenSymbol = await loadContracts(tokenAddress);
+    if (tokenSymbol) {
+      console.log("Check add room params ", room, tokenAddress, tokenSymbol, selectedChainId);
+      setToken(tokenSymbol);
+      await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
+      setImportToken(false);
+      notification.success({
+        message: "This ERC20 Token is already in the token dropdown",
+        description: "Try another address or select the option from the Token dropdown.",
+        placement: "topRight",
+      });
     } else {
       notification.error({
-        message: "This ERC20 Token is already in the token dropdown",
+        message: "This ERC20 Token was not found in the list",
         description: "Try another address or select the option from the Token dropdown.",
         placement: "topRight",
       });
@@ -130,6 +125,8 @@ export default function HostRoom({
   };
 
   const handleTokenListUpdate = newToken => {
+    setLoadedTokenList(newToken);
+    newToken = Object.keys(newToken) ? Object.keys(newToken) : newToken;
     const update = new Set([...newToken, ...tokenList]);
     setTokenList([...update]);
   };
@@ -265,36 +262,6 @@ export default function HostRoom({
     updatedImportList.splice(index, 1);
     setImportedAddresses([...updatedImportList]);
     localStorage.setItem(room, JSON.stringify([...updatedImportList]));
-  };
-
-  const lookupAddress = async (provider, address) => {
-    if (address && utils.isAddress(address)) {
-      // console.log(`looking up ${address}`)
-      try {
-        // Accuracy of reverse resolution is not enforced.
-        // We then manually ensure that the reported ens name resolves to address
-        const reportedName = await provider.lookupAddress(address);
-        const resolvedAddress = await provider.resolveName(reportedName);
-
-        if (address && utils.getAddress(address) === utils.getAddress(resolvedAddress)) {
-          return reportedName;
-        }
-        return utils.getAddress(address);
-      } catch (e) {
-        return utils.getAddress(address);
-      }
-    }
-    return 0;
-  };
-
-  const filterAddresses = async () => {
-    setIsFiltering(true);
-    const output = await filterLimit(addresses, 10, async address => {
-      const ens = await lookupAddress(mainnetProvider, address).then(name => name);
-      return ens && ens.indexOf("0x") < 0;
-    });
-    setAddresses(output);
-    setIsFiltering(false);
   };
 
   const copyToClipBoard = () => {
@@ -457,14 +424,15 @@ export default function HostRoom({
                       value={amount}
                       addonBefore="Total Amount to Distribute"
                       addonAfter={
-                        <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
-                          <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
-                          {availableTokens.map(name => (
-                            <Select.Option key={name} value={name}>
-                              {name}
-                            </Select.Option>
-                          ))}
-                        </Select>
+                        <TokenList
+                          token={token}
+                          setToken={setToken}
+                          readContracts={readContracts}
+                          tokenListHandler={tokens => setAvailableTokens(tokens)}
+                          nativeCurrency={nativeCurrency}
+                          tokenList={tokenList}
+                          availableTokens={availableTokens}
+                        />
                       }
                       style={{ marginTop: "10px" }}
                       onChange={amountChangeHandler}
@@ -504,6 +472,9 @@ export default function HostRoom({
                       ethPayHandler={ethPayHandler}
                       tokenPayHandler={tokenPayHandler}
                       nativeCurrency={nativeCurrency}
+                      loadContracts={loadContracts}
+                      loadedTokenList={loadedTokenList}
+                      userSigner={userSigner}
                     />
                   </div>
                 </div>

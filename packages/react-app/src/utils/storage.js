@@ -23,6 +23,16 @@ const watchCollection = (coll, cb, id = true) => {
   });
 };
 
+const watchCollectionField = (coll, cb, fieldkey, fieldvalue) => {
+  return onSnapshot(coll, docs => {
+    const res = {};
+    docs.forEach(doc => {
+      res[doc.data()[fieldkey]] = doc.data()[fieldvalue];
+    });
+    cb && cb(res);
+  });
+};
+
 export const watchRoom = (room, cb) => {
   return watchCollection(getCollection(room, "signs"), cb);
 };
@@ -35,9 +45,11 @@ export const watchRoomTx = (room, network, cb) => {
 };
 
 export const watchRoomTokens = (room, network, cb) => {
-  return watchCollection(
+  return watchCollectionField(
     query(getCollection(room, "tokens"), where("network", "==", network), orderBy("createdAt", "desc")),
     cb,
+    "tokenSymbol",
+    "tokenAddress",
   );
 };
 
@@ -53,19 +65,8 @@ export const registerTransactionForRoom = (room, hash, network) => {
   return addRoomTxFunction({ room, hash, network });
 };
 
-export const addTokenToRoom = (room, address, tokenSymbol, network) => {
+export const addTokenToRoom = (room, tokenAddress, tokenSymbol, network) => {
   const addRoomTxFunction = httpsCallable(functions, "addRoomToken");
 
-  return addRoomTxFunction({ room, address, tokenSymbol, network });
-};
-
-export const checkIfTokenInRoom = (room, tokenAddress, network, cb) => {
-  return watchCollection(
-    query(
-      getCollection(room, "tokens"),
-      where("network", "==", network, "tokenAddress", "==", tokenAddress),
-      orderBy("createdAt", "desc"),
-    ),
-    cb,
-  );
+  return addRoomTxFunction({ room, tokenAddress, tokenSymbol, network });
 };
