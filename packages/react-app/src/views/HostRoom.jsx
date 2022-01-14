@@ -182,7 +182,7 @@ export default function HostRoom({
       const parsedImports = JSON.parse(importLocalStorageTokens);
       setLoadedTokenList(parsedImports);
     }
-  }, [room, chainId]);
+  }, [chainId]);
 
   useEffect(() => {
     // clear existing subscriptions
