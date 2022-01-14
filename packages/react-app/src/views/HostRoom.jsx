@@ -70,7 +70,7 @@ export default function HostRoom({
       //await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
       const temp = {};
       temp[tokenSymbol] = { tokenAddress };
-      localStorage.setItem(`${room}+${selectedChainId}+token`, JSON.stringify({ ...loadedTokenList, ...temp }));
+      localStorage.setItem(`${room}+${chainId}+token`, JSON.stringify({ ...loadedTokenList, ...temp }));
       setImportToken(false);
       notification.success({
         message: "The ERC20 Token has been added",
@@ -86,68 +86,60 @@ export default function HostRoom({
 
   const handleAddressImport = async addressesToImport => {
     //removes all of the spaces
-    const str = addressesToImport.replace(/\s/g, '');
+    const str = addressesToImport.replace(/\s/g, "");
 
     //Splits the string into an array of addresses
     let arr = str.split(",");
-  
-    //loop through each element in array
-   for(let index=0; index< arr.length;index++){
-     const element = arr[index];
-     if(!ethers.utils.isAddress(element)){
-      try{
-      let addr = await mainnetProvider.resolveName(element);
-        if(addr){
-          if(allAddresses.includes(addr)){
-            return notification.error({
-              message: "Failed to Add Address",
-              description: element + " is already included!",
-              placement: "bottomRight",
-            });
-           }
-          //changes ens in the array to address
-          arr[index] = addr;
-        }
-        //error if ens is not address
-        else {
-          throw "error";
-        }
 
-    
-      } catch(e){
+    //loop through each element in array
+    for (let index = 0; index < arr.length; index++) {
+      const element = arr[index];
+      if (!ethers.utils.isAddress(element)) {
+        try {
+          let addr = await mainnetProvider.resolveName(element);
+          if (addr) {
+            if (allAddresses.includes(addr)) {
+              return notification.error({
+                message: "Failed to Add Address",
+                description: element + " is already included!",
+                placement: "bottomRight",
+              });
+            }
+            //changes ens in the array to address
+            arr[index] = addr;
+          }
+          //error if ens is not address
+          else {
+            throw "error";
+          }
+        } catch (e) {
+          return notification.error({
+            message: "Failed to Add Address",
+            description: element + " is not a valid Ethereum address",
+            placement: "bottomRight",
+          });
+        }
+      }
+      if (allAddresses.includes(element)) {
         return notification.error({
           message: "Failed to Add Address",
-          description: element + " is not a valid Ethereum address",
+          description: element + " is already included!",
           placement: "bottomRight",
         });
       }
-     }
-     if(allAddresses.includes(element)){
-      return notification.error({
-        message: "Failed to Add Address",
-        description: element + " is already included!",
+    }
+
+    // sets the addresses to local storage + changes the state
+    Promise.all(arr).then(arr => {
+      localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
+      setImportedAddresses([...importedAddresses, ...arr]);
+      setImportAddressModal(false);
+
+      return notification.success({
+        message: "Successfully Added Addresses",
         placement: "bottomRight",
       });
-     }
-     
-   }
-
-   // sets the addresses to local storage + changes the state
-    Promise.all(arr).then(arr =>{
-    localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
-    setImportedAddresses([...importedAddresses, ...arr]);
-    setImportAddressModal(false);
- 
- 
-    return notification.success({
-     message: "Successfully Added Addresses",
-     placement: "bottomRight",
-   });
-  });
-
-
-   
-
+    });
   };
 
   const handleConfetti = e => {
@@ -181,13 +173,16 @@ export default function HostRoom({
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
     }
+  }, [room]);
+
+  useEffect(() => {
     //Import tokens from local storage
-    const importLocalStorageTokens = localStorage.getItem(`${room}+${selectedChainId}+token`);
+    const importLocalStorageTokens = localStorage.getItem(`${room}+${chainId}+token`);
     if (importLocalStorageTokens) {
       const parsedImports = JSON.parse(importLocalStorageTokens);
       setLoadedTokenList(parsedImports);
     }
-  }, [room]);
+  }, [room, chainId]);
 
   useEffect(() => {
     // clear existing subscriptions
