@@ -70,7 +70,7 @@ export default function HostRoom({
       //await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
       const temp = {};
       temp[tokenSymbol] = { tokenAddress };
-      localStorage.setItem(`${room}+${chainId}+token`, JSON.stringify({ ...loadedTokenList, ...temp }));
+      localStorage.setItem(`${chainId}+token`, JSON.stringify({ ...loadedTokenList, ...temp }));
       setImportToken(false);
       notification.success({
         message: "The ERC20 Token has been added",
@@ -177,7 +177,7 @@ export default function HostRoom({
 
   useEffect(() => {
     //Import tokens from local storage
-    const importLocalStorageTokens = localStorage.getItem(`${room}+${chainId}+token`);
+    const importLocalStorageTokens = localStorage.getItem(`${chainId}+token`);
     if (importLocalStorageTokens) {
       const parsedImports = JSON.parse(importLocalStorageTokens);
       setLoadedTokenList(parsedImports);
