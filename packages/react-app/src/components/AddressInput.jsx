@@ -4,6 +4,7 @@ import { useLookupAddress } from "eth-hooks/dapps/ens";
 import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
 import Blockie from "./Blockie";
+const { TextArea } = Input;
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -116,7 +117,8 @@ export default function AddressInput(props) {
   return (
     <div>
       {scanner}
-      <Input
+      <TextArea
+        autoSize
         id="0xAddress" // name it something other than address for auto fill doxxing
         name="0xAddress" // name it something other than address for auto fill doxxing
         autoComplete="off"
@@ -124,7 +126,6 @@ export default function AddressInput(props) {
         placeholder={props.placeholder ? props.placeholder : "address"}
         prefix={<Blockie address={currentValue} size={8} scale={3} />}
         value={currentValue}
-        addonAfter={clearButton}
         onChange={e => {
           updateAddress(e.target.value);
         }}

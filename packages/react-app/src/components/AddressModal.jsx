@@ -4,26 +4,25 @@ import { AddressInput } from ".";
 import { ethers, utils } from "ethers";
 
 function ImportModal({ handleAddress, ...props }) {
-  const [address, setAddress] = useState("");
+  const [addresses, setAddresses] = useState("");
 
   const onOk = () => {
-    handleAddress(address);
-    setAddress("");
+    handleAddress(addresses.toLowerCase());
+    setAddresses("");
   };
 
-  const clear = () =>{
-    setAddress("");
-  }
   return (
-    <Modal title="Add Address" centered {...props} onOk={onOk}>
-      <p>Note: Imported addresses can only be seen by the current host</p>
+    <Modal title="Import Addresses" centered {...props} onOk={onOk}>
+      <p>
+        Note: Imported addresses can only be seen by the current host.
+      </p>
+      <p>When adding addresses in bulk, separate addresses with commas.</p>
       <AddressInput
         autoFocus
-        placeholder="Enter Address"
-        value={address}
-        onChange={setAddress}
+        placeholder="Enter Addresses"
+        value={addresses}
+        onChange={setAddresses}
         ensProvider={props.mainnetProvider}
-        clear={clear}
       />
     </Modal>
   );
