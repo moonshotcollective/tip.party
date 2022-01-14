@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Input, Select, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
+import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
 import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
-import { ethers, utils } from "ethers";
-import { filterLimit } from "async";
+import { ethers } from "ethers";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
 import * as storage from "../utils/storage";
@@ -46,8 +45,7 @@ export default function HostRoom({
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const allAddresses = [...addresses, ...importedAddresses];
-  const [tokenList, setTokenList] = useState([]);
-  const [loadedTokenList, setLoadedTokenList] = useState([]);
+  const [loadedTokenList, setLoadedTokenList] = useState({});
 
   const { readContracts, writeContracts } = contracts;
 
@@ -69,7 +67,10 @@ export default function HostRoom({
       });
     } else if (tokenSymbol) {
       setToken(tokenSymbol);
-      await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
+      //await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
+      const temp = {};
+      temp[tokenSymbol] = { tokenAddress };
+      localStorage.setItem(`${room}+${selectedChainId}+token`, JSON.stringify({ ...loadedTokenList, ...temp }));
       setImportToken(false);
       notification.success({
         message: "The ERC20 Token has been added",
@@ -122,13 +123,6 @@ export default function HostRoom({
     setTxHash([...update]);
   };
 
-  const handleTokenListUpdate = newToken => {
-    setLoadedTokenList(newToken);
-    newToken = Object.keys(newToken) ? Object.keys(newToken) : newToken;
-    const update = new Set([...newToken, ...tokenList]);
-    setTokenList([...update]);
-  };
-
   useEffect(() => {
     if (addresses.includes(address.toLowerCase())) {
       setIsSignedIn(true);
@@ -136,11 +130,17 @@ export default function HostRoom({
   }, [addresses, address]);
 
   useEffect(() => {
-    //console.log("imported addresses: " + localStorage.getItem("importedAddresses"));
+    //Import addresses from local storage
     const imports = localStorage.getItem(room);
     if (imports) {
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
+    }
+    //Import tokens from local storage
+    const importLocalStorageTokens = localStorage.getItem(`${room}+${selectedChainId}+token`);
+    if (importLocalStorageTokens) {
+      const parsedImports = JSON.parse(importLocalStorageTokens);
+      setLoadedTokenList(parsedImports);
     }
   }, [room]);
 
@@ -152,7 +152,6 @@ export default function HostRoom({
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
       subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
-      subs.current.push(storage.watchRoomTokens(room, chainId, handleTokenListUpdate));
     }
   }, [room, chainId]);
 
@@ -428,7 +427,7 @@ export default function HostRoom({
                           readContracts={readContracts}
                           tokenListHandler={tokens => setAvailableTokens(tokens)}
                           nativeCurrency={nativeCurrency}
-                          tokenList={tokenList}
+                          loadedTokenList={loadedTokenList}
                           availableTokens={availableTokens}
                         />
                       }

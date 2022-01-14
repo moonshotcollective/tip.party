@@ -38,7 +38,7 @@ export default function PayButton({
     let balance;
     let address;
     if (!readContracts[token]) {
-      const tokenAddress = loadedTokenList[token];
+      const tokenAddress = loadedTokenList[token].tokenAddress;
       const readUpdate = new ethers.Contract(tokenAddress, ERC20ABI, userSigner);
       decimals = await readUpdate.decimals();
       allowance = await readUpdate.allowance(callerAddress, spender);
@@ -70,7 +70,7 @@ export default function PayButton({
     const newAllowance = ethers.utils.parseUnits(maxApproval, tokenInfo[token].decimals);
     let res;
     if (!readContracts[token]) {
-      const tokenAddress = loadedTokenList[token];
+      const tokenAddress = loadedTokenList[token].tokenAddress;
       const writeUpdate = new ethers.Contract(tokenAddress, ERC20ABI, userSigner);
       res = await writeUpdate.approve(spender, newAllowance);
     } else {

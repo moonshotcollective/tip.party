@@ -7,7 +7,7 @@ export default function TokenList({
   readContracts,
   tokenListHandler,
   nativeCurrency,
-  tokenList,
+  loadedTokenList,
   availableTokens,
 }) {
   useEffect(() => {
@@ -18,13 +18,14 @@ export default function TokenList({
 
       return acc;
     }, []);
+    const loadedTokenArray = Object.keys(loadedTokenList);
     if (tokenListHandler && (typeof tokenListHandler).toLowerCase() === "function") {
       tokenListHandler(erc20List);
     }
-    if (tokenList.length > 0) {
-      tokenListHandler([...tokenList, ...erc20List]);
+    if (loadedTokenArray.length > 0) {
+      tokenListHandler([...loadedTokenArray, ...erc20List]);
     }
-  }, [readContracts, tokenList]);
+  }, [readContracts, loadedTokenList]);
 
   return (
     <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
