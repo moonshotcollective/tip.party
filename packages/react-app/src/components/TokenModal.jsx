@@ -12,6 +12,7 @@ function ImportModal({ handleAddress, ...props }) {
 
   return (
     <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
+      <p>Note: Imported tokens can only be seen by the current host</p>
       <AddressInput value={tokenAddress} onChange={setTokenAddress} />
     </Modal>
   );
