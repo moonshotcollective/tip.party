@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Select } from "antd";
-import { ethers } from "ethers";
 
 export default function TokenList({
   token,
@@ -19,12 +18,10 @@ export default function TokenList({
 
       return acc;
     }, []);
-    console.log("VIEW ERC20 LIST ", erc20List);
     if (tokenListHandler && (typeof tokenListHandler).toLowerCase() === "function") {
       tokenListHandler(erc20List);
     }
     if (tokenList.length > 0) {
-      console.log("VIEW TOKEN LIST ", tokenList);
       tokenListHandler([...tokenList, ...erc20List]);
     }
   }, [readContracts, tokenList]);

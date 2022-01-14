@@ -61,25 +61,23 @@ export default function HostRoom({
   }, [oldWriteContracts]);
 
   const handleTokenImport = async tokenAddress => {
-    // load the contract to the scaffold variables
-
-    console.log("availableTokens ", availableTokens);
-
     const tokenSymbol = await loadContracts(tokenAddress);
-    if (tokenSymbol) {
-      console.log("Check add room params ", room, tokenAddress, tokenSymbol, selectedChainId);
+    if (availableTokens.includes(tokenSymbol)) {
+      notification.error({
+        message: "The ERC20 token address is avaialable in the token drop down.",
+        placement: "topRight",
+      });
+    } else if (tokenSymbol) {
       setToken(tokenSymbol);
       await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
       setImportToken(false);
       notification.success({
-        message: "This ERC20 Token is already in the token dropdown",
-        description: "Try another address or select the option from the Token dropdown.",
+        message: "The ERC20 Token has been added",
         placement: "topRight",
       });
     } else {
       notification.error({
-        message: "This ERC20 Token was not found in the list",
-        description: "Try another address or select the option from the Token dropdown.",
+        message: "This ERC20 Address is not Valid",
         placement: "topRight",
       });
     }

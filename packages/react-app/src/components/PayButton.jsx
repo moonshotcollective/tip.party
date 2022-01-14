@@ -50,10 +50,8 @@ export default function PayButton({
       balance = await readContracts[token].balanceOf(callerAddress);
       address = readContracts[token].address;
     }
-
     const adjustedAmount = ethers.utils.parseUnits(amount || "0", decimals);
     const hasEnoughAllowance = allowance.lt(adjustedAmount);
-    console.log("view token info ", decimals, allowance, address, balance);
     setTokenInfo({ ...tokenInfo, [token]: { decimals, allowance, address, balance } });
 
     if (balance.isZero()) {

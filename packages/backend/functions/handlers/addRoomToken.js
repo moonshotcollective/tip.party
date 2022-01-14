@@ -9,6 +9,4 @@ module.exports = functions.https.onCall((data, context) => {
     .firestore()
     .doc(`rooms/${room}/tokens/${tokenAddress}`)
     .set({ tokenAddress, network, tokenSymbol, createdAt: admin.firestore.FieldValue.serverTimestamp() });
-
-  return { signedIn: true };
 });
