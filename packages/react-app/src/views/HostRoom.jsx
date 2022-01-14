@@ -137,7 +137,7 @@ export default function HostRoom({
  
  
     return notification.success({
-     message: "Successfully added address",
+     message: "Successfully Added Addresses",
      placement: "bottomRight",
    });
   });
