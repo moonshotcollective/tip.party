@@ -524,27 +524,6 @@ function App(props) {
           </div>
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
-          {room && (
-            <div className="flex flex-col px-7">
-              <Space direction="vertical">
-                <label className="text-base">Toggle Host:</label>
-                <AntdSwitch checkedChildren="Host" unCheckedChildren="Guest" checked={isHost} onChange={toggleHost} />
-                {/* <Button
-                  size="large"
-                  type="primary"
-                  style={
-                    isHost
-                      ? { borderColor: "#4b3ff5", backgroundColor: "#4b3ff5" }
-                      : { borderColor: "#6F3FF5", backgroundColor: "#6F3FF5" }
-                  }
-                  onClick={toggleHost}
-                >
-                  {" "}
-                  {isHost ? "Sign in as Guest" : "Become a Host"}
-                </Button> */}
-              </Space>
-            </div>
-          )}
           <Account
             address={address}
             localProvider={localProvider}
@@ -557,6 +536,21 @@ function App(props) {
             blockExplorer={blockExplorer}
             networkSelect={networkSelect}
             networkDisplay={networkDisplay}
+            hostToggleSwitch={
+              room && (
+                <div className="flex flex-col px-7">
+                  <Space direction="vertical">
+                    <label className="text-base">Toggle Host:</label>
+                    <AntdSwitch
+                      checkedChildren="Host"
+                      unCheckedChildren="Guest"
+                      checked={isHost}
+                      onChange={toggleHost}
+                    />
+                  </Space>
+                </div>
+              )
+            }
           />
         </span>
       </div>
