@@ -20,3 +20,5 @@ export { default as L2Bridge } from "./L2Bridge";
 export { default as TransactionHash } from "./TransactionHash";
 export { default as PayButton } from "./PayButton";
 export { default as AddressModal } from "./AddressModal";
+export { default as TokenModal } from "./TokenModal";
+export { default as TokenList } from "./TokenList";

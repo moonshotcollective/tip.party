@@ -1,4 +1,7 @@
-import { Alert, Button, Menu, Select } from "antd";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+//import Torus from "@toruslabs/torus-embed"
+import WalletLink from "walletlink";
+import { Alert, Button, Menu, Select, Space, Switch as AntdSwitch } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
@@ -17,7 +20,7 @@ const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
 //const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-const configuredNetworks = ["rinkeby"];
+const configuredNetworks = ["matic", "rinkeby"];
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
@@ -75,6 +78,7 @@ function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isHost, setHost] = useState(false);
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -130,6 +134,8 @@ function App(props) {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
+
+  const room = window.location.pathname.slice(6);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -264,7 +270,7 @@ function App(props) {
       );
     }
   } else {
-    networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
+    networkDisplay = <span></span>;
   }
 
   const options = [];
@@ -360,6 +366,20 @@ function App(props) {
     setRoute(window.location.pathname);
   }, [setRoute]);
 
+  useEffect(() => {
+    if (room) {
+      const userType = localStorage.getItem(room + "userType");
+      if (userType === "host") {
+        setHost(true);
+      }
+    }
+  }, [room]);
+
+  const toggleHost = () => {
+    localStorage.setItem(room + "userType", isHost ? "guest" : "host");
+    setHost(!isHost);
+  };
+
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -427,6 +447,27 @@ function App(props) {
           </div>
         </a>
         <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
+          {room && (
+            <div className="flex flex-col px-7">
+              <Space direction="vertical">
+                <label className="text-base">Toggle Host:</label>
+                <AntdSwitch checkedChildren="Host" unCheckedChildren="Guest" checked={isHost} onChange={toggleHost} />
+                {/* <Button
+                  size="large"
+                  type="primary"
+                  style={
+                    isHost
+                      ? { borderColor: "#4b3ff5", backgroundColor: "#4b3ff5" }
+                      : { borderColor: "#6F3FF5", backgroundColor: "#6F3FF5" }
+                  }
+                  onClick={toggleHost}
+                >
+                  {" "}
+                  {isHost ? "Sign in as Guest" : "Become a Host"}
+                </Button> */}
+              </Space>
+            </div>
+          )}
           <Account
             address={address}
             localProvider={localProvider}
@@ -438,6 +479,7 @@ function App(props) {
             logoutOfWeb3Modal={logoutOfWeb3Modal}
             blockExplorer={blockExplorer}
             networkSelect={networkSelect}
+            networkDisplay={networkDisplay}
           />
         </span>
       </div>
@@ -473,11 +515,6 @@ function App(props) {
           <Switch>
             <>
               <Route exact path="/">
-                {/*
-                    🎛 this scaffolding is full of commonly used components
-                    this <Contract/> component will automatically parse your ABI
-                    and give you a form to interact with it locally
-                */}
                 <Home
                   writeContracts={writeContracts}
                   readContracts={readContracts}
@@ -503,6 +540,8 @@ function App(props) {
                   selectedChainId={selectedChainId}
                   tx={tx}
                   nativeCurrency={targetNetwork.nativeCurrency}
+                  isHost={isHost}
+                  isWalletConnected={isWalletConnected}
                 />
               </Route>
               <Route exact path="/contracts">

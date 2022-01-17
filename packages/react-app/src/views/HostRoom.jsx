@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Input, Select, Collapse, Tabs, Menu, Dropdown } from "antd";
-import { CloseOutlined, ExportOutlined } from "@ant-design/icons";
-import { Address, PayButton, TransactionHash, AddressModal } from "../components";
+import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
-import { ethers, utils } from "ethers";
-import { filterLimit } from "async";
+import { ethers } from "ethers";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
 import * as storage from "../utils/storage";
@@ -30,12 +29,12 @@ export default function HostRoom({
   nativeCurrency,
 }) {
   const { room } = useParams();
-  //const { width, height } = useWindowSize()
 
   const [amount, setAmount] = useState(0);
   const [token, setToken] = useState(nativeCurrency);
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
+  const [importedAddresses, setImportedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
   const [blacklist, setBlacklist] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
@@ -43,8 +42,11 @@ export default function HostRoom({
   const [availableTokens, setAvailableTokens] = useState([]);
   const [isFiltering, setIsFiltering] = useState(false);
   const [importToken, setImportToken] = useState(false);
+  const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+  const allAddresses = [...addresses, ...importedAddresses];
+  const [loadedTokenList, setLoadedTokenList] = useState({});
 
   const { readContracts, writeContracts } = contracts;
   const { sdk, safe } = useSafeAppsSDK();
@@ -59,10 +61,87 @@ export default function HostRoom({
   }, [oldWriteContracts]);
 
   const handleTokenImport = async tokenAddress => {
-    // load the contract to the scaffold variables
     const tokenSymbol = await loadContracts(tokenAddress);
-    setToken(tokenSymbol);
-    setImportToken(false);
+    if (availableTokens.includes(tokenSymbol)) {
+      notification.error({
+        message: "The ERC20 token address is avaialable in the token drop down.",
+        placement: "topRight",
+      });
+    } else if (tokenSymbol) {
+      setToken(tokenSymbol);
+      //await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
+      const temp = {};
+      temp[tokenSymbol] = { tokenAddress };
+      localStorage.setItem(`${chainId}+token`, JSON.stringify({ ...loadedTokenList, ...temp }));
+      setImportToken(false);
+      notification.success({
+        message: "The ERC20 Token has been added",
+        placement: "topRight",
+      });
+    } else {
+      notification.error({
+        message: "This ERC20 Address is not Valid",
+        placement: "topRight",
+      });
+    }
+  };
+
+  const handleAddressImport = async addressesToImport => {
+    //removes all of the spaces
+    const str = addressesToImport.replace(/\s/g, "");
+
+    //Splits the string into an array of addresses
+    let arr = str.split(",");
+
+    //loop through each element in array
+    for (let index = 0; index < arr.length; index++) {
+      const element = arr[index];
+      if (!ethers.utils.isAddress(element)) {
+        try {
+          let addr = await mainnetProvider.resolveName(element);
+          if (addr) {
+            if (allAddresses.includes(addr)) {
+              return notification.error({
+                message: "Failed to Add Address",
+                description: element + " is already included!",
+                placement: "bottomRight",
+              });
+            }
+            //changes ens in the array to address
+            arr[index] = addr;
+          }
+          //error if ens is not address
+          else {
+            throw "error";
+          }
+        } catch (e) {
+          return notification.error({
+            message: "Failed to Add Address",
+            description: element + " is not a valid Ethereum address",
+            placement: "bottomRight",
+          });
+        }
+      }
+      if (allAddresses.includes(element)) {
+        return notification.error({
+          message: "Failed to Add Address",
+          description: element + " is already included!",
+          placement: "bottomRight",
+        });
+      }
+    }
+
+    // sets the addresses to local storage + changes the state
+    Promise.all(arr).then(arr => {
+      localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
+      setImportedAddresses([...importedAddresses, ...arr]);
+      setImportAddressModal(false);
+
+      return notification.success({
+        message: "Successfully Added Addresses",
+        placement: "bottomRight",
+      });
+    });
   };
 
   const handleConfetti = e => {
@@ -90,6 +169,24 @@ export default function HostRoom({
   }, [addresses, address]);
 
   useEffect(() => {
+    //Import addresses from local storage
+    const imports = localStorage.getItem(room);
+    if (imports) {
+      const parsedImports = JSON.parse(imports);
+      setImportedAddresses(parsedImports);
+    }
+  }, [room]);
+
+  useEffect(() => {
+    //Import tokens from local storage
+    const importLocalStorageTokens = localStorage.getItem(`${chainId}+token`);
+    if (importLocalStorageTokens) {
+      const parsedImports = JSON.parse(importLocalStorageTokens);
+      setLoadedTokenList(parsedImports);
+    }
+  }, [chainId]);
+
+  useEffect(() => {
     // clear existing subscriptions
     subs.current.map(sub => sub());
 
@@ -112,7 +209,7 @@ export default function HostRoom({
   const ethPayHandler = async () => {
     console.log("Beginning ethPayHandler ", tx, userSigner.provider);
     const result = tx(
-      writeContracts.TokenDistributor.splitEth(addresses, room, {
+      writeContracts.TokenDistributor.splitEth(allAddresses, room, {
         value: ethers.utils.parseEther(amount),
       }),
       async update => {
@@ -132,7 +229,7 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / addresses.length + " " + token,
+            description: "Each user received " + amount / allAddresses.length + " " + token,
             placement: "topRight",
           });
           handleConfetti();
@@ -147,7 +244,7 @@ export default function HostRoom({
   const tokenPayHandler = async opts => {
     const result = tx(
       writeContracts.TokenDistributor.splitTokenFromUser(
-        addresses,
+        allAddresses,
         ethers.utils.parseUnits(amount, opts.decimals),
         opts.address,
         room,
@@ -168,7 +265,7 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / addresses.length + " " + token,
+            description: "Each user received " + amount / allAddresses.length + " " + token,
             placement: "topRight",
           });
           handleConfetti();
@@ -202,35 +299,11 @@ export default function HostRoom({
     setAddresses([...updatedAddressesList]);
     setBlacklist([...blacklist, addressChanged]);
   };
-
-  const lookupAddress = async (provider, address) => {
-    if (address && utils.isAddress(address)) {
-      // console.log(`looking up ${address}`)
-      try {
-        // Accuracy of reverse resolution is not enforced.
-        // We then manually ensure that the reported ens name resolves to address
-        const reportedName = await provider.lookupAddress(address);
-        const resolvedAddress = await provider.resolveName(reportedName);
-
-        if (address && utils.getAddress(address) === utils.getAddress(resolvedAddress)) {
-          return reportedName;
-        }
-        return utils.getAddress(address);
-      } catch (e) {
-        return utils.getAddress(address);
-      }
-    }
-    return 0;
-  };
-
-  const filterAddresses = async () => {
-    setIsFiltering(true);
-    const output = await filterLimit(addresses, 10, async address => {
-      const ens = await lookupAddress(mainnetProvider, address).then(name => name);
-      return ens && ens.indexOf("0x") < 0;
-    });
-    setAddresses(output);
-    setIsFiltering(false);
+  const removeImportedAddress = index => {
+    const updatedImportList = [...importedAddresses];
+    updatedImportList.splice(index, 1);
+    setImportedAddresses([...updatedImportList]);
+    localStorage.setItem(room, JSON.stringify([...updatedImportList]));
   };
 
   const copyToClipBoard = () => {
@@ -264,7 +337,7 @@ export default function HostRoom({
       <h2 id="title">Tip Your Party!</h2>
       <h3>
         {" "}
-        You are the Host for "<b>{room}</b>" room{" "}
+        You are the <b>Host</b> for "<b>{room}</b>" room{" "}
       </h3>
       <div
         className="Room"
@@ -280,11 +353,26 @@ export default function HostRoom({
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
-              <div style={{ marginTop: 10 }}>
-                {/* <div style={{ marginBottom: 20 }}>
-                <h2>Sign In</h2>
-              </div> */}
-                {/* <Divider /> */}
+              <div>
+                <AddressModal
+                  visible={importAddressModal}
+                  handleAddress={handleAddressImport}
+                  onCancel={() => setImportAddressModal(false)}
+                  okText="Submit"
+                  mainnetProvider={mainnetProvider}
+                />
+                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      e.preventDefault();
+
+                      setImportAddressModal(true);
+                    }}
+                  >
+                    Import Address +
+                  </a>
+                </div>
 
                 <div style={{ flex: 1 }}>
                   <Collapse defaultActiveKey={["1"]}>
@@ -301,7 +389,7 @@ export default function HostRoom({
                     >
                       <List
                         bordered
-                        dataSource={addresses}
+                        dataSource={allAddresses}
                         renderItem={(item, index) => (
                           <List.Item key={`${item.toLowerCase()}-${index}`}>
                             <div
@@ -315,7 +403,14 @@ export default function HostRoom({
                               }}
                             >
                               <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
-                              <Button onClick={() => unList(index)} size="medium">
+                              {importedAddresses.includes(item) && <Tag color="grey">imported</Tag>}
+                              <Button
+                                onClick={() => {
+                                  if (importedAddresses.includes(item)) removeImportedAddress(index - addresses.length);
+                                  else unList(index);
+                                }}
+                                size="medium"
+                              >
                                 <CloseOutlined />
                               </Button>
                             </div>
@@ -324,7 +419,18 @@ export default function HostRoom({
                       />
                     </Collapse.Panel>
                     {blacklist.length > 0 && (
-                      <Collapse.Panel header="Blacklist" key="2">
+                      <Collapse.Panel
+                        header="Blacklist"
+                        key="2"
+                        extra={
+                          <Popover
+                            title="Blacklist:"
+                            content="Addresses in the blacklist are temporarily removed from the pay list and will not be included in the payout."
+                          >
+                            <InfoCircleOutlined />
+                          </Popover>
+                        }
+                      >
                         <List
                           bordered
                           dataSource={blacklist}
@@ -360,20 +466,21 @@ export default function HostRoom({
                       value={amount}
                       addonBefore="Total Amount to Distribute"
                       addonAfter={
-                        <Select defaultValue={nativeCurrency} value={token} onChange={value => setToken(value)}>
-                          <Select.Option value={nativeCurrency}>{nativeCurrency}</Select.Option>
-                          {availableTokens.map(name => (
-                            <Select.Option key={name} value={name}>
-                              {name}
-                            </Select.Option>
-                          ))}
-                        </Select>
+                        <TokenList
+                          token={token}
+                          setToken={setToken}
+                          readContracts={readContracts}
+                          tokenListHandler={tokens => setAvailableTokens(tokens)}
+                          nativeCurrency={nativeCurrency}
+                          loadedTokenList={loadedTokenList}
+                          availableTokens={availableTokens}
+                        />
                       }
                       style={{ marginTop: "10px" }}
                       onChange={amountChangeHandler}
                     />
 
-                    <AddressModal
+                    <TokenModal
                       visible={importToken}
                       handleAddress={handleTokenImport}
                       onCancel={() => setImportToken(false)}
@@ -406,6 +513,9 @@ export default function HostRoom({
                       ethPayHandler={ethPayHandler}
                       tokenPayHandler={tokenPayHandler}
                       nativeCurrency={nativeCurrency}
+                      loadContracts={loadContracts}
+                      loadedTokenList={loadedTokenList}
+                      userSigner={userSigner}
                     />
                   </div>
                 </div>

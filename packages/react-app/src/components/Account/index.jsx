@@ -52,6 +52,7 @@ export default function Account({
   blockExplorer,
   width,
   networkSelect,
+  networkDisplay,
 }) {
   function isValidAddress(address) {
     return address && address !== "0x0000000000000000000000000000000000000000";
@@ -90,6 +91,7 @@ export default function Account({
                   blockieSize={10}
                 />
               </Dropdown.Button>
+              {networkDisplay}
             </div>
           ) : (
             ""
