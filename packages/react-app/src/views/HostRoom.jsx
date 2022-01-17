@@ -10,6 +10,7 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
+import { useSafeAppsSDK } from "@gnosis.pm/safe-apps-react-sdk";
 import "./HostRoom.css";
 
 export default function HostRoom({
@@ -48,6 +49,7 @@ export default function HostRoom({
   const [loadedTokenList, setLoadedTokenList] = useState({});
 
   const { readContracts, writeContracts } = contracts;
+  const { sdk, safe } = useSafeAppsSDK();
 
   const subs = useRef([]);
 
@@ -205,11 +207,13 @@ export default function HostRoom({
   };
 
   const ethPayHandler = async () => {
+    console.log("Beginning ethPayHandler ", tx, userSigner.provider);
     const result = tx(
       writeContracts.TokenDistributor.splitEth(allAddresses, room, {
         value: ethers.utils.parseEther(amount),
       }),
       async update => {
+        console.log("into ethPayHandler update", update);
         await handleResponseHash(update);
         console.log("📡 Transaction Update:", update);
         if (update && (update.status === "confirmed" || update.status === 1)) {
@@ -274,6 +278,7 @@ export default function HostRoom({
   };
 
   const handleResponseHash = async result => {
+    console.log("handleResponseHash ", result);
     if (result.hash && selectedChainId && room) {
       await storage.registerTransactionForRoom(room, result.hash, selectedChainId);
     }
@@ -487,7 +492,6 @@ export default function HostRoom({
                         href="#"
                         onClick={e => {
                           e.preventDefault();
-
                           setImportToken(true);
                         }}
                       >

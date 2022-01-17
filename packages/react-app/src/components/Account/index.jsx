@@ -74,7 +74,7 @@ export default function Account({
 
   const modalButtons = [];
   if (web3Modal) {
-    if (web3Modal.cachedProvider) {
+    if (web3Modal?.cachedProvider || web3Modal?.provider?.safe) {
       modalButtons.push(
         <div key="first">
           {isValidAddress(address) ? (

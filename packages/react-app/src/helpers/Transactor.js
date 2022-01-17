@@ -1,6 +1,7 @@
 import { notification } from "antd";
 import Notify from "bnc-notify";
 import { BLOCKNATIVE_DAPPID } from "../constants";
+import { useSafeAppsSDK } from "@gnosis.pm/safe-apps-react-sdk";
 
 const { ethers } = require("ethers");
 
@@ -12,9 +13,14 @@ const callbacks = {};
 const DEBUG = true;
 
 export default function Transactor(providerOrSigner, gasPrice, etherscan) {
+  const { sdk, safe } = useSafeAppsSDK();
+
   if (typeof providerOrSigner !== "undefined") {
     // eslint-disable-next-line consistent-return
     return async (tx, callback) => {
+      console.log("Transactor tx ", tx);
+      console.log("Transactor callback ", callback);
+      console.log("providerOrSigner callback ", providerOrSigner);
       let signer;
       let network;
       let provider;
@@ -29,26 +35,23 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
       }
 
       console.log("network", network);
-
       var options = null;
       var notify = null;
-      if (navigator.onLine) {
-        options = {
-          dappId: BLOCKNATIVE_DAPPID, // GET YOUR OWN KEY AT https://account.blocknative.com
-          system: "ethereum",
-          networkId: network.chainId,
-          // darkMode: Boolean, // (default: false)
-          transactionHandler: txInformation => {
-            if (DEBUG) console.log("HANDLE TX", txInformation);
-            const possibleFunction = callbacks[txInformation.transaction.hash];
-            if (typeof possibleFunction === "function") {
-              possibleFunction(txInformation.transaction);
-            }
-          },
-        };
+      options = {
+        dappId: BLOCKNATIVE_DAPPID, // GET YOUR OWN KEY AT https://account.blocknative.com
+        system: "ethereum",
+        networkId: network.chainId,
+        // darkMode: Boolean, // (default: false)
+        transactionHandler: txInformation => {
+          if (DEBUG) console.log("HANDLE TX", txInformation);
+          const possibleFunction = callbacks[txInformation.transaction.hash];
+          if (typeof possibleFunction === "function") {
+            possibleFunction(txInformation.transaction);
+          }
+        },
+      };
 
-        notify = Notify(options);
-      }
+      notify = Notify(options);
 
       let etherscanNetwork = "";
       if (network.name && network.chainId > 1) {
@@ -62,26 +65,48 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
 
       try {
         let result;
-        if (tx instanceof Promise) {
-          if (DEBUG) console.log("AWAITING TX", tx);
+        if (providerOrSigner?.provider?.provider?.wc?._peerMeta?.name === "Gnosis Safe Multisig") {
+          const accountData = providerOrSigner?.provider?.wc?._peerMeta?.accounts[0];
+          console.log("GNOSIS Safe TX", tx, callback);
           result = await tx;
+          console.log("result", result);
+          // Returns a hash to identify the Safe transaction
+          const safeTxHash = await sdk.txs.send({
+            txs: [
+              {
+                to: accountData,
+                value: "0x0",
+                data: result,
+              },
+            ],
+          });
+          console.log("safeTxHash ", safeTxHash);
+          const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash);
+          console.log("safeTx ", safeTx);
         } else {
-          if (!tx.gasPrice) {
-            tx.gasPrice = gasPrice || ethers.utils.parseUnits("4.1", "gwei");
+          if (tx instanceof Promise) {
+            if (DEBUG) console.log("AWAITING TX", tx);
+            result = await tx;
+            console.log("callback result ", result);
+          } else {
+            if (!tx.gasPrice) {
+              tx.gasPrice = gasPrice || ethers.utils.parseUnits("4.1", "gwei");
+            }
+            if (!tx.gasLimit) {
+              tx.gasLimit = ethers.utils.hexlify(120000);
+            }
+            if (DEBUG) console.log("RUNNING TX", tx);
+            result = await signer.sendTransaction(tx);
           }
-          if (!tx.gasLimit) {
-            tx.gasLimit = ethers.utils.hexlify(120000);
-          }
-          if (DEBUG) console.log("RUNNING TX", tx);
-          result = await signer.sendTransaction(tx);
         }
+
         if (DEBUG) console.log("RESULT:", result);
         // console.log("Notify", notify);
 
         if (callback) {
           callbacks[result.hash] = callback;
         }
-
+        console.log("callback result view callbacks ", callbacks);
         // if it is a valid Notify.js network, use that, if not, just send a default notification
         if (notify && [1, 3, 4, 5, 42, 100].indexOf(network.chainId) >= 0) {
           const { emitter } = notify.hash(result.hash);
@@ -117,6 +142,7 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
 
         return result;
       } catch (e) {
+        console.log("main error ", e);
         if (DEBUG) console.log(e);
         // Accounts for Metamask and default signer on all networks
         let message =
@@ -127,7 +153,6 @@ export default function Transactor(providerOrSigner, gasPrice, etherscan) {
             : e.data
             ? e.data
             : JSON.stringify(e);
-
         if (!e.error && e.message) {
           message = e.message;
         }

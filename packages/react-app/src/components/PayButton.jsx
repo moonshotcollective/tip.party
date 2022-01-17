@@ -88,8 +88,10 @@ export default function PayButton({
     const payParams = { token, ...tokenInfo[token] };
     if (isETH()) {
       setStatus(4);
+      console.log("pay happening ", status);
       await ethPayHandler();
       setStatus(3);
+      console.log("end of pay happening ", status);
     } else {
       if (status === 1) {
         await approveTokenAllowance();
@@ -103,7 +105,9 @@ export default function PayButton({
 
   useEffect(() => {
     if (isETH()) {
+      console.log("refresh happening ", status);
       refreshETH();
+      console.log("after refresh happening ", status);
     } else if (tokenInfo[token]) {
       const adjustedAmount = ethers.utils.parseUnits(amount || "0", tokenInfo[token].decimals);
       const hasEnoughAllowance = tokenInfo[token].allowance.lt(adjustedAmount);
@@ -113,6 +117,7 @@ export default function PayButton({
   }, [amount]);
 
   useEffect(() => {
+    console.log("check it out ", status, renderButtonText());
     if (!isETH()) {
       setStatus(0);
       refreshTokenDetails();
@@ -123,7 +128,6 @@ export default function PayButton({
 
   const renderButtonText = () => {
     let text = "Loading...";
-
     switch (status) {
       case 1:
         text = `Approve ${appName} to transfer ${token}`;
@@ -144,7 +148,6 @@ export default function PayButton({
         text = "Loading...";
         break;
     }
-
     return text;
   };
 
