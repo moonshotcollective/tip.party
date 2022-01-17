@@ -53,6 +53,7 @@ export default function Account({
   width,
   networkSelect,
   networkDisplay,
+  hostToggleSwitch,
 }) {
   function isValidAddress(address) {
     return address && address !== "0x0000000000000000000000000000000000000000";
@@ -79,6 +80,7 @@ export default function Account({
         <div key="first">
           {isValidAddress(address) ? (
             <div className="flex flex-row">
+              {hostToggleSwitch}
               <div className="flex flex-col mr-4">
                 <label className="text-base">Select Network:</label>
                 {networkSelect}
