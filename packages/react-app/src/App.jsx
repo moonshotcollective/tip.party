@@ -538,15 +538,14 @@ function App(props) {
             networkDisplay={networkDisplay}
             hostToggleSwitch={
               room && (
-                <div className="flex flex-col px-7">
-                  <Space direction="vertical">
+                <div className="flex flex-col mt-5 px-7">
+                  <Space>
                     {/*<AntdSwitch
                   checkedChildren="Host"
                   unCheckedChildren="Guest"
                   checked={isHost}
                   onChange={toggleHost}
                 /> */}
-                <label className="text-base">Toggle Host:</label>
                     <Button
                       size="large"
                       type="primary"
