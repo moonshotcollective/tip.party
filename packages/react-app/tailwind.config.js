@@ -22,6 +22,7 @@ module.exports = {
         purple: {
           overlay: "#240871",
           imgText: "#8C65F7",
+          darkpurple: "#0B0228",
         },
         brown: {
           "dark-brown": "#262626",

@@ -1,5 +1,4 @@
-import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
-import { Badge, Input } from "antd";
+import { Input } from "antd";
 import { useLookupAddress } from "eth-hooks/dapps/ens";
 import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
@@ -41,10 +40,7 @@ export default function AddressInput(props) {
   const ens = useLookupAddress(props.ensProvider, currentValue);
 
   const clearButton = (
-    <div
-      style={{ marginTop: 4, cursor: "pointer" }}
-      onClick={props.clear}
-    >
+    <div style={{ marginTop: 4, cursor: "pointer" }} onClick={props.clear}>
       {/* <Badge count={<CameraOutlined style={{ fontSize: 9 }} />}>
         <QrcodeOutlined style={{ fontSize: 18 }} />
       </Badge>{" "} */}

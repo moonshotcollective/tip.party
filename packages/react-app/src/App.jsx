@@ -488,7 +488,7 @@ function App(props) {
   }
 
   return (
-    <div className="App pb-20">
+    <div className="App pb-20 bg-purple-darkpurple">
       <div className="p-10 mx-auto flex flex-wrap">
         <a
           href="/"

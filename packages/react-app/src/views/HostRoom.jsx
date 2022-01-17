@@ -328,7 +328,7 @@ export default function HostRoom({
   );
 
   return (
-    <div>
+    <div className="bg-purple-darkpurple">
       <h2 id="title">Tip Your Party!</h2>
       <h3>
         {" "}

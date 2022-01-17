@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { HostRoom, GuestRoom } from ".";
-import { Space, Switch } from "antd";
 
 export default function Rooms({
   appServer,
