@@ -538,15 +538,27 @@ function App(props) {
             networkDisplay={networkDisplay}
             hostToggleSwitch={
               room && (
-                <div className="flex flex-col px-7">
-                  <Space direction="vertical">
-                    <label className="text-base">Toggle Host:</label>
-                    <AntdSwitch
-                      checkedChildren="Host"
-                      unCheckedChildren="Guest"
-                      checked={isHost}
-                      onChange={toggleHost}
-                    />
+                <div className="flex flex-col mt-5 px-7">
+                  <Space>
+                    {/*<AntdSwitch
+                  checkedChildren="Host"
+                  unCheckedChildren="Guest"
+                  checked={isHost}
+                  onChange={toggleHost}
+                /> */}
+                    <Button
+                      size="large"
+                      type="primary"
+                      style={
+                        isHost
+                          ? { borderColor: "#4b3ff5", backgroundColor: "#4b3ff5" }
+                          : { borderColor: "#6F3FF5", backgroundColor: "#6F3FF5" }
+                      }
+                      onClick={toggleHost}
+                    >
+                      {" "}
+                      {isHost ? "Sign in as Guest" : "Become a Host"}
+                    </Button>
                   </Space>
                 </div>
               )
