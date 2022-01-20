@@ -355,11 +355,11 @@ export const NETWORKS = {
     nativeCurrency: "ETH",
   },
   arbitrum: {
-    name: "Arbitrum",
+    name: "arbitrum",
     color: "#50a0ea",
     chainId: 42161,
     blockExplorer: "https://explorer.arbitrum.io/#/",
-    rpcUrl: `https://arb1.arbitrum.io/rpc`,
+    rpcUrl: process.env.REACT_APP_ARBITRUM_NETWORK,
     gasPrice: 0,
     nativeCurrency: "ETH",
   },
@@ -391,8 +391,8 @@ export const NETWORKS = {
     color: "#f01a37",
     chainId: 10,
     gasPrice: 1000000000,
-    rpcUrl: process.env.REACT_APP_OPTIMISM_NETWORK,
     blockExplorer: "https://optimistic.etherscan.io/",
+    rpcUrl: process.env.REACT_APP_OPTIMISM_NETWORK,
     nativeCurrency: "ETH",
   },
   localAvalanche: {

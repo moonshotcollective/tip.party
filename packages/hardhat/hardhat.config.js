@@ -99,6 +99,15 @@ module.exports = {
         mnemonic: mnemonic(),
       },
     },
+    arbitrum: {
+      url: "https://mainnet.arbitrum.io/rpc",
+      accounts: {
+        mnemonic: mnemonic(),
+      },
+      companionNetworks: {
+        l1: "mainnet",
+      },
+    },
     rinkebyArbitrum: {
       url: "https://rinkeby.arbitrum.io/rpc",
       gasPrice: 0,
