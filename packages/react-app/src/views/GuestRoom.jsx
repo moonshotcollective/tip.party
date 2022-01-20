@@ -209,6 +209,9 @@ export default function GuestRoom({
                         </div>
                       }
                     >
+                      {addresses.length==0 &&<h2>
+                        This room is currently empty </h2>}
+                      {addresses.length>0 &&
                       <List
                         bordered
                         dataSource={addresses}
@@ -229,6 +232,7 @@ export default function GuestRoom({
                           </List.Item>
                         )}
                       />
+                            }
                     </Collapse.Panel>
                   </Collapse>
                 </div>
@@ -237,8 +241,10 @@ export default function GuestRoom({
             <Tabs.TabPane tab="Payouts" key="2">
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
-                <Card title="Payout Transactions" style={{ width: "100%" }}>
-                  <List
+                <Card title={txHash.length >0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
+                {txHash.length==0 &&<h2>
+                        No payouts have been administered for this room </h2>}
+                  {txHash.length >0 &&<List
                     bordered
                     dataSource={txHash}
                     renderItem={(item, index) => (
@@ -253,6 +259,7 @@ export default function GuestRoom({
                       </List.Item>
                     )}
                   />
+                  }
                 </Card>
               </div>
             </Tabs.TabPane>

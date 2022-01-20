@@ -382,6 +382,9 @@ export default function HostRoom({
                         </div>
                       }
                     >
+                                            {addresses.length==0 &&<h2>
+                        This room is currently empty </h2>}
+                      {addresses.length>0 &&
                       <List
                         bordered
                         dataSource={allAddresses}
@@ -411,7 +414,7 @@ export default function HostRoom({
                             </div>
                           </List.Item>
                         )}
-                      />
+                      />}
                     </Collapse.Panel>
                     {blacklist.length > 0 && (
                       <Collapse.Panel
@@ -520,8 +523,10 @@ export default function HostRoom({
             <Tabs.TabPane tab="Payouts" key="2">
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
-                <Card title="Payout Transactions" style={{ width: "100%" }}>
-                  <List
+                <Card title={txHash.length >0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
+                {txHash.length==0 &&<h2>
+                        No payouts have been administered for this room </h2>}
+                  {txHash.length >0 &&<List
                     bordered
                     dataSource={txHash}
                     renderItem={(item, index) => (
@@ -536,6 +541,7 @@ export default function HostRoom({
                       </List.Item>
                     )}
                   />
+                  }
                 </Card>
               </div>
             </Tabs.TabPane>
