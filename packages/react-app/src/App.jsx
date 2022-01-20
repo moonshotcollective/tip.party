@@ -24,7 +24,7 @@ const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
 //const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-const configuredNetworks = ["matic", "xdai", "optimism", "rinkeby"];
+const configuredNetworks = ["arbitrum", "matic", "optimism", "rinkeby", "xdai"];
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }

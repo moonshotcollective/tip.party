@@ -25,7 +25,7 @@ const { isAddress, getAddress, formatUnits, parseUnits } = utils;
 //
 // Select the network you want to deploy to here:
 //
-const defaultNetwork = "localhost";
+const defaultNetwork = "arbitrum";
 
 function mnemonic() {
   try {
@@ -97,6 +97,15 @@ module.exports = {
       url: "https://rpc-mainnet.maticvigil.com/",
       accounts: {
         mnemonic: mnemonic(),
+      },
+    },
+    arbitrum: {
+      url: "https://mainnet.arbitrum.io/rpc",
+      accounts: {
+        mnemonic: mnemonic(),
+      },
+      companionNetworks: {
+        l1: "mainnet",
       },
     },
     rinkebyArbitrum: {
