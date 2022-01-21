@@ -52,7 +52,7 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
           <div style={{ fontStyle: "italic", color: "#efefef" }}>In Progress...</div>
         ) : (
           <>
-            {txData && txData.status == 1 ? (
+            {txData && txData.status === 1 ? (
               <div style={{ fontStyle: "normal", fontWeight: "bold", color: "green" }}>Success</div>
             ) : (
               <div style={{ fontStyle: "normal", fontWeight: "bold", color: "red" }}>Fail</div>

@@ -36,10 +36,8 @@ export default function HostRoom({
   const [importedAddresses, setImportedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
   const [blacklist, setBlacklist] = useState([]);
-  const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
-  const [isFiltering, setIsFiltering] = useState(false);
   const [importToken, setImportToken] = useState(false);
   const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
@@ -58,6 +56,50 @@ export default function HostRoom({
     }
   }, [oldWriteContracts]);
 
+  useEffect(() => {
+    if (addresses.includes(address.toLowerCase())) {
+      setIsSignedIn(true);
+    }
+  }, [addresses, address]);
+
+  useEffect(() => {
+    //Import addresses from local storage
+    const imports = localStorage.getItem(room);
+    if (imports) {
+      const parsedImports = JSON.parse(imports);
+      setImportedAddresses(parsedImports);
+    }
+  }, [room]);
+
+  useEffect(() => {
+    //Import tokens from local storage
+    const importLocalStorageTokens = localStorage.getItem(`${chainId}+token`);
+    if (importLocalStorageTokens) {
+      const parsedImports = JSON.parse(importLocalStorageTokens);
+      setLoadedTokenList(parsedImports);
+    }
+  }, [chainId]);
+
+  useEffect(() => {
+    // clear existing subscriptions
+    subs.current.map(sub => sub());
+
+    // start new subscriptions
+    if (chainId) {
+      subs.current.push(storage.watchRoom(room, handleListUpdate));
+      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
+    }
+  }, [room, chainId]);
+
+  const amountChangeHandler = e => {
+    // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
+    const re = /^\d*\.?\d*$/;
+
+    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value !== ".") {
+      setAmount(e.target.value);
+    }
+  };
+
   const handleTokenImport = async tokenAddress => {
     const tokenSymbol = await loadContracts(tokenAddress);
     if (availableTokens.includes(tokenSymbol)) {
@@ -67,7 +109,6 @@ export default function HostRoom({
       });
     } else if (tokenSymbol) {
       setToken(tokenSymbol);
-      //await storage.addTokenToRoom(room, tokenAddress, tokenSymbol, selectedChainId);
       const temp = {};
       temp[tokenSymbol] = { tokenAddress };
       localStorage.setItem(`${chainId}+token`, JSON.stringify({ ...loadedTokenList, ...temp }));
@@ -158,50 +199,6 @@ export default function HostRoom({
   const handleTransactionUpdate = newTx => {
     const update = new Set([...newTx, ...txHash]);
     setTxHash([...update]);
-  };
-
-  useEffect(() => {
-    if (addresses.includes(address.toLowerCase())) {
-      setIsSignedIn(true);
-    }
-  }, [addresses, address]);
-
-  useEffect(() => {
-    //Import addresses from local storage
-    const imports = localStorage.getItem(room);
-    if (imports) {
-      const parsedImports = JSON.parse(imports);
-      setImportedAddresses(parsedImports);
-    }
-  }, [room]);
-
-  useEffect(() => {
-    //Import tokens from local storage
-    const importLocalStorageTokens = localStorage.getItem(`${chainId}+token`);
-    if (importLocalStorageTokens) {
-      const parsedImports = JSON.parse(importLocalStorageTokens);
-      setLoadedTokenList(parsedImports);
-    }
-  }, [chainId]);
-
-  useEffect(() => {
-    // clear existing subscriptions
-    subs.current.map(sub => sub());
-
-    // start new subscriptions
-    if (chainId) {
-      subs.current.push(storage.watchRoom(room, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
-    }
-  }, [room, chainId]);
-
-  const amountChangeHandler = e => {
-    // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
-    const re = /^\d*\.?\d*$/;
-
-    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value !== ".") {
-      setAmount(e.target.value);
-    }
   };
 
   const ethPayHandler = async () => {
