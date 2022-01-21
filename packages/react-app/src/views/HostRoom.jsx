@@ -36,10 +36,8 @@ export default function HostRoom({
   const [importedAddresses, setImportedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
   const [blacklist, setBlacklist] = useState([]);
-  const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
-  const [isFiltering, setIsFiltering] = useState(false);
   const [importToken, setImportToken] = useState(false);
   const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
