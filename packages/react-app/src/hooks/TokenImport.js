@@ -25,15 +25,19 @@ function TokenImport(provider, signer) {
   };
 
   const loadContract = async tokenAddress => {
-    const readUpdate = new ethers.Contract(tokenAddress, ERC20ABI, provider);
-    const writeUpdate = new ethers.Contract(tokenAddress, ERC20ABI, signer);
+    try {
+      const readUpdate = new ethers.Contract(tokenAddress, ERC20ABI, provider);
+      const writeUpdate = new ethers.Contract(tokenAddress, ERC20ABI, signer);
 
-    const symbol = await readUpdate.symbol();
+      const symbol = await readUpdate.symbol();
 
-    const data = { readContracts: { [symbol]: readUpdate }, writeContracts: { [symbol]: writeUpdate } };
-    addContract(data);
+      const data = { readContracts: { [symbol]: readUpdate }, writeContracts: { [symbol]: writeUpdate } };
+      addContract(data);
 
-    return symbol;
+      return symbol;
+    } catch (e) {
+      console.log(`Error Adding Token with address ${tokenAddress}: ${e}`);
+    }
   };
 
   return [contracts, loadContract, addContract];

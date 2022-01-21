@@ -1,0 +1,55 @@
+[debug] [2022-01-02T01:16:05.318Z] ----------------------------------------------------------------------
+[debug] [2022-01-02T01:16:05.320Z] Command:       /Users/macbook/.nvm/versions/node/v16.0.0/bin/node /usr/local/bin/firebase init emulators
+[debug] [2022-01-02T01:16:05.321Z] CLI Version:   10.0.1
+[debug] [2022-01-02T01:16:05.321Z] Platform:      darwin
+[debug] [2022-01-02T01:16:05.321Z] Node Version:  v16.0.0
+[debug] [2022-01-02T01:16:05.338Z] Time:          Sat Jan 01 2022 20:16:05 GMT-0500 (Eastern Standard Time)
+[debug] [2022-01-02T01:16:05.338Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2022-01-02T01:16:05.342Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2022-01-02T01:16:05.479Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2022-01-02T01:16:05.481Z] > authorizing via signed-in user (fahim.farque@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Volumes/T7/T7 Projects/d-tips
+
+Before we get started, keep in mind:
+
+  * You are currently outside your home directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2022-01-02T01:16:05.831Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2022-01-02T01:16:05.831Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2022-01-02T01:16:15.179Z] > refreshing access token with scopes: []
+[debug] [2022-01-02T01:16:15.180Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2022-01-02T01:16:15.390Z] <<< HTTP RESPONSE 400 {"date":"Sun, 02 Jan 2022 01:16:15 GMT","cache-control":"no-cache, no-store, max-age=0, must-revalidate","pragma":"no-cache","expires":"Mon, 01 Jan 1990 00:00:00 GMT","content-type":"application/json; charset=utf-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","server":"scaffolding on HTTPServer2","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2022-01-02T01:16:15.393Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2022-01-02T01:16:15.685Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 401
+[debug] [2022-01-02T01:16:15.685Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2022-01-02T01:16:15.686Z] HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2022-01-02T01:16:15.688Z] FirebaseError: HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+    at module.exports (/usr/local/lib/node_modules/firebase-tools/lib/responseToError.js:38:12)
+    at Client.doRequest (/usr/local/lib/node_modules/firebase-tools/lib/apiv2.js:241:23)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Client.request (/usr/local/lib/node_modules/firebase-tools/lib/apiv2.js:96:20)
+    at async getProjectPage (/usr/local/lib/node_modules/firebase-tools/lib/management/projects.js:233:17)
+    at async getFirebaseProjectPage (/usr/local/lib/node_modules/firebase-tools/lib/management/projects.js:250:23)
+    at async selectProjectInteractively (/usr/local/lib/node_modules/firebase-tools/lib/management/projects.js:95:41)
+    at async Object.doSetup [as project] (/usr/local/lib/node_modules/firebase-tools/lib/init/features/project.js:88:27)
+    at async init (/usr/local/lib/node_modules/firebase-tools/lib/init/index.js:19:9)
+[error] 
+[error] Error: Failed to list Firebase projects. See firebase-debug.log for more info.

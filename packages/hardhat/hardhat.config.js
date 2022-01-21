@@ -99,6 +99,15 @@ module.exports = {
         mnemonic: mnemonic(),
       },
     },
+    arbitrum: {
+      url: "https://mainnet.arbitrum.io/rpc",
+      accounts: {
+        mnemonic: mnemonic(),
+      },
+      companionNetworks: {
+        l1: "mainnet",
+      },
+    },
     rinkebyArbitrum: {
       url: "https://rinkeby.arbitrum.io/rpc",
       gasPrice: 0,
@@ -129,13 +138,21 @@ module.exports = {
         l2: "localArbitrum",
       },
     },
-    kovanOptimism: {
-      url: "https://kovan.optimism.io",
-      gasPrice: 0,
+    optimism: {
+      url: "https://mainnet.optimism.io",
       accounts: {
         mnemonic: mnemonic(),
       },
-      ovm: true,
+      companionNetworks: {
+        l1: "mainnet",
+      },
+    },
+    kovanOptimism: {
+      url: "https://kovan.optimism.io",
+      gasPrice: 225000000000,
+      accounts: {
+        mnemonic: mnemonic(),
+      },
       companionNetworks: {
         l1: "kovan",
       },
@@ -146,7 +163,6 @@ module.exports = {
       accounts: {
         mnemonic: mnemonic(),
       },
-      ovm: true,
       companionNetworks: {
         l1: "localOptimismL1",
       },

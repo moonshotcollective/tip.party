@@ -1,17 +1,20 @@
-module.exports = {
-  env: {
-    browser: true,
+{
+  "env": {
+    "browser": true
   },
-  // airbnb disabled after upgrade to cra 4 due to errors in our code
-  extends: [/*"airbnb"*/ "plugin:prettier/recommended"],
-  plugins: ["babel"],
-  rules: {
+  "extends": ["airbnb", "plugin:prettier/recommended", "prettier/react"],
+  "plugins": ["babel","import"],
+  "rules": {
     "prettier/prettier": "warn",
-    "prettier/prettier": [
+    "import/extensions": [
       "warn",
+      "ignorePackages",
       {
-        endOfLine: "auto",
-      },
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
     ],
     "import/prefer-default-export": "off",
     "prefer-destructuring": "off",
@@ -25,6 +28,6 @@ module.exports = {
     "no-underscore-dangle": "off",
     "no-nested-ternary": "off",
     "no-restricted-syntax": "off",
-    "no-plusplus": "off",
-  },
-};
+    "no-plusplus": "off"
+  }
+}

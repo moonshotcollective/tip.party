@@ -1,9 +1,9 @@
-import { CameraOutlined, QrcodeOutlined } from "@ant-design/icons";
-import { Badge, Input } from "antd";
+import { Input } from "antd";
 import { useLookupAddress } from "eth-hooks/dapps/ens";
 import React, { useCallback, useState } from "react";
 import QrReader from "react-qr-reader";
 import Blockie from "./Blockie";
+const { TextArea } = Input;
 
 // probably we need to change value={toAddress} to address={toAddress}
 
@@ -39,17 +39,12 @@ export default function AddressInput(props) {
   const currentValue = typeof props.value !== "undefined" ? props.value : value;
   const ens = useLookupAddress(props.ensProvider, currentValue);
 
-  const scannerButton = (
-    <div
-      style={{ marginTop: 4, cursor: "pointer" }}
-      onClick={() => {
-        setScan(!scan);
-      }}
-    >
-      <Badge count={<CameraOutlined style={{ fontSize: 9 }} />}>
+  const clearButton = (
+    <div style={{ marginTop: 4, cursor: "pointer" }} onClick={props.clear}>
+      {/* <Badge count={<CameraOutlined style={{ fontSize: 9 }} />}>
         <QrcodeOutlined style={{ fontSize: 18 }} />
-      </Badge>{" "}
-      Scan
+      </Badge>{" "} */}
+      Clear
     </div>
   );
 
@@ -118,15 +113,15 @@ export default function AddressInput(props) {
   return (
     <div>
       {scanner}
-      <Input
+      <TextArea
+        autoSize
         id="0xAddress" // name it something other than address for auto fill doxxing
         name="0xAddress" // name it something other than address for auto fill doxxing
         autoComplete="off"
         autoFocus={props.autoFocus}
         placeholder={props.placeholder ? props.placeholder : "address"}
         prefix={<Blockie address={currentValue} size={8} scale={3} />}
-        value={ens || currentValue}
-        addonAfter={scannerButton}
+        value={currentValue}
         onChange={e => {
           updateAddress(e.target.value);
         }}

@@ -1,17 +1,18 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Menu, Layout, PageHeader, Space, Select } from "antd";
+import { Alert, Button, Menu, Select, Space } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account, Contract, ThemeSwitch } from "./components";
+import { Account } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Admin, Room, Home, WalletNotConnected } from "./views";
+import { Rooms, Home } from "./views";
+
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -23,18 +24,22 @@ const DEBUG = true;
 const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
-const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+//const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
+const configuredNetworks = ["arbitrum", "mainnet", "matic", "optimism", "rinkeby", "xdai"];
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
 
 const cachedNetwork = window.localStorage.getItem("network");
 if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
+
 /// 📡 What chain are your contracts deployed to?
-let targetNetwork = NETWORKS[cachedNetwork || "mainnet"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+//let targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
+let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 🛰 providers
-if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
+if (DEBUG) console.log(`Connecting to ${cachedNetwork || "mainnet"}`);
+if (DEBUG) console.log(`Network info: ${targetNetwork}`);
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 //
@@ -149,11 +154,11 @@ function App(props) {
       ? scaffoldEthProvider
       : mainnetInfura;
 
+  //Sets the states to be used across Tip Party
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [owner, setOwner] = useState("");
-  const [admin, setAdmin] = useState(false);
+  const [isHost, setHost] = useState(false);
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -210,6 +215,8 @@ function App(props) {
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
 
+  const room = window.location.pathname.slice(6);
+
   // EXTERNAL CONTRACT EXAMPLE:
   //
   // If you want to bring in the mainnet DAI contract it would look like:
@@ -220,19 +227,7 @@ function App(props) {
     console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
   });
 
-  const title = admin ? "Pay your contributors" : "Sign in with your message";
-
   const appServer = process.env.REACT_APP_SERVER;
-
-  const updateOwner = async () => {
-    const o = await readContracts?.TokenDistributor?.owner();
-    setOwner(o);
-  };
-
-  const updateAdmin = async () => {
-    const isAdmin = await readContracts?.TokenDistributor?.checkIsDistributor(address);
-    setAdmin(isAdmin);
-  };
 
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
@@ -264,12 +259,9 @@ function App(props) {
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("🔐 writeContracts", writeContracts);
-      console.log("owner: ", owner);
     }
 
     if (readContracts) {
-      updateOwner();
-      updateAdmin();
       setIsWalletConnected(AddressHelper.isValidAddress(address));
     }
   }, [
@@ -358,7 +350,7 @@ function App(props) {
       );
     }
   } else {
-    networkDisplay = <div style={{ color: targetNetwork.color }}>{targetNetwork.name}</div>;
+    networkDisplay = <span></span>;
   }
 
   const options = [];
@@ -366,7 +358,7 @@ function App(props) {
     if (configuredNetworks.indexOf(id) > -1) {
       options.push(
         <Select.Option key={id} value={NETWORKS[id].name}>
-          <span style={{ color: NETWORKS[id].color, fontSize: 14 }}>{NETWORKS[id].name}</span>
+          <span style={{ color: NETWORKS[id].color, fontSize: 20 }}>{NETWORKS[id].name}</span>
         </Select.Option>,
       );
     }
@@ -453,6 +445,20 @@ function App(props) {
     setRoute(window.location.pathname);
   }, [setRoute]);
 
+  useEffect(() => {
+    if (room) {
+      const userType = localStorage.getItem(room + "userType");
+      if (userType === "host") {
+        setHost(true);
+      }
+    }
+  }, [room]);
+
+  const toggleHost = () => {
+    localStorage.setItem(room + "userType", isHost ? "guest" : "host");
+    setHost(!isHost);
+  };
+
   let faucetHint = "";
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -484,11 +490,16 @@ function App(props) {
   }
 
   return (
-    <div className="App">
-      <Layout style={{ fixed: "top" }}>
-        <PageHeader
-          title={
-            <a href="/" target="_blank" rel="noopener noreferrer" style={{ float: "left" }} className="navbar-title">
+    <div className="App pb-20 bg-purple-darkpurple">
+      <div className="p-10 mx-auto flex flex-wrap">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 navbar-title"
+        >
+          <div className="flex flex-col">
+            <div className="flex flex-row text-2xl lg:text-5xl">
               Tip Party
               <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -509,33 +520,50 @@ function App(props) {
                   fill="#FFCC00"
                 />
               </svg>
-              <p className="navbar-subtitle">by MOONSHOT COLLECTIVE</p>
-            </a>
-          }
-          style={{ cursor: "pointer", margin: 10, padding: 0 }}
-          extra={[
-            <Space>
-              <span>{faucetHint}</span>
-              <span>{networkDisplay}</span>
-              <Account
-                address={address}
-                localProvider={localProvider}
-                userSigner={userSigner}
-                mainnetProvider={mainnetProvider}
-                price={price}
-                web3Modal={web3Modal}
-                loadWeb3Modal={loadWeb3Modal}
-                logoutOfWeb3Modal={logoutOfWeb3Modal}
-                blockExplorer={blockExplorer}
-                isOwner={admin}
-              />
-              {networkSelect}
-            </Space>,
-          ]}
-        />
-      </Layout>
+            </div>
+
+            <p className="navbar-subtitle text-base lg:text-2xl">by MOONSHOT COLLECTIVE</p>
+          </div>
+        </a>
+        <span className="flex inline-flex sm:ml-auto sm:mt-0 flex-col lg:flex-row ml-2">
+          <Account
+            address={address}
+            localProvider={localProvider}
+            userSigner={userSigner}
+            mainnetProvider={mainnetProvider}
+            price={price}
+            web3Modal={web3Modal}
+            loadWeb3Modal={loadWeb3Modal}
+            logoutOfWeb3Modal={logoutOfWeb3Modal}
+            blockExplorer={blockExplorer}
+            networkSelect={networkSelect}
+            networkDisplay={networkDisplay}
+            hostToggleSwitch={
+              room && (
+                <div className="flex flex-col mt-5 px-7">
+                  <Space>
+                    <Button
+                      size="large"
+                      type="primary"
+                      style={
+                        isHost
+                          ? { borderColor: "#4b3ff5", backgroundColor: "#4b3ff5" }
+                          : { borderColor: "#6F3FF5", backgroundColor: "#6F3FF5" }
+                      }
+                      onClick={toggleHost}
+                    >
+                      {" "}
+                      {isHost ? "Sign in as Guest" : "Become a Host"}
+                    </Button>
+                  </Space>
+                </div>
+              )
+            }
+          />
+        </span>
+      </div>
       <BrowserRouter>
-        {targetNetwork.name == "localhost" && (
+        {targetNetwork.name === "localhost" && (
           <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
             <Menu.Item key="/">
               <Link
@@ -547,7 +575,7 @@ function App(props) {
                 App
               </Link>
             </Menu.Item>
-            {targetNetwork.name == "localhost" && (
+            {targetNetwork.name === "localhost" && (
               <Menu.Item key="/contracts">
                 <Link
                   onClick={() => {
@@ -559,171 +587,63 @@ function App(props) {
                 </Link>
               </Menu.Item>
             )}
-            {admin && (
-              <Menu.Item key="/adminpanel">
-                <Link
-                  onClick={() => {
-                    setRoute("/adminpanel");
-                  }}
-                  to="/adminpanel"
-                >
-                  Admin Panel
-                </Link>
-              </Menu.Item>
-            )}
           </Menu>
         )}
 
         <main>
           <Switch>
-            {!isWalletConnected ? (
-              <WalletNotConnected
-                connector={
-                  <Account
-                    address={address}
-                    localProvider={localProvider}
-                    userSigner={userSigner}
-                    mainnetProvider={mainnetProvider}
-                    price={price}
-                    web3Modal={web3Modal}
-                    loadWeb3Modal={loadWeb3Modal}
-                    logoutOfWeb3Modal={logoutOfWeb3Modal}
-                    blockExplorer={blockExplorer}
-                    isOwner={admin}
-                    width={300}
-                  />
-                }
-              />
-            ) : (
-              <>
-                <Route exact path="/">
-                  {/*
-                    🎛 this scaffolding is full of commonly used components
-                    this <Contract/> component will automatically parse your ABI
-                    and give you a form to interact with it locally
-                */}
-                  <Home
-                    writeContracts={writeContracts}
-                    readContracts={readContracts}
-                    admin={admin}
-                    address={address}
-                    mainnetProvider={mainnetProvider}
-                    tx={tx}
-                    isWalletConnected={isWalletConnected}
-                    nativeCurrency= {targetNetwork.nativeCurrency}
-                  />
-                </Route>
-                <Route path="/room/:room">
-                  <Room
-                    address={address}
-                    appServer={appServer}
-                    web3Modal={web3Modal}
-                    userSigner={userSigner}
-                    mainnetProvider={mainnetProvider}
-                    readContracts={readContracts}
-                    writeContracts={writeContracts}
-                    localProvider={localProvider}
-                    yourLocalBalance={yourLocalBalance}
-                    admin={admin}
-                    chainId={localChainId || selectedChainId}
-                    selectedChainId={selectedChainId}
-                    tx={tx}
-                    nativeCurrency= {targetNetwork.nativeCurrency}
-                  />
-                </Route>
-                <Route exact path="/contracts">
-                  <Contract
-                    name="TokenDistributor"
-                    signer={userSigner}
-                    provider={localProvider}
-                    address={address}
-                    blockExplorer={blockExplorer}
-                  />
-                  <Contract
-                    name="DummyToken"
-                    signer={userSigner}
-                    provider={localProvider}
-                    address={address}
-                    blockExplorer={blockExplorer}
-                  />
-                </Route>
-                {admin && (
-                  <Route exact path="/adminpanel">
-                    <Admin
-                      readContracts={readContracts}
-                      writeContracts={writeContracts}
-                      mainnetProvider={mainnetProvider}
-                      localProvider={localProvider}
-                      yourLocalBalance={yourLocalBalance}
-                      title={title}
-                      appServer={appServer}
-                      tx={tx}
-                      address={address}
-                      admin={admin}
-                    />
-                  </Route>
-                )}
-              </>
-            )}
+            <>
+              <Route exact path="/">
+                <Home
+                  writeContracts={writeContracts}
+                  readContracts={readContracts}
+                  address={address}
+                  mainnetProvider={mainnetProvider}
+                  tx={tx}
+                  isWalletConnected={isWalletConnected}
+                  nativeCurrency={targetNetwork.nativeCurrency}
+                />
+              </Route>
+              <Route path="/room/:room">
+                <Rooms
+                  address={address}
+                  appServer={appServer}
+                  web3Modal={web3Modal}
+                  userSigner={userSigner}
+                  mainnetProvider={mainnetProvider}
+                  readContracts={readContracts}
+                  writeContracts={writeContracts}
+                  localProvider={localProvider}
+                  yourLocalBalance={yourLocalBalance}
+                  chainId={localChainId || selectedChainId}
+                  selectedChainId={selectedChainId}
+                  tx={tx}
+                  nativeCurrency={targetNetwork.nativeCurrency}
+                  isHost={isHost}
+                  isWalletConnected={isWalletConnected}
+                />
+              </Route>
+              {/* This is used when testing out smart contracts:
+              <Route exact path="/contracts">
+                <Contract
+                  name="TokenDistributor"
+                  signer={userSigner}
+                  provider={localProvider}
+                  address={address}
+                  blockExplorer={blockExplorer}
+                />
+                <Contract
+                  name="GTC"
+                  signer={userSigner}
+                  provider={localProvider}
+                  address={address}
+                  blockExplorer={blockExplorer}
+                />
+              </Route> */}
+            </>
           </Switch>
         </main>
       </BrowserRouter>
-
-      <ThemeSwitch />
-
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={12}>
-            <Ramp price={price} address={address} networks={NETWORKS} />
-          </Col>
-          <Col span={12} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-            <Button
-              onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-              }}
-              size="large"
-              shape="round"
-            >
-              <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                💬
-              </span>
-              Support
-            </Button>
-          </Col> 
-        </Row>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={24}>
-            {faucetAvailable ? (
-              <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-            ) : (
-                ""
-              )}
-          </Col>
-        </Row>
-      </div> */}
-
-      {/* <Menu
-            mode="inline"
-            openKeys={openKeys}
-          onOpenChange={keys => {
-          setOpenKeys(openKeys ? keys : []);
-        }}
-          style={{ marginTop: "10px", border: "1px solid" }}
-          onClick={e => {
-          setMenuTitle(e.key);
-          setOpenKeys([]);
-        }}
-      >
-      <SubMenu key="sub1" title={menuTitle}>
-        <Menu.Item key="GTC">GTC</Menu.Item>
-        <Menu.Item key="DAI">DAI</Menu.Item>
-        <Menu.Item key="USDC">USDC</Menu.Item>
-      </SubMenu>
-    </Menu> */}
     </div>
   );
 }

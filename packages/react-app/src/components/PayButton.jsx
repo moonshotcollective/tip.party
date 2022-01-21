@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "antd";
 import { ethers } from "ethers";
+import { ERC20ABI } from "../constants";
 
 const loadingStatus = [0, 2, 4];
 const disabledStatus = [...loadingStatus, 5];
@@ -19,24 +20,38 @@ export default function PayButton({
   tokenListHandler,
   ethPayHandler,
   tokenPayHandler,
-  nativeCurrency
+  nativeCurrency,
+  loadContracts,
+  loadedTokenList,
+  userSigner,
 }) {
   const [tokenInfo, setTokenInfo] = useState({});
-  const [status, setStatus] = useState(0); // loading | lowAllowance | approving | ready | distributing | noBalance
+  const [status, setStatus] = useState(3); // loading | lowAllowance | approving | ready | distributing | noBalance
 
   const refreshETH = () => {
-    setStatus(yourLocalBalance.gte(ethers.utils.parseEther(amount || "0")) ? 3 : 5);
+    if (yourLocalBalance) setStatus(yourLocalBalance.gte(ethers.utils.parseEther(amount || "0")) ? 3 : 5);
   };
 
   const refreshTokenDetails = async () => {
-    const decimals = await readContracts[token].decimals();
-    const allowance = await readContracts[token].allowance(callerAddress, spender);
-    const balance = await readContracts[token].balanceOf(callerAddress);
-    const address = readContracts[token].address;
-
+    let decimals;
+    let allowance;
+    let balance;
+    let address;
+    if (!readContracts[token]) {
+      const tokenAddress = loadedTokenList[token].tokenAddress;
+      const readUpdate = new ethers.Contract(tokenAddress, ERC20ABI, userSigner);
+      decimals = await readUpdate.decimals();
+      allowance = await readUpdate.allowance(callerAddress, spender);
+      balance = await readUpdate.balanceOf(callerAddress);
+      address = readUpdate.address;
+    } else {
+      decimals = await readContracts[token].decimals();
+      allowance = await readContracts[token].allowance(callerAddress, spender);
+      balance = await readContracts[token].balanceOf(callerAddress);
+      address = readContracts[token].address;
+    }
     const adjustedAmount = ethers.utils.parseUnits(amount || "0", decimals);
     const hasEnoughAllowance = allowance.lt(adjustedAmount);
-
     setTokenInfo({ ...tokenInfo, [token]: { decimals, allowance, address, balance } });
 
     if (balance.isZero()) {
@@ -53,8 +68,14 @@ export default function PayButton({
   const approveTokenAllowance = async () => {
     setStatus(2);
     const newAllowance = ethers.utils.parseUnits(maxApproval, tokenInfo[token].decimals);
-
-    const res = await writeContracts[token].approve(spender, newAllowance);
+    let res;
+    if (!readContracts[token]) {
+      const tokenAddress = loadedTokenList[token].tokenAddress;
+      const writeUpdate = new ethers.Contract(tokenAddress, ERC20ABI, userSigner);
+      res = await writeUpdate.approve(spender, newAllowance);
+    } else {
+      res = await writeContracts[token].approve(spender, newAllowance);
+    }
     await res.wait(1);
     await refreshTokenDetails();
   };
@@ -99,20 +120,6 @@ export default function PayButton({
       refreshETH();
     }
   }, [token]);
-
-  useEffect(() => {
-    const erc20List = Object.keys(readContracts).reduce((acc, contract) => {
-      if (typeof readContracts[contract].decimals !== "undefined") {
-        acc.push(contract);
-      }
-
-      return acc;
-    }, []);
-
-    if (tokenListHandler && (typeof tokenListHandler).toLowerCase() === "function") {
-      tokenListHandler(erc20List);
-    }
-  }, [readContracts]);
 
   const renderButtonText = () => {
     let text = "Loading...";

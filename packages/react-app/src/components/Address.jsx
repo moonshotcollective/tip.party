@@ -64,49 +64,19 @@ export default function Address(props) {
   }
 
   const etherscanLink = blockExplorerLink(address, props.blockExplorer);
-  if (props.minimized) {
-    return (
-      <span style={{ verticalAlign: "middle" }}>
-        <a
-          style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }}
-          target="_blank"
-          href={etherscanLink}
-          rel="noopener noreferrer"
-        >
-          <Blockies seed={address.toLowerCase()} size={8} scale={2} />
-        </a>
-      </span>
-    );
-  }
 
-  let text;
-  if (props.onChange) {
-    text = (
-      <Text editable={{ onChange: props.onChange }} copyable={{ text: address }}>
-        <a
-          style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }}
-          target="_blank"
-          href={etherscanLink}
-          rel="noopener noreferrer"
-        >
-          {displayAddress}
-        </a>
-      </Text>
-    );
-  } else {
-    text = (
-      <Text copyable={{ text: address }}>
-        <a
-          style={{ color: currentTheme === "light" ? "#222222" : "#ddd", hoverColor: "#6F3FF5" }}
-          target="_blank"
-          href={etherscanLink}
-          rel="noopener noreferrer"
-        >
-          {displayAddress}
-        </a>
-      </Text>
-    );
-  }
+  const text = (
+    <Text>
+      <a
+        style={{ color: currentTheme === "light" ? "#222222" : "#ddd", fontSize: 20 }}
+        target="_blank"
+        href={etherscanLink}
+        rel="noopener noreferrer"
+      >
+        {displayAddress}
+      </a>
+    </Text>
+  );
 
   return (
     <div style={{ padding: 10 }}>
@@ -114,7 +84,7 @@ export default function Address(props) {
         avatar={
           <Blockies
             seed={address.toLowerCase()}
-            size={props.blockieSize || 6}
+            size={props.blockieSize || 4}
             scale={props.fontSize ? props.fontSize / 7 : 4}
           />
         }

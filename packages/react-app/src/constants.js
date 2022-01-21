@@ -248,7 +248,7 @@ export const NETWORKS = {
     // rpcUrl: "https://speedy-nodes-nyc.moralis.io/43d22b430189c5a5c63506a7/eth/mainnet",
     rpcUrl: process.env.REACT_APP_MAINNET_NETWORK,
     blockExplorer: "https://etherscan.io/",
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   kovan: {
     name: "kovan",
@@ -257,16 +257,16 @@ export const NETWORKS = {
     rpcUrl: `https://kovan.infura.io/v3/${INFURA_ID}`,
     blockExplorer: "https://kovan.etherscan.io/",
     faucet: "https://gitter.im/kovan-testnet/faucet", // https://faucet.kovan.network/
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   rinkeby: {
     name: "rinkeby",
     color: "#e0d068",
     chainId: 4,
-    rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_ID}`,
+    rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/3ywW5DoY2uKjixRdtVTxTFMEiOHdxQUR`,
     faucet: "https://faucet.rinkeby.io/",
     blockExplorer: "https://rinkeby.etherscan.io/",
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   ropsten: {
     name: "ropsten",
@@ -275,7 +275,7 @@ export const NETWORKS = {
     faucet: "https://faucet.ropsten.be/",
     blockExplorer: "https://ropsten.etherscan.io/",
     rpcUrl: `https://ropsten.infura.io/v3/${INFURA_ID}`,
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   goerli: {
     name: "goerli",
@@ -284,7 +284,7 @@ export const NETWORKS = {
     faucet: "https://goerli-faucet.slock.it/",
     blockExplorer: "https://goerli.etherscan.io/",
     rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   xdai: {
     name: "xdai",
@@ -295,7 +295,7 @@ export const NETWORKS = {
     rpcUrl: process.env.REACT_APP_XDAI_NETWORK,
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
-    nativeCurrency: "XDAI"
+    nativeCurrency: "XDAI",
   },
   matic: {
     name: "matic",
@@ -303,10 +303,21 @@ export const NETWORKS = {
     chainId: 137,
     price: 1,
     gasPrice: 1000000000,
-    rpcUrl: "https://rpc-mainnet.maticvigil.com",
+    rpcUrl: process.env.REACT_APP_MATIC_NETWORK,
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://explorer-mainnet.maticvigil.com//",
-    nativeCurrency: "MATIC"
+    nativeCurrency: "MATIC",
+  },
+  polygon: {
+    name: "matic",
+    color: "#2bbdf7",
+    chainId: 137,
+    price: 1,
+    gasPrice: 1000000000,
+    rpcUrl: process.env.REACT_APP_MATIC_NETWORK,
+    faucet: "https://faucet.matic.network/",
+    blockExplorer: "https://explorer-mainnet.maticvigil.com//",
+    nativeCurrency: "MATIC",
   },
   mumbai: {
     name: "mumbai",
@@ -317,7 +328,7 @@ export const NETWORKS = {
     rpcUrl: "https://rpc-mumbai.maticvigil.com",
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://mumbai-explorer.matic.today/",
-    nativeCurrency: "MATIC"
+    nativeCurrency: "MATIC",
   },
   localArbitrum: {
     name: "localArbitrum",
@@ -325,7 +336,7 @@ export const NETWORKS = {
     chainId: 153869338190755,
     blockExplorer: "",
     rpcUrl: `http://localhost:8547`,
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   localArbitrumL1: {
     name: "localArbitrumL1",
@@ -333,7 +344,7 @@ export const NETWORKS = {
     chainId: 44010,
     blockExplorer: "",
     rpcUrl: `http://localhost:7545`,
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   rinkebyArbitrum: {
     name: "Arbitrum Testnet",
@@ -341,16 +352,16 @@ export const NETWORKS = {
     chainId: 421611,
     blockExplorer: "https://rinkeby-explorer.arbitrum.io/#/",
     rpcUrl: `https://rinkeby.arbitrum.io/rpc`,
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   arbitrum: {
-    name: "Arbitrum",
+    name: "arbitrum",
     color: "#50a0ea",
     chainId: 42161,
     blockExplorer: "https://explorer.arbitrum.io/#/",
-    rpcUrl: `https://arb1.arbitrum.io/rpc`,
+    rpcUrl: process.env.REACT_APP_ARBITRUM_NETWORK,
     gasPrice: 0,
-    nativeCurrency: "ETH"
+    nativeCurrency: "ETH",
   },
   localOptimismL1: {
     name: "localOptimismL1",
@@ -379,8 +390,10 @@ export const NETWORKS = {
     name: "optimism",
     color: "#f01a37",
     chainId: 10,
+    gasPrice: 1000000000,
     blockExplorer: "https://optimistic.etherscan.io/",
-    rpcUrl: `https://mainnet.optimism.io`,
+    rpcUrl: process.env.REACT_APP_OPTIMISM_NETWORK,
+    nativeCurrency: "ETH",
   },
   localAvalanche: {
     name: "localAvalanche",

@@ -5,7 +5,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import Blockies from "react-blockies";
 import { Transactor } from "../helpers";
 import Wallet from "./Wallet";
-
+import { useLookupAddress } from "../hooks";
 const { utils } = require("ethers");
 
 // improved a bit by converting address to ens if it exists
@@ -60,7 +60,7 @@ export default function Faucet(props) {
     blockie = <div />;
   }
 
-  // const ens = useLookupAddress(props.ensProvider, address);
+  const ens = useLookupAddress(props.ensProvider, address);
 
   const updateAddress = useCallback(
     async newValue => {
