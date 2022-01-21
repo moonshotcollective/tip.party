@@ -28,7 +28,6 @@ export default function GuestRoom({
   nativeCurrency,
 }) {
   const { room } = useParams();
-  //const { width, height } = useWindowSize()
 
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
@@ -49,6 +48,23 @@ export default function GuestRoom({
     }
   }, [oldWriteContracts]);
 
+  useEffect(() => {
+    if (addresses.includes(address.toLowerCase())) {
+      setIsSignedIn(true);
+    }
+  }, [addresses, address]);
+
+  useEffect(() => {
+    // clear existing subscriptions
+    subs.current.map(sub => sub());
+
+    // start new subscriptions
+    if (chainId) {
+      subs.current.push(storage.watchRoom(room, handleListUpdate));
+      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
+    }
+  }, [room, chainId]);
+
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
     setTimeout(() => {
@@ -66,29 +82,6 @@ export default function GuestRoom({
     const update = new Set([...newTx, ...txHash]);
     setTxHash([...update]);
   };
-
-  useEffect(() => {
-    if (addresses.includes(address.toLowerCase())) {
-      setIsSignedIn(true);
-    }
-  }, [addresses, address]);
-
-  // useEffect(() => {
-  //   const dist =  storage.getRoomDistributor(room);
-  //   setDistributor(dist);
-  //   console.log("Distributor: " + dist)
-  // }, [room] );
-
-  useEffect(() => {
-    // clear existing subscriptions
-    subs.current.map(sub => sub());
-
-    // start new subscriptions
-    if (chainId) {
-      subs.current.push(storage.watchRoom(room, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
-    }
-  }, [room, chainId]);
 
   const handleSignIn = async () => {
     if (typeof appServer == "undefined") {

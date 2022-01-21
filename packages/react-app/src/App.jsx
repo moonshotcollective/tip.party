@@ -12,6 +12,7 @@ import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
 import { Rooms, Home } from "./views";
+
 // Wallets for wallet connect
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
@@ -153,6 +154,7 @@ function App(props) {
       ? scaffoldEthProvider
       : mainnetInfura;
 
+  //Sets the states to be used across Tip Party
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -540,12 +542,6 @@ function App(props) {
               room && (
                 <div className="flex flex-col mt-5 px-7">
                   <Space>
-                    {/*<AntdSwitch
-                  checkedChildren="Host"
-                  unCheckedChildren="Guest"
-                  checked={isHost}
-                  onChange={toggleHost}
-                /> */}
                     <Button
                       size="large"
                       type="primary"
@@ -627,6 +623,7 @@ function App(props) {
                   isWalletConnected={isWalletConnected}
                 />
               </Route>
+              {/* This is used when testing out smart contracts:
               <Route exact path="/contracts">
                 <Contract
                   name="TokenDistributor"
@@ -642,63 +639,11 @@ function App(props) {
                   address={address}
                   blockExplorer={blockExplorer}
                 />
-              </Route>
+              </Route> */}
             </>
           </Switch>
         </main>
       </BrowserRouter>
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      {/* <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={12}>
-            <Ramp price={price} address={address} networks={NETWORKS} />
-          </Col>
-          <Col span={12} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-            <Button
-              onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-              }}
-              size="large"
-              shape="round"
-            >
-              <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                💬
-              </span>
-              Support
-            </Button>
-          </Col> 
-        </Row>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={24}>
-            {faucetAvailable ? (
-              <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-            ) : (
-                ""
-              )}
-          </Col>
-        </Row>
-      </div> */}
-      {/* <Menu
-            mode="inline"
-            openKeys={openKeys}
-          onOpenChange={keys => {
-          setOpenKeys(openKeys ? keys : []);
-        }}
-          style={{ marginTop: "10px", border: "1px solid" }}
-          onClick={e => {
-          setMenuTitle(e.key);
-          setOpenKeys([]);
-        }}
-      >
-      <SubMenu key="sub1" title={menuTitle}>
-        <Menu.Item key="GTC">GTC</Menu.Item>
-        <Menu.Item key="DAI">DAI</Menu.Item>
-        <Menu.Item key="USDC">USDC</Menu.Item>
-      </SubMenu>
-    </Menu> */}
     </div>
   );
 }
