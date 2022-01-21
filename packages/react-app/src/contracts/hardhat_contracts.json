@@ -1,11 +1,11 @@
 {
-  "4": {
-    "rinkeby": {
-      "name": "rinkeby",
-      "chainId": "4",
+  "1": {
+    "mainnet": {
+      "name": "mainnet",
+      "chainId": "1",
       "contracts": {
         "TokenDistributor": {
-          "address": "0xB65F4a3C29351290cfAB792Aee18e53C508f55ff",
+          "address": "0x0fDBe2Ae14f5e628a77a2d5C890bB59B4a83484F",
           "abi": [
             {
               "anonymous": false,
@@ -166,13 +166,13 @@
       }
     }
   },
-  "137": {
-    "matic": {
-      "name": "matic",
-      "chainId": "137",
+  "4": {
+    "rinkeby": {
+      "name": "rinkeby",
+      "chainId": "4",
       "contracts": {
         "TokenDistributor": {
-          "address": "0x6CD844908154B9DB1d538637FD429072E60CB2f9",
+          "address": "0xB65F4a3C29351290cfAB792Aee18e53C508f55ff",
           "abi": [
             {
               "anonymous": false,
