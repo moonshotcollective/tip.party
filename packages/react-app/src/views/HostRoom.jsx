@@ -299,7 +299,7 @@ export default function HostRoom({
   };
 
   const copyToClipBoard = () => {
-    copy(addresses, {
+    copy(allAddresses, {
       debug: true,
       message: "Copied List to ClipBoard",
     });
@@ -312,7 +312,7 @@ export default function HostRoom({
   const exportMenu = (
     <Menu>
       <Menu.Item key="export_csv">
-        <CSVLink data={addresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
+        <CSVLink data={allAddresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
           Export CSV
         </CSVLink>
       </Menu.Item>
