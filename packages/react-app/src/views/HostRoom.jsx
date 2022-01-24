@@ -299,7 +299,7 @@ export default function HostRoom({
   };
 
   const copyToClipBoard = () => {
-    copy(addresses, {
+    copy(allAddresses, {
       debug: true,
       message: "Copied List to ClipBoard",
     });
@@ -373,7 +373,7 @@ export default function HostRoom({
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
-                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="hover">
                             <ExportOutlined />
                           </Dropdown>
                         </div>
