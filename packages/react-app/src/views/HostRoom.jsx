@@ -299,7 +299,7 @@ export default function HostRoom({
   };
 
   const copyToClipBoard = () => {
-    copy(addresses, {
+    copy(allAddresses, {
       debug: true,
       message: "Copied List to ClipBoard",
     });
@@ -312,7 +312,7 @@ export default function HostRoom({
   const exportMenu = (
     <Menu>
       <Menu.Item key="export_csv">
-        <CSVLink data={addresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
+        <CSVLink data={allAddresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
           Export CSV
         </CSVLink>
       </Menu.Item>
@@ -373,14 +373,14 @@ export default function HostRoom({
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
-                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="hover">
                             <ExportOutlined />
                           </Dropdown>
                         </div>
                       }
                     >
-                      {addresses.length == 0 && <h2>This room is currently empty </h2>}
-                      {addresses.length > 0 && (
+                      {allAddresses.length == 0 && <h2>This room is currently empty </h2>}
+                      {allAddresses.length > 0 && (
                         <List
                           bordered
                           dataSource={allAddresses}
