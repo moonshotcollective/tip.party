@@ -46,6 +46,7 @@ export default function HostRoom({
   const [loadedTokenList, setLoadedTokenList] = useState({});
 
   const { readContracts, writeContracts } = contracts;
+  const numericalAmount = amount[0] === "." ? "0" + amount : amount;
 
   const subs = useRef([]);
 
@@ -95,7 +96,7 @@ export default function HostRoom({
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
     const re = /^\d*\.?\d*$/;
 
-    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value !== ".") {
+    if ((e.target.value === "" || re.test(e.target.value))) {
       setAmount(e.target.value);
     }
   };
@@ -204,7 +205,7 @@ export default function HostRoom({
   const ethPayHandler = async () => {
     const result = tx(
       writeContracts.TokenDistributor.splitEth(allAddresses, room, {
-        value: ethers.utils.parseEther(amount),
+        value: ethers.utils.parseEther(numericalAmount),
       }),
       async update => {
         await handleResponseHash(update);
@@ -238,7 +239,7 @@ export default function HostRoom({
     const result = tx(
       writeContracts.TokenDistributor.splitTokenFromUser(
         allAddresses,
-        ethers.utils.parseUnits(amount, opts.decimals),
+        ethers.utils.parseUnits(numericalAmount, opts.decimals),
         opts.address,
         room,
       ),
@@ -258,7 +259,7 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / allAddresses.length + " " + token,
+            description: "Each user received " + numericalAmount / allAddresses.length + " " + token,
             placement: "topRight",
           });
           handleConfetti();
@@ -501,8 +502,8 @@ export default function HostRoom({
                       appName="Tip.party"
                       tokenListHandler={tokens => setAvailableTokens(tokens)}
                       callerAddress={address}
-                      maxApproval={amount}
-                      amount={amount}
+                      maxApproval={numericalAmount}
+                      amount={numericalAmount}
                       spender={spender}
                       yourLocalBalance={yourLocalBalance}
                       readContracts={readContracts}
