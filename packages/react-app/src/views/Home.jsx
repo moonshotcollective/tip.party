@@ -1,10 +1,12 @@
 import React from "react";
 import { Input, Button, Form } from "antd";
+import slugify from "slugify";
 import "./Home.css";
 
 export default function Admin() {
   const handleJoinRoom = ({ room }) => {
-    window.location.replace(window.location.href + "room/" + room);
+    const slugifiedRoom = slugify(room.toLowerCase(), "_");
+    window.location.replace(window.location.href + "room/" + slugifiedRoom);
   };
 
   return (
