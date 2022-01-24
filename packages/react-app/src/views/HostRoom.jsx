@@ -373,14 +373,14 @@ export default function HostRoom({
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
-                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="hover">
                             <ExportOutlined />
                           </Dropdown>
                         </div>
                       }
                     >
-                      {addresses.length == 0 && <h2>This room is currently empty </h2>}
-                      {addresses.length > 0 && (
+                      {allAddresses.length == 0 && <h2>This room is currently empty </h2>}
+                      {allAddresses.length > 0 && (
                         <List
                           bordered
                           dataSource={allAddresses}
