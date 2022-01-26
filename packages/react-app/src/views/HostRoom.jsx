@@ -10,6 +10,7 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
+import { NETWORK } from "../constants";
 import "./HostRoom.css";
 
 export default function HostRoom({
@@ -47,6 +48,7 @@ export default function HostRoom({
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
+  const explorer = NETWORK(chainId).blockExplorer ?  NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const subs = useRef([]);
 
@@ -96,7 +98,7 @@ export default function HostRoom({
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
     const re = /^\d*\.?\d*$/;
 
-    if ((e.target.value === "" || re.test(e.target.value))) {
+    if (e.target.value === "" || re.test(e.target.value)) {
       setAmount(e.target.value);
     }
   };
@@ -223,7 +225,19 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / allAddresses.length + " " + token,
+            description: (
+              <div>
+                <p>
+                  Each user received {numericalAmount / allAddresses.length} {token}
+                </p>
+                <p>
+                  Transaction hash:{" "}
+                  <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
+                    {update.hash.substr(0, 20)}
+                  </a>
+                </p>
+              </div>
+            ),
             placement: "topRight",
           });
           handleConfetti();
@@ -259,7 +273,19 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + numericalAmount / allAddresses.length + " " + token,
+            description: (
+              <div>
+                <p>
+                  Each user received {numericalAmount / allAddresses.length} {token} 
+                </p>
+                <p>
+                  Transaction hash:{" "}
+                  <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
+                    {update.hash.substr(0, 20)}
+                  </a>
+                </p>
+              </div>
+            ),
             placement: "topRight",
           });
           handleConfetti();

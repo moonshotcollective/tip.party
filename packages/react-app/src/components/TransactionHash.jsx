@@ -42,7 +42,7 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
               href={`${explorer}tx/${hash}`}
               rel="noopener noreferrer"
             >
-              {hash.substr(0, 10)}
+              {hash.substr(0, 20)}
             </a>
         {loading ? (
           <div style={{ fontStyle: "italic", color: "#efefef" }}>In Progress...</div>
