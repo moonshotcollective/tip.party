@@ -48,7 +48,7 @@ export default function HostRoom({
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
-  const explorer = NETWORK(chainId).blockExplorer ?  NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
+  const explorer = chainId ?  NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const subs = useRef([]);
 
@@ -231,7 +231,7 @@ export default function HostRoom({
                   Each user received {numericalAmount / allAddresses.length} {token}
                 </p>
                 <p>
-                  Transaction hash:{" "}
+                  Transaction link:{" "}
                   <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
                     {update.hash.substr(0, 20)}
                   </a>
@@ -279,7 +279,7 @@ export default function HostRoom({
                   Each user received {numericalAmount / allAddresses.length} {token} 
                 </p>
                 <p>
-                  Transaction hash:{" "}
+                  Transaction link:{" "}
                   <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
                     {update.hash.substr(0, 20)}
                   </a>
