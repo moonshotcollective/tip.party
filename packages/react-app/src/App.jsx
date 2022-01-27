@@ -602,7 +602,8 @@ function App(props) {
                   mainnetProvider={mainnetProvider}
                   tx={tx}
                   isWalletConnected={isWalletConnected}
-                  nativeCurrency={targetNetwork.nativeCurrency}
+                  isHost={isHost}
+                  setHost={setHost}
                 />
               </Route>
               <Route path="/room/:room">
