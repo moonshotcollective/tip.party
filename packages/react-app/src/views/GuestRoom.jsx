@@ -189,6 +189,22 @@ export default function GuestRoom({
                     Sign Into "{room}" Room
                   </Button>
                 </div>
+                <div style={{ marginBottom: 20 }}>
+                  <Button
+                    onClick={() => {
+                      const el = document.createElement("input");
+                      el.value = window.location.href;
+                      document.body.appendChild(el);
+                      el.select();
+                      document.execCommand("copy");
+                      document.body.removeChild(el);
+                    }}
+                    type="primary"
+                    size="large"
+                  >
+                    Share link
+                  </Button>
+                </div>
                 <div style={{ flex: 1 }}>
                   <Collapse defaultActiveKey={["1"]}>
                     <Collapse.Panel
