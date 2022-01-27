@@ -1,9 +1,8 @@
-import { Modal, Select } from "antd";
-import React, { useState, useMemo, useEffect } from "react";
+import { Select } from "antd";
+import { useState, useMemo, useEffect } from "react";
 import { ethers } from "ethers";
 import axios from "axios";
 import searchico from "searchico";
-import { AddressInput } from ".";
 
 // helpers to load token name and symbol for unlisted tokens
 const ERC20ABI = ["function symbol() view returns (string)", "function name() view returns (string)"];
@@ -33,7 +32,6 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
   const [value, setValue] = useState(null);
   const [list, setList] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const [tokenAddress, setTokenAddress] = useState("");
 
   const listCollection = useMemo(() => {
     return searchico(list, { keys: ["address", "name", "symbol"] });
@@ -50,7 +48,7 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
         <div style={{ display: "flex", alignItems: "center" }}>
           {i.logoURI && (
             <div style={{ marginRight: "5px" }}>
-              <img src={i.logoURI} alt={`${i.name} (${i.symbol})`} style={{ height: "10px" }} />
+              <img src={i.logoURI} alt={`${i.name} (${i.symbol})`} />
             </div>
           )}
           {i.name} - {i.symbol} {i.address?.substr(0, 5) + "..." + i.address?.substr(-4)}{" "}
@@ -61,7 +59,6 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
   }, [JSON.stringify(searchResults)]);
 
   const handleSearch = async val => {
-    console.log("View result ", props.networkTokenList, list);
     let collectionResult = [];
 
     if (val.length > 0) {
@@ -72,10 +69,11 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
         const nativeTokenObj = {
           chainId: chainId,
           decimals: 18,
-          name: nativeToken.name,
-          symbol: nativeToken.symbol,
-          // address: "0x0000000000000000000000000000000000000000",
-          // logoURI: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880",
+          name: "Native Token",
+          symbol: "ETH",
+          address: "0x0000000000000000000000000000000000000000",
+          logoURI: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880",
+          ...nativeToken,
         };
 
         collectionResult.push(nativeTokenObj);
@@ -117,13 +115,11 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
   };
 
   const loadList = async () => {
-    console.log("Beginning ");
-    if (props.networkTokenList) {
-      const res = await axios.get("https://api.github.com/repos/github/developer.github.com/pages");
-      console.log("Beginning --> ", res);
-      const { tokens } = res.data;
-      setList(tokens);
-    }
+    // https://tokens.coingecko.com/uniswap/all.json
+    const res = await axios.get("https://tokens.coingecko.com/uniswap/all.json");
+    const { tokens } = res.data;
+
+    setList(tokens);
   };
 
   useEffect(() => {
@@ -131,30 +127,25 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
   }, []);
 
   return (
-    <Modal title="Import ERC-20 Token" centered {...props}>
-      <p>Note: Imported tokens can only be seen by the current host</p>
-      {list ? (
-        <Select
-          showSearch
-          size="large"
-          showArrow={false}
-          defaultActiveFirstOption={false}
-          onSearch={handleSearch}
-          filterOption={false}
-          labelInValue={true}
-          id="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
-          name="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
-          placeholder={props.placeholder ? props.placeholder : "Token search... Eg: GTC"}
-          value={value}
-          onChange={handleOnChange}
-          notFoundContent={null}
-          style={{ width: "100%" }}
-        >
-          {children}
-        </Select>
-      ) : (
-        <AddressInput value={tokenAddress} onChange={setTokenAddress} />
-      )}
-    </Modal>
+    <div>
+      <Select
+        showSearch
+        size="large"
+        showArrow={false}
+        defaultActiveFirstOption={false}
+        onSearch={handleSearch}
+        filterOption={false}
+        labelInValue={true}
+        id="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
+        name="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
+        placeholder={props.placeholder ? props.placeholder : "Token search... Eg: GTC"}
+        value={value}
+        onChange={handleOnChange}
+        notFoundContent={null}
+        style={{ width: "100%" }}
+      >
+        {children}
+      </Select>
+    </div>
   );
 }

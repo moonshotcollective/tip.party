@@ -26,6 +26,8 @@ export default function HostRoom({
   selectedChainId,
   tx,
   nativeCurrency,
+  nativeCurrencyName,
+  networkTokenList,
 }) {
   const { room } = useParams();
 
@@ -96,7 +98,7 @@ export default function HostRoom({
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
     const re = /^\d*\.?\d*$/;
 
-    if ((e.target.value === "" || re.test(e.target.value))) {
+    if (e.target.value === "" || re.test(e.target.value)) {
       setAmount(e.target.value);
     }
   };
@@ -479,9 +481,13 @@ export default function HostRoom({
 
                     <TokenModal
                       visible={importToken}
-                      handleAddress={handleTokenImport}
                       onCancel={() => setImportToken(false)}
                       okText="Import Token"
+                      chainId={chainId}
+                      onChange={handleTokenImport}
+                      localProvider={localProvider}
+                      nativeToken={{ name: nativeCurrencyName, symbol: nativeCurrency }}
+                      networkTokenList={networkTokenList}
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>

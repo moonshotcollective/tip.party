@@ -16,6 +16,8 @@ export default function Rooms({
   tx,
   nativeCurrency,
   isHost,
+  nativeCurrencyName,
+  networkTokenList,
 }) {
   return (
     <div>
@@ -35,6 +37,8 @@ export default function Rooms({
             selectedChainId={selectedChainId}
             tx={tx}
             nativeCurrency={nativeCurrency}
+            nativeCurrencyName={nativeCurrencyName}
+            networkTokenList={networkTokenList}
           />
         )}
       </div>
