@@ -72,8 +72,11 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
         const nativeTokenObj = {
           chainId: chainId,
           decimals: 18,
-          name: nativeToken.name,
-          symbol: nativeToken.symbol,
+          name: "Native Token",
+          symbol: "ETH",
+          address: "0x0000000000000000000000000000000000000000",
+          logoURI: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880",
+          ...nativeToken,
         };
 
         collectionResult.push(nativeTokenObj);
@@ -160,7 +163,7 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
       ) : (
         <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
           <p>Note: Imported tokens can only be seen by the current host</p>
-          <AddressInput value={tokenAddress} onChange={setTokenAddress} />
+          <AddressInput value={tokenAddress} onChange={setTokenAddress} placeholder="Enter Token Address" />
         </Modal>
       )}
     </>
