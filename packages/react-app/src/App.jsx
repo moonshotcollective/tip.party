@@ -600,7 +600,6 @@ function App(props) {
                   address={address}
                   mainnetProvider={mainnetProvider}
                   tx={tx}
-                  isWalletConnected={isWalletConnected}
                   nativeCurrency={targetNetwork.nativeCurrency}
                 />
               </Route>
@@ -620,7 +619,6 @@ function App(props) {
                   tx={tx}
                   nativeCurrency={targetNetwork.nativeCurrency}
                   isHost={isHost}
-                  isWalletConnected={isWalletConnected}
                   loadWeb3Modal={loadWeb3Modal}
                 />
               </Route>

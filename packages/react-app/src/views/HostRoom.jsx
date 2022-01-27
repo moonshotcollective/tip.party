@@ -26,8 +26,7 @@ export default function HostRoom({
   selectedChainId,
   tx,
   nativeCurrency,
-  isWalletConnected,
-  loadWeb3Modal
+  loadWeb3Modal,
 }) {
   const { room } = useParams();
 
@@ -98,7 +97,7 @@ export default function HostRoom({
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
     const re = /^\d*\.?\d*$/;
 
-    if ((e.target.value === "" || re.test(e.target.value))) {
+    if (e.target.value === "" || re.test(e.target.value)) {
       setAmount(e.target.value);
     }
   };
@@ -329,9 +328,9 @@ export default function HostRoom({
 
   return (
     <div className="bg-purple-darkpurple">
-            {! isWalletConnected &&
+      {!web3Modal && (
         <Button
-          style={{height: "50px" , fontSize: "20px", marginBottom: "40px"}}
+          style={{ height: "50px", fontSize: "20px", marginBottom: "40px" }}
           key="loginbutton"
           size="large"
           onClick={loadWeb3Modal}
@@ -339,7 +338,8 @@ export default function HostRoom({
           shape="round"
         >
           Connect Wallet to Tip!
-        </Button>}
+        </Button>
+      )}
 
       <h2 id="title">Tip Your Party!</h2>
       <h3>

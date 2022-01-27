@@ -170,7 +170,7 @@ export default function GuestRoom({
 
   return (
     <div className="bg-purple-darkpurple">
-      {!isWalletConnected && (
+      {!web3Modal && (
         <Button 
           style={{ height: "50px", fontSize: "20px", marginBottom: "40px" }}
           key="loginbutton"
