@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import { Typography } from "antd";
+import { Address } from ".";
 import { NETWORK } from "../constants";
 
-export default function TransactionHash({ hash, localProvider, chainId, ...props }) {
+export default function TransactionHash({ hash, localProvider, chainId, mainnetProvider, ...props }) {
   const { currentTheme } = useThemeSwitcher();
   const [loading, updateLoading] = useState(true);
   const [txData, updateTxData] = useState({});
@@ -12,6 +13,7 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
     const _tx = await localProvider.waitForTransaction(hash, 1);
 
     console.log(txData);
+    console.log("provider" + mainnetProvider);
     updateTxData(_tx);
     updateLoading(false);
   };
@@ -36,6 +38,12 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
           fontSize: props.fontSize ? props.fontSize : 20,
         }}
       >
+        <p>Tipper:</p>
+          <div style ={{ justifyContent: "center"}}>
+                  
+        <Address address={txData.from} ensProvider={mainnetProvider} fontSize={props.fontSize} />
+        </div>
+        Tx Hash: 
         <div>
           <Typography.Text copyable={{ text: hash }}>
             <a
@@ -48,6 +56,7 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
             </a>
           </Typography.Text>
         </div>
+
         {loading ? (
           <div style={{ fontStyle: "italic", color: "#efefef" }}>In Progress...</div>
         ) : (

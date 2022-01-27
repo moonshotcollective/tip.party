@@ -91,6 +91,7 @@ export default function Account({
                   ensProvider={mainnetProvider}
                   blockExplorer={blockExplorer}
                   blockieSize={10}
+                  blockie
                 />
               </Dropdown.Button>
               {networkDisplay}

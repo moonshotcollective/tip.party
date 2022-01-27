@@ -397,7 +397,7 @@ export default function HostRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                                <Address address={item} ensProvider={mainnetProvider} fontSize={20} blockie />
                                 {importedAddresses.includes(item) && <Tag color="grey">imported</Tag>}
                                 <Button
                                   onClick={() => {
@@ -443,7 +443,7 @@ export default function HostRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={12} />
+                                <Address address={item} ensProvider={mainnetProvider} fontSize={20} blockie />
                                 <Button onClick={() => reList(index)} size="medium">
                                   <CloseOutlined />
                                 </Button>
@@ -536,6 +536,7 @@ export default function HostRoom({
                             }}
                           >
                             <TransactionHash
+                              mainnetProvider={mainnetProvider}
                               localProvider={localProvider}
                               chainId={chainId}
                               hash={item}

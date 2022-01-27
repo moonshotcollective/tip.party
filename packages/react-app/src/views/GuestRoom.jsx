@@ -219,7 +219,7 @@ export default function GuestRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                                <Address address={item} ensProvider={mainnetProvider} fontSize={20} blockie />
                               </div>
                             </List.Item>
                           )}
@@ -237,7 +237,6 @@ export default function GuestRoom({
                   {txHash.length == 0 && <h2>No payouts have been administered for this room </h2>}
                   {txHash.length > 0 && (
                     <List
-                      bordered
                       dataSource={txHash}
                       renderItem={(item, index) => (
                         <List.Item>
@@ -247,10 +246,11 @@ export default function GuestRoom({
                             }}
                           >
                             <TransactionHash
-                              localProvider={localProvider}
-                              chainId={chainId}
-                              hash={item}
-                              fontSize={14}
+                                mainnetProvider={mainnetProvider}
+                                localProvider={localProvider}
+                                chainId={chainId}
+                                hash={item}
+                                fontSize={14}
                             />
                           </div>
                         </List.Item>

@@ -68,7 +68,7 @@ export default function Address(props) {
   const text = (
     <Text>
       <a
-        style={{ color: currentTheme === "light" ? "#222222" : "#ddd", fontSize: 20 }}
+        style={{ color: currentTheme === "light" ? "#222222" : "#ddd", fontSize: props.fontSize }}
         target="_blank"
         href={etherscanLink}
         rel="noopener noreferrer"
@@ -82,11 +82,15 @@ export default function Address(props) {
     <div style={{ padding: 10 }}>
       <Meta
         avatar={
-          <Blockies
+      
+            props.blockie && (<Blockies
             seed={address.toLowerCase()}
             size={props.blockieSize || 4}
             scale={props.fontSize ? props.fontSize / 7 : 4}
           />
+            )
+
+          
         }
         title={text}
         description={props.extra}
