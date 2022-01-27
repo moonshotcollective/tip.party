@@ -169,6 +169,10 @@ export default function GuestRoom({
   return (
     <div className="bg-purple-darkpurple">
       <h2 id="title">Welcome to the Tip Party!</h2>
+      <h3>
+        {" "}
+        You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
+      </h3>
       <div
         className="Room"
         style={{
