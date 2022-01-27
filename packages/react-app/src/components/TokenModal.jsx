@@ -74,8 +74,6 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
           decimals: 18,
           name: nativeToken.name,
           symbol: nativeToken.symbol,
-          // address: "0x0000000000000000000000000000000000000000",
-          // logoURI: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880",
         };
 
         collectionResult.push(nativeTokenObj);
@@ -117,12 +115,12 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
   };
 
   const loadList = async () => {
-    console.log("Beginning ");
     if (props.networkTokenList) {
-      const res = await axios.get("https://api.github.com/repos/github/developer.github.com/pages");
-      console.log("Beginning --> ", res);
+      const res = await axios.get(props.networkTokenList);
       const { tokens } = res.data;
       setList(tokens);
+    } else {
+      setList([]);
     }
   };
 
@@ -130,31 +128,41 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
     loadList();
   }, []);
 
+  const onOk = () => {
+    setTokenAddress("");
+    onChange(tokenAddress.toLowerCase());
+  };
+
   return (
-    <Modal title="Import ERC-20 Token" centered {...props}>
-      <p>Note: Imported tokens can only be seen by the current host</p>
-      {list ? (
-        <Select
-          showSearch
-          size="large"
-          showArrow={false}
-          defaultActiveFirstOption={false}
-          onSearch={handleSearch}
-          filterOption={false}
-          labelInValue={true}
-          id="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
-          name="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
-          placeholder={props.placeholder ? props.placeholder : "Token search... Eg: GTC"}
-          value={value}
-          onChange={handleOnChange}
-          notFoundContent={null}
-          style={{ width: "100%" }}
-        >
-          {children}
-        </Select>
+    <>
+      {list.length > 1 ? (
+        <Modal title="Import ERC-20 Token" centered {...props}>
+          <p>Note: Imported tokens can only be seen by the current host</p>
+          <Select
+            showSearch
+            size="large"
+            showArrow={false}
+            defaultActiveFirstOption={false}
+            onSearch={handleSearch}
+            filterOption={false}
+            labelInValue={true}
+            id="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
+            name="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
+            placeholder={props.placeholder ? props.placeholder : "Token search... Eg: GTC"}
+            value={value}
+            onChange={handleOnChange}
+            notFoundContent={null}
+            style={{ width: "100%" }}
+          >
+            {children}
+          </Select>
+        </Modal>
       ) : (
-        <AddressInput value={tokenAddress} onChange={setTokenAddress} />
+        <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
+          <p>Note: Imported tokens can only be seen by the current host</p>
+          <AddressInput value={tokenAddress} onChange={setTokenAddress} />
+        </Modal>
       )}
-    </Modal>
+    </>
   );
 }
