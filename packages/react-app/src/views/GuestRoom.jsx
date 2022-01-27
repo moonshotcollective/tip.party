@@ -26,6 +26,8 @@ export default function GuestRoom({
   selectedChainId,
   tx,
   nativeCurrency,
+  isWalletConnected,
+  loadWeb3Modal,
 }) {
   const { room } = useParams();
 
@@ -168,6 +170,18 @@ export default function GuestRoom({
 
   return (
     <div className="bg-purple-darkpurple">
+      {!isWalletConnected && (
+        <Button 
+          style={{ height: "50px", fontSize: "20px", marginBottom: "40px" }}
+          key="loginbutton"
+          size="large"
+          onClick={loadWeb3Modal}
+          type="primary"
+          shape="round"
+        >
+          Connect Wallet to Sign In!
+        </Button>
+      )}
       <h2 id="title">Welcome to the Tip Party!</h2>
       <div
         className="Room"
