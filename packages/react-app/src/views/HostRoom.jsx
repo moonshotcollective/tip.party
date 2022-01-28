@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag, message } from "antd";
-import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined, CopyOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -331,8 +331,6 @@ export default function HostRoom({
       <h3>
         {" "}
         You are the <b>Host</b> for "<b>{room}</b>" room{" "}
-      </h3>
-      <div style={{ marginBottom: 20 }}>
         <Button
           onClick={() => {
             try {
@@ -342,17 +340,23 @@ export default function HostRoom({
               el.select();
               document.execCommand("copy");
               document.body.removeChild(el);
-              message.success("Link copied to clipboard");
+              return notification.success({
+                message: "Room link copied to clipboard",
+                placement: "topRight",
+              });
             } catch (err) {
-              message.error("Failed to copy link to clipboard");
+              return notification.success({
+                message: "Failed to copy room link to clipboard",
+                placement: "topRight",
+              });
             }
           }}
           type="primary"
-          size="large"
+          size="medium"
         >
-          Share link
+          Share Room link
         </Button>
-      </div>
+      </h3>
       <div
         className="Room"
         style={{
