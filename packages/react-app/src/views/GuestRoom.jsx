@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown } from "antd";
-import { ExportOutlined } from "@ant-design/icons";
+import { ExportOutlined, CopyOutlined } from "@ant-design/icons";
 import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
@@ -190,7 +190,7 @@ export default function GuestRoom({
               <div style={{ marginTop: 10 }}>
                 <div style={{ marginBottom: 20 }}>
                   <Button type="primary" size="large" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                    Sign Into "{room}" Room
+                    Sign Into "{room}" Room{" "}
                   </Button>
                 </div>
                 <div style={{ flex: 1 }}>
