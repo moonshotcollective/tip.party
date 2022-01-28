@@ -3,7 +3,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import { ethers } from "ethers";
 import axios from "axios";
 import searchico from "searchico";
-import { AddressInput } from ".";
 
 // helpers to load token name and symbol for unlisted tokens
 const ERC20ABI = ["function symbol() view returns (string)", "function name() view returns (string)"];
@@ -21,14 +20,6 @@ const loadERC20 = async (address, p) => {
   }
 };
 
-/*
-  <TokenSelect
-    chainId={1}
-    onChange={setToAddress}
-    localProvider={localProvider}
-    nativeToken={{ name: 'Native token', symbol: 'ETH' }}
-  />
-*/
 export default function TokenSelect({ onChange, chainId = 1, localProvider, ...props }) {
   const [value, setValue] = useState(null);
   const [list, setList] = useState([]);
