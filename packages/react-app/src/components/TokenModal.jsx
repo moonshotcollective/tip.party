@@ -20,7 +20,7 @@ const loadERC20 = async (address, p) => {
   }
 };
 
-export default function TokenSelect({ onChange, chainId = 1, localProvider, ...props }) {
+export default function TokenModal({ onChange, chainId = 1, localProvider, ...props }) {
   const [value, setValue] = useState(null);
   const [list, setList] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
