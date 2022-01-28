@@ -380,7 +380,7 @@ export default function HostRoom({
           type="link"
           size="medium"
         >
-          <LinkOutlined />
+          <LinkOutlined style={{ color: "#C9B8FF" }} />
         </Button>
       </h3>
       <div
