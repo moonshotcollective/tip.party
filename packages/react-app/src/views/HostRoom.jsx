@@ -356,7 +356,7 @@ export default function HostRoom({
       <h2 id="title">Tip Your Party!</h2>
       <h3>
         {" "}
-        You are the <b>Host</b> for "<b>{room}</b>" room{" "}
+        You are a <b>Host</b> for "<b>{room}</b>" room{" "}
       </h3>
       <div
         className="Room"
