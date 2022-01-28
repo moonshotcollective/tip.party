@@ -172,6 +172,31 @@ export default function GuestRoom({
       <h3>
         {" "}
         You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
+        <Button
+          onClick={() => {
+            try {
+              const el = document.createElement("input");
+              el.value = window.location.href;
+              document.body.appendChild(el);
+              el.select();
+              document.execCommand("copy");
+              document.body.removeChild(el);
+              return notification.success({
+                message: "Room link copied to clipboard",
+                placement: "topRight",
+              });
+            } catch (err) {
+              return notification.success({
+                message: "Failed to copy room link to clipboard",
+                placement: "topRight",
+              });
+            }
+          }}
+          type="primary"
+          size="medium"
+        >
+          Share Room Link
+        </Button>
       </h3>
       <div
         className="Room"
