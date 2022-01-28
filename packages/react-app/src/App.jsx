@@ -620,7 +620,6 @@ function App(props) {
                   selectedChainId={selectedChainId}
                   tx={tx}
                   nativeCurrency={targetNetwork.nativeCurrency}
-                  nativeCurrencyName={targetNetwork.nativeCurrencyName}
                   networkTokenList={targetNetwork.networkTokenList}
                   isHost={isHost}
                   isWalletConnected={isWalletConnected}

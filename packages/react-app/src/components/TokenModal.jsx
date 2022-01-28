@@ -29,11 +29,10 @@ const loadERC20 = async (address, p) => {
     nativeToken={{ name: 'Native token', symbol: 'ETH' }}
   />
 */
-export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, localProvider, ...props }) {
+export default function TokenSelect({ onChange, chainId = 1, localProvider, ...props }) {
   const [value, setValue] = useState(null);
   const [list, setList] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const [tokenAddress, setTokenAddress] = useState("");
 
   const listCollection = useMemo(() => {
     return searchico(list, { keys: ["address", "name", "symbol"] });
@@ -69,18 +68,6 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
       collectionResult = (listCollection?.find(val) || []).filter(i => i.chainId === chainId);
 
       if (collectionResult.length < 1) {
-        const nativeTokenObj = {
-          chainId: chainId,
-          decimals: 18,
-          name: "Native Token",
-          symbol: "ETH",
-          address: "0x0000000000000000000000000000000000000000",
-          logoURI: "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880",
-          ...nativeToken,
-        };
-
-        collectionResult.push(nativeTokenObj);
-
         try {
           const checksumAddress = ethers.utils.getAddress(val);
           // load contract and try to get name and symbol if there's a provider given
@@ -109,7 +96,6 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
     setSearchResults([]);
 
     // TODO : check if it's an address that's not on list & Add as unlisted
-
     setValue(e);
 
     if (typeof onChange === "function") {
@@ -131,41 +117,30 @@ export default function TokenSelect({ onChange, chainId = 1, nativeToken = {}, l
     loadList();
   }, []);
 
-  const onOk = () => {
-    setTokenAddress("");
-    onChange(tokenAddress.toLowerCase());
-  };
-
   return (
     <>
-      {list.length > 1 ? (
-        <Modal title="Import ERC-20 Token" centered {...props}>
-          <p>Note: Imported tokens can only be seen by the current host</p>
-          <Select
-            showSearch
-            size="large"
-            showArrow={false}
-            defaultActiveFirstOption={false}
-            onSearch={handleSearch}
-            filterOption={false}
-            labelInValue={true}
-            id="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
-            name="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
-            placeholder={props.placeholder ? props.placeholder : "Token search... Eg: GTC"}
-            value={value}
-            onChange={handleOnChange}
-            notFoundContent={null}
-            style={{ width: "100%" }}
-          >
-            {children}
-          </Select>
-        </Modal>
-      ) : (
-        <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
-          <p>Note: Imported tokens can only be seen by the current host</p>
-          <AddressInput value={tokenAddress} onChange={setTokenAddress} placeholder="Enter Token Address" />
-        </Modal>
-      )}
+      <Modal title="Import ERC-20 Token" centered {...props}>
+        <p>Look Up ERC-20 Token or Enter Token Address</p>
+        <p>Note: Imported tokens can only be seen by the current host</p>
+        <Select
+          showSearch
+          size="large"
+          showArrow={false}
+          defaultActiveFirstOption={false}
+          onSearch={handleSearch}
+          filterOption={false}
+          labelInValue={true}
+          id="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
+          name="0xERC20TokenSelect" // name it something other than address for auto fill doxxing
+          placeholder={props.placeholder ? props.placeholder : "Token search... Eg: GTC"}
+          value={value}
+          onChange={handleOnChange}
+          notFoundContent={null}
+          style={{ width: "100%" }}
+        >
+          {children}
+        </Select>
+      </Modal>
     </>
   );
 }

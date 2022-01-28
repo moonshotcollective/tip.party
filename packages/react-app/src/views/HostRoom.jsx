@@ -26,7 +26,6 @@ export default function HostRoom({
   selectedChainId,
   tx,
   nativeCurrency,
-  nativeCurrencyName,
   networkTokenList,
 }) {
   const { room } = useParams();
@@ -480,14 +479,20 @@ export default function HostRoom({
                     />
 
                     <TokenModal
+                      destroyOnClose={true}
                       visible={importToken}
-                      onCancel={() => setImportToken(false)}
-                      okText="Import Token"
                       chainId={chainId}
                       onChange={handleTokenImport}
                       localProvider={localProvider}
-                      nativeToken={{ name: nativeCurrencyName, symbol: nativeCurrency }}
                       networkTokenList={networkTokenList}
+                      footer={
+                        (null,
+                        (
+                          <Button type="primary" onClick={() => setImportToken(false)}>
+                            cancel
+                          </Button>
+                        ))
+                      }
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>

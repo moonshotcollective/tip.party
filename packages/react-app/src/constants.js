@@ -247,7 +247,6 @@ export const NETWORKS = {
     rpcUrl: process.env.REACT_APP_MAINNET_NETWORK,
     blockExplorer: "https://etherscan.io/",
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
     networkTokenList: "https://tokens.coingecko.com/uniswap/all.json",
   },
   kovan: {
@@ -258,7 +257,6 @@ export const NETWORKS = {
     blockExplorer: "https://kovan.etherscan.io/",
     faucet: "https://gitter.im/kovan-testnet/faucet", // https://faucet.kovan.network/
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
   },
   rinkeby: {
     name: "rinkeby",
@@ -268,7 +266,6 @@ export const NETWORKS = {
     faucet: "https://faucet.rinkeby.io/",
     blockExplorer: "https://rinkeby.etherscan.io/",
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
   },
   ropsten: {
     name: "ropsten",
@@ -278,7 +275,6 @@ export const NETWORKS = {
     blockExplorer: "https://ropsten.etherscan.io/",
     rpcUrl: `https://ropsten.infura.io/v3/${INFURA_ID}`,
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
   },
   goerli: {
     name: "goerli",
@@ -288,7 +284,6 @@ export const NETWORKS = {
     blockExplorer: "https://goerli.etherscan.io/",
     rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
   },
   xdai: {
     name: "xdai",
@@ -300,7 +295,6 @@ export const NETWORKS = {
     faucet: "https://xdai-faucet.top/",
     blockExplorer: "https://blockscout.com/poa/xdai/",
     nativeCurrency: "XDAI",
-    nativeCurrencyName: "Xdai",
   },
   matic: {
     name: "matic",
@@ -312,8 +306,6 @@ export const NETWORKS = {
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://explorer-mainnet.maticvigil.com//",
     nativeCurrency: "MATIC",
-    nativeCurrencyName: "Matic",
-    networkTokenList: "https://api.github.com/repos/Uniswap/pages",
   },
   polygon: {
     name: "matic",
@@ -325,8 +317,6 @@ export const NETWORKS = {
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://explorer-mainnet.maticvigil.com//",
     nativeCurrency: "MATIC",
-    nativeCurrencyName: "Matic",
-    networkTokenList: "https://api.github.com/repos/Uniswap/pages",
   },
   mumbai: {
     name: "mumbai",
@@ -338,7 +328,6 @@ export const NETWORKS = {
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://mumbai-explorer.matic.today/",
     nativeCurrency: "MATIC",
-    nativeCurrencyName: "Matic",
   },
   localArbitrum: {
     name: "localArbitrum",
@@ -347,7 +336,6 @@ export const NETWORKS = {
     blockExplorer: "",
     rpcUrl: `http://localhost:8547`,
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
   },
   localArbitrumL1: {
     name: "localArbitrumL1",
@@ -356,7 +344,6 @@ export const NETWORKS = {
     blockExplorer: "",
     rpcUrl: `http://localhost:7545`,
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
   },
   rinkebyArbitrum: {
     name: "Arbitrum Testnet",
@@ -365,7 +352,6 @@ export const NETWORKS = {
     blockExplorer: "https://rinkeby-explorer.arbitrum.io/#/",
     rpcUrl: `https://rinkeby.arbitrum.io/rpc`,
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
   },
   arbitrum: {
     name: "arbitrum",
@@ -375,7 +361,6 @@ export const NETWORKS = {
     rpcUrl: process.env.REACT_APP_ARBITRUM_NETWORK,
     gasPrice: 0,
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
     networkTokenList: "https://bridge.arbitrum.io/token-list-42161.json",
   },
   localOptimismL1: {
@@ -409,7 +394,6 @@ export const NETWORKS = {
     blockExplorer: "https://optimistic.etherscan.io/",
     rpcUrl: process.env.REACT_APP_OPTIMISM_NETWORK,
     nativeCurrency: "ETH",
-    nativeCurrencyName: "Ethereum",
     networkTokenList: "https://static.optimism.io/optimism.tokenlist.json",
   },
   localAvalanche: {
