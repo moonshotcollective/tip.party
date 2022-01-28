@@ -112,7 +112,6 @@ export default function TokenModal({ onChange, chainId = 1, localProvider, ...pr
     <>
       <Modal title="Import ERC-20 Token" centered {...props}>
         <p>Look Up ERC-20 Token or Enter Token Address</p>
-        <p>Note: Imported tokens can only be seen by the current host</p>
         <Select
           showSearch
           size="large"

@@ -485,14 +485,7 @@ export default function HostRoom({
                       onChange={handleTokenImport}
                       localProvider={localProvider}
                       networkTokenList={networkTokenList}
-                      footer={
-                        (null,
-                        (
-                          <Button type="primary" onClick={() => setImportToken(false)}>
-                            cancel
-                          </Button>
-                        ))
-                      }
+                      onCancel={() => setImportToken(false)}
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
