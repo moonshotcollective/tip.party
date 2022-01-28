@@ -357,7 +357,7 @@ export default function HostRoom({
       <h3>
         {" "}
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
-        <Button
+        <a
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -377,11 +377,10 @@ export default function HostRoom({
               });
             }
           }}
-          type="link"
-          size="medium"
+
         >
-          <LinkOutlined />
-        </Button>
+          <LinkOutlined style={{ color: "#C9B8FF" }} />
+        </a>
       </h3>
       <div
         className="Room"
