@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown } from "antd";
+import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown, message } from "antd";
 import { ExportOutlined } from "@ant-design/icons";
 import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
@@ -192,12 +192,17 @@ export default function GuestRoom({
                 <div style={{ marginBottom: 20 }}>
                   <Button
                     onClick={() => {
-                      const el = document.createElement("input");
+                      try {
+                        const el = document.createElement("input");
                       el.value = window.location.href;
                       document.body.appendChild(el);
                       el.select();
                       document.execCommand("copy");
                       document.body.removeChild(el);
+                      message.success('Link copied to clipboard');
+                      } catch (err) {
+                        message.error('Failed to copy link to clipboard');
+                      }
                     }}
                     type="primary"
                     size="large"

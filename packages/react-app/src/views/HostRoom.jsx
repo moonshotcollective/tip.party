@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
+import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag, message } from "antd";
 import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
@@ -96,7 +96,7 @@ export default function HostRoom({
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
     const re = /^\d*\.?\d*$/;
 
-    if ((e.target.value === "" || re.test(e.target.value))) {
+    if (e.target.value === "" || re.test(e.target.value)) {
       setAmount(e.target.value);
     }
   };
@@ -332,6 +332,27 @@ export default function HostRoom({
         {" "}
         You are the <b>Host</b> for "<b>{room}</b>" room{" "}
       </h3>
+      <div style={{ marginBottom: 20 }}>
+        <Button
+          onClick={() => {
+            try {
+              const el = document.createElement("input");
+              el.value = window.location.href;
+              document.body.appendChild(el);
+              el.select();
+              document.execCommand("copy");
+              document.body.removeChild(el);
+              message.success("Link copied to clipboard");
+            } catch (err) {
+              message.error("Failed to copy link to clipboard");
+            }
+          }}
+          type="primary"
+          size="large"
+        >
+          Share link
+        </Button>
+      </div>
       <div
         className="Room"
         style={{
