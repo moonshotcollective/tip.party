@@ -195,7 +195,7 @@ export default function GuestRoom({
           type="primary"
           size="medium"
         >
-          Share Room Link
+          <CopyOutlined />
         </Button>
       </h3>
       <div

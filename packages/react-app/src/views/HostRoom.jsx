@@ -380,7 +380,7 @@ export default function HostRoom({
           type="primary"
           size="medium"
         >
-          Share Room Link
+          <CopyOutlined />
         </Button>
       </h3>
       <div
