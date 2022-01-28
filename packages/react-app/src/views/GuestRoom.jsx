@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown } from "antd";
-import { ExportOutlined, CopyOutlined } from "@ant-design/icons";
+import { ExportOutlined, LinkOutlined } from "@ant-design/icons";
 import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
@@ -171,7 +171,7 @@ export default function GuestRoom({
       <h2 id="title">Welcome to the Tip Party!</h2>
       <h3>
         {" "}
-        You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
+        You are a <b>Guest</b> in "<b>{room}</b>" room
         <Button
           onClick={() => {
             try {
@@ -192,10 +192,10 @@ export default function GuestRoom({
               });
             }
           }}
-          type="primary"
+          type="link"
           size="medium"
         >
-          <CopyOutlined />
+          <LinkOutlined />
         </Button>
       </h3>
       <div
@@ -225,7 +225,7 @@ export default function GuestRoom({
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
-                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="hover">
                             <ExportOutlined />
                           </Dropdown>
                         </div>
