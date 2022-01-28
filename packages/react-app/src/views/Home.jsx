@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Input, Button, Form } from "antd";
 import { useHistory } from "react-router";
 import slugify from "slugify";
@@ -12,6 +12,8 @@ export default function Home({ setHost, ...props }) {
     history.push({ pathname: `/room/${slugifiedRoom}` });
   };
 
+  const [room, setRoom] = useState("");
+
   return (
     <div className="Home bg-purple-darkpurple" style={{ margin: "20px auto", width: 500, padding: 60 }}>
       <div>
@@ -20,11 +22,14 @@ export default function Home({ setHost, ...props }) {
           <Form name="join_room" onFinish={handleJoinRoom}>
             <Form.Item name="room" rules={[{ required: true, message: "Please enter a room name!" }]}>
               <div>
-                <Input placeholder="Room name" size="large" style={{ backgroundColor: "#0B0228" }} />
+                <Input placeholder="Room name" size="large" style={{ backgroundColor: "#0B0228" }} onChange={ e =>{
+                  setRoom(e.target.value);
+                }} />
               </div>
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item >
+              <div className="grid grid-cols-2 gap-4">
               <Button
                 id="button1"
                 type="primary"
@@ -33,26 +38,28 @@ export default function Home({ setHost, ...props }) {
                 block
                 htmlType="submit"
                 onClick={() => {
+                  localStorage.setItem(room + "userType", "guest");
                   setHost(false);
+
                 }}
               >
                 Join Room
               </Button>
-              <br />
-              <br />
               <Button
-                id="button1"
+                id="button2"
                 type="primary"
                 size="large"
                 shape="round"
                 block
                 htmlType="submit"
                 onClick={() => {
+                  localStorage.setItem(room + "userType", "host");
                   setHost(true);
                 }}
               >
                 Create Room
               </Button>
+              </div>
             </Form.Item>
           </Form>
         </div>

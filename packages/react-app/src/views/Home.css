@@ -14,9 +14,7 @@
     color: #FFCC00;
 }
 
-#button1{
-    border: 1px solid #6F3FF5;
-    background: #6F3FF5;
-    border-radius: 40px;
-    
+#button2{
+    background-color: #b39419;
+    border-color: #b39419;    
 }
