@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown } from "antd";
-import { ExportOutlined } from "@ant-design/icons";
+import { ExportOutlined, LinkOutlined } from "@ant-design/icons";
 import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
@@ -169,6 +169,34 @@ export default function GuestRoom({
   return (
     <div className="bg-purple-darkpurple">
       <h2 id="title">Welcome to the Tip Party!</h2>
+      <h3>
+        {" "}
+        You are a <b>Guest</b> in "<b>{room}</b>" room {" "}
+        <a
+          onClick={() => {
+            try {
+              const el = document.createElement("input");
+              el.value = window.location.href;
+              document.body.appendChild(el);
+              el.select();
+              document.execCommand("copy");
+              document.body.removeChild(el);
+              return notification.success({
+                message: "Room link copied to clipboard",
+                placement: "topRight",
+              });
+            } catch (err) {
+              return notification.success({
+                message: "Failed to copy room link to clipboard",
+                placement: "topRight",
+              });
+            }
+          }}
+          
+        >
+          <LinkOutlined style={{ color: "#C9B8FF" }} />
+        </a>
+      </h3>
       <div
         className="Room"
         style={{
@@ -186,7 +214,7 @@ export default function GuestRoom({
               <div style={{ marginTop: 10 }}>
                 <div style={{ marginBottom: 20 }}>
                   <Button type="primary" size="large" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                    Sign Into "{room}" Room
+                    Sign Into "{room}" Room{" "}
                   </Button>
                 </div>
                 <div style={{ flex: 1 }}>
@@ -196,7 +224,7 @@ export default function GuestRoom({
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
-                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="hover">
                             <ExportOutlined />
                           </Dropdown>
                         </div>
