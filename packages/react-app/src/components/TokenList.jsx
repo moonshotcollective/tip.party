@@ -23,7 +23,14 @@ export default function TokenList({
       tokenListHandler(erc20List);
     }
     if (loadedTokenArray.length > 0) {
-      tokenListHandler([...loadedTokenArray, ...erc20List]);
+      // Check for list duplicates
+      const tempArray = loadedTokenArray;
+      for (const item in erc20List) {
+        if (!tempArray.includes(item) && item.length > 2) {
+          tempArray.push(item);
+        }
+      }
+      tokenListHandler([...tempArray]);
     }
   }, [readContracts, loadedTokenList]);
 

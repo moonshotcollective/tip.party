@@ -20,7 +20,7 @@ const loadERC20 = async (address, p) => {
   }
 };
 
-export default function TokenModal({ onChange, chainId = 1, localProvider, ...props }) {
+export default function TokenModal({ setImportToken, onChange, chainId = 1, localProvider, ...props }) {
   const [value, setValue] = useState(null);
   const [list, setList] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -85,13 +85,7 @@ export default function TokenModal({ onChange, chainId = 1, localProvider, ...pr
 
   const handleOnChange = async e => {
     setSearchResults([]);
-
-    // TODO : check if it's an address that's not on list & Add as unlisted
     setValue(e);
-
-    if (typeof onChange === "function") {
-      onChange(e.value);
-    }
   };
 
   const loadList = async () => {
@@ -108,10 +102,16 @@ export default function TokenModal({ onChange, chainId = 1, localProvider, ...pr
     loadList();
   }, []);
 
+  const onOk = () => {
+    onChange(value.value);
+    setImportToken(false);
+  };
+
   return (
     <>
-      <Modal title="Import ERC-20 Token" centered {...props}>
+      <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
         <p>Look Up ERC-20 Token or Enter Token Address</p>
+        <p>Note: Imported tokens can only be seen by the current host</p>
         <Select
           showSearch
           size="large"

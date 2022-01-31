@@ -107,10 +107,7 @@ export default function HostRoom({
   const handleTokenImport = async tokenAddress => {
     const tokenSymbol = await loadContracts(tokenAddress);
     if (availableTokens.includes(tokenSymbol)) {
-      notification.error({
-        message: "The ERC20 token address is avaialable in the token drop down.",
-        placement: "topRight",
-      });
+      setToken(tokenSymbol);
     } else if (tokenSymbol) {
       setToken(tokenSymbol);
       const temp = {};
@@ -358,7 +355,7 @@ export default function HostRoom({
       <h3>
         {" "}
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
-        <a
+        <button
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -378,10 +375,9 @@ export default function HostRoom({
               });
             }
           }}
-
         >
           <LinkOutlined style={{ color: "#C9B8FF" }} />
-        </a>
+        </button>
       </h3>
       <div
         className="Room"
@@ -431,7 +427,7 @@ export default function HostRoom({
                         </div>
                       }
                     >
-                      {allAddresses.length == 0 && <h2>This room is currently empty </h2>}
+                      {allAddresses.length === 0 && <h2>This room is currently empty </h2>}
                       {allAddresses.length > 0 && (
                         <List
                           bordered
@@ -536,6 +532,8 @@ export default function HostRoom({
                       localProvider={localProvider}
                       networkTokenList={networkTokenList}
                       onCancel={() => setImportToken(false)}
+                      okText="Import Token"
+                      setImportToken={setImportToken}
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
@@ -554,7 +552,6 @@ export default function HostRoom({
                       style={{ marginTop: 20 }}
                       token={token}
                       appName="Tip.party"
-                      tokenListHandler={tokens => setAvailableTokens(tokens)}
                       callerAddress={address}
                       maxApproval={numericalAmount}
                       amount={numericalAmount}
