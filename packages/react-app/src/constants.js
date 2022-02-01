@@ -244,11 +244,10 @@ export const NETWORKS = {
     name: "mainnet",
     color: "#ff8b9e",
     chainId: 1,
-    // rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-    // rpcUrl: "https://speedy-nodes-nyc.moralis.io/43d22b430189c5a5c63506a7/eth/mainnet",
     rpcUrl: process.env.REACT_APP_MAINNET_NETWORK,
     blockExplorer: "https://etherscan.io/",
     nativeCurrency: "ETH",
+    networkTokenList: "https://tokens.coingecko.com/uniswap/all.json",
   },
   kovan: {
     name: "kovan",
@@ -263,7 +262,7 @@ export const NETWORKS = {
     name: "rinkeby",
     color: "#e0d068",
     chainId: 4,
-    rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/3ywW5DoY2uKjixRdtVTxTFMEiOHdxQUR`,
+    rpcUrl: process.env.REACT_APP_RINKEBY_NETWORK,
     faucet: "https://faucet.rinkeby.io/",
     blockExplorer: "https://rinkeby.etherscan.io/",
     nativeCurrency: "ETH",
@@ -362,6 +361,7 @@ export const NETWORKS = {
     rpcUrl: process.env.REACT_APP_ARBITRUM_NETWORK,
     gasPrice: 0,
     nativeCurrency: "ETH",
+    networkTokenList: "https://bridge.arbitrum.io/token-list-42161.json",
   },
   localOptimismL1: {
     name: "localOptimismL1",
@@ -394,6 +394,7 @@ export const NETWORKS = {
     blockExplorer: "https://optimistic.etherscan.io/",
     rpcUrl: process.env.REACT_APP_OPTIMISM_NETWORK,
     nativeCurrency: "ETH",
+    networkTokenList: "https://static.optimism.io/optimism.tokenlist.json",
   },
   localAvalanche: {
     name: "localAvalanche",
