@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
-import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -10,6 +10,8 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
+import { NETWORK } from "../constants";
+import axios from "axios";
 import "./HostRoom.css";
 
 export default function HostRoom({
@@ -27,6 +29,7 @@ export default function HostRoom({
   tx,
   nativeCurrency,
   loadWeb3Modal,
+  networkTokenList,
 }) {
   const { room } = useParams();
 
@@ -45,9 +48,12 @@ export default function HostRoom({
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const allAddresses = [...addresses, ...importedAddresses];
   const [loadedTokenList, setLoadedTokenList] = useState({});
+  const [list, setList] = useState([]);
+  const [importLoading, setImportLoading] = useState(false);
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const subs = useRef([]);
 
@@ -105,10 +111,7 @@ export default function HostRoom({
   const handleTokenImport = async tokenAddress => {
     const tokenSymbol = await loadContracts(tokenAddress);
     if (availableTokens.includes(tokenSymbol)) {
-      notification.error({
-        message: "The ERC20 token address is avaialable in the token drop down.",
-        placement: "topRight",
-      });
+      setToken(tokenSymbol);
     } else if (tokenSymbol) {
       setToken(tokenSymbol);
       const temp = {};
@@ -224,7 +227,19 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / allAddresses.length + " " + token,
+            description: (
+              <div>
+                <p>
+                  Each user received {numericalAmount / allAddresses.length} {token}
+                </p>
+                <p>
+                  Transaction link:{" "}
+                  <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
+                    {update.hash.substr(0, 20)}
+                  </a>
+                </p>
+              </div>
+            ),
             placement: "topRight",
           });
           handleConfetti();
@@ -260,7 +275,19 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + numericalAmount / allAddresses.length + " " + token,
+            description: (
+              <div>
+                <p>
+                  Each user received {numericalAmount / allAddresses.length} {token}
+                </p>
+                <p>
+                  Transaction link:{" "}
+                  <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
+                    {update.hash.substr(0, 20)}
+                  </a>
+                </p>
+              </div>
+            ),
             placement: "topRight",
           });
           handleConfetti();
@@ -344,7 +371,30 @@ export default function HostRoom({
       <h2 id="title">Tip Your Party!</h2>
       <h3>
         {" "}
-        You are the <b>Host</b> for "<b>{room}</b>" room{" "}
+        You are a <b>Host</b> for "<b>{room}</b>" room{" "}
+        <button
+          onClick={() => {
+            try {
+              const el = document.createElement("input");
+              el.value = window.location.href;
+              document.body.appendChild(el);
+              el.select();
+              document.execCommand("copy");
+              document.body.removeChild(el);
+              return notification.success({
+                message: "Room link copied to clipboard",
+                placement: "topRight",
+              });
+            } catch (err) {
+              return notification.success({
+                message: "Failed to copy room link to clipboard",
+                placement: "topRight",
+              });
+            }
+          }}
+        >
+          <LinkOutlined style={{ color: "#C9B8FF" }} />
+        </button>
       </h3>
 
       <div
@@ -395,7 +445,7 @@ export default function HostRoom({
                         </div>
                       }
                     >
-                      {allAddresses.length == 0 && <h2>This room is currently empty </h2>}
+                      {allAddresses.length === 0 && <h2>This room is currently empty </h2>}
                       {allAddresses.length > 0 && (
                         <List
                           bordered
@@ -493,29 +543,45 @@ export default function HostRoom({
                     />
 
                     <TokenModal
+                      destroyOnClose={true}
                       visible={importToken}
-                      handleAddress={handleTokenImport}
+                      chainId={chainId}
+                      onChange={handleTokenImport}
+                      localProvider={localProvider}
+                      networkTokenList={networkTokenList}
                       onCancel={() => setImportToken(false)}
                       okText="Import Token"
+                      setImportToken={setImportToken}
+                      list={list}
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
-                      <a
-                        href="#"
-                        onClick={e => {
+                      <Button
+                        type="primary"
+                        ghost
+                        loading={importLoading}
+                        icon={<div></div>}
+                        onClick={async e => {
                           e.preventDefault();
-
+                          if (networkTokenList) {
+                            setImportLoading(true);
+                            const res = await axios.get(networkTokenList);
+                            setImportLoading(false);
+                            const { tokens } = res.data;
+                            setList(tokens);
+                          } else {
+                            setList([]);
+                          }
                           setImportToken(true);
                         }}
                       >
-                        import ERC20 token...
-                      </a>
+                        Import ERC-20 Token
+                      </Button>
                     </div>
                     <PayButton
                       style={{ marginTop: 20 }}
                       token={token}
                       appName="Tip.party"
-                      tokenListHandler={tokens => setAvailableTokens(tokens)}
                       callerAddress={address}
                       maxApproval={numericalAmount}
                       amount={numericalAmount}

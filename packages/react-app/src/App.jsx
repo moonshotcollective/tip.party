@@ -281,7 +281,7 @@ function App(props) {
     const networkLocal = NETWORK(localChainId);
     if (selectedChainId === 1337 && localChainId === 31337) {
       networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 130, padding: 16 }}>
           <Alert
             message="⚠️ Wrong Network ID"
             description={
@@ -298,12 +298,14 @@ function App(props) {
       );
     } else {
       networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 130, padding: 16 }}>
           <Alert
             message="⚠️ Wrong Network"
             description={
               <div>
-                You have <b>{networkSelected && networkSelected.name}</b> selected and you need to be on{" "}
+                <p>
+                  You have <b>{networkSelected && networkSelected.name}</b> selected.
+                </p>
                 <Button
                   onClick={async () => {
                     const ethereum = window.ethereum;
@@ -338,9 +340,8 @@ function App(props) {
                     }
                   }}
                 >
-                  <b>{networkLocal && networkLocal.name}</b>
+                  <b>Click here to switch to {networkLocal && networkLocal.name}</b>
                 </Button>
-                .
               </div>
             }
             type="error"
@@ -618,6 +619,7 @@ function App(props) {
                   selectedChainId={selectedChainId}
                   tx={tx}
                   nativeCurrency={targetNetwork.nativeCurrency}
+                  networkTokenList={targetNetwork.networkTokenList}
                   isHost={isHost}
                   loadWeb3Modal={loadWeb3Modal}
                 />

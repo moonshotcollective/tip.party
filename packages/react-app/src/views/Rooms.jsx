@@ -17,6 +17,7 @@ export default function Rooms({
   nativeCurrency,
   isHost,
   loadWeb3Modal,
+  networkTokenList,
 }) {
   return (
     <div>
@@ -37,6 +38,7 @@ export default function Rooms({
             tx={tx}
             nativeCurrency={nativeCurrency}
             loadWeb3Modal={loadWeb3Modal}
+            networkTokenList={networkTokenList}
           />
         )}
       </div>
