@@ -48,6 +48,7 @@ export default function HostRoom({
   const allAddresses = [...addresses, ...importedAddresses];
   const [loadedTokenList, setLoadedTokenList] = useState({});
   const [list, setList] = useState([]);
+  const [importLoading, setImportLoading] = useState(false);
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
@@ -540,12 +541,16 @@ export default function HostRoom({
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
-                      <button
-                        className="text-purple-textPurple"
+                      <Button
+                        type="primary"
+                        ghost
+                        loading={importLoading}
                         onClick={async e => {
                           e.preventDefault();
                           if (networkTokenList) {
+                            setImportLoading(true);
                             const res = await axios.get(networkTokenList);
+                            setImportLoading(false);
                             const { tokens } = res.data;
                             setList(tokens);
                           } else {
@@ -554,8 +559,8 @@ export default function HostRoom({
                           setImportToken(true);
                         }}
                       >
-                        import ERC20 token...
-                      </button>
+                        Import ERC-20 Token
+                      </Button>
                     </div>
                     <PayButton
                       style={{ marginTop: 20 }}
