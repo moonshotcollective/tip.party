@@ -601,7 +601,6 @@ function App(props) {
                   address={address}
                   mainnetProvider={mainnetProvider}
                   tx={tx}
-                  isWalletConnected={isWalletConnected}
                   nativeCurrency={targetNetwork.nativeCurrency}
                 />
               </Route>
@@ -622,7 +621,7 @@ function App(props) {
                   nativeCurrency={targetNetwork.nativeCurrency}
                   networkTokenList={targetNetwork.networkTokenList}
                   isHost={isHost}
-                  isWalletConnected={isWalletConnected}
+                  loadWeb3Modal={loadWeb3Modal}
                 />
               </Route>
               {/* This is used when testing out smart contracts:

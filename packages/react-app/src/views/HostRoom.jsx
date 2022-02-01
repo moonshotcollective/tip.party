@@ -28,6 +28,7 @@ export default function HostRoom({
   selectedChainId,
   tx,
   nativeCurrency,
+  loadWeb3Modal,
   networkTokenList,
 }) {
   const { room } = useParams();
@@ -354,6 +355,19 @@ export default function HostRoom({
 
   return (
     <div className="bg-purple-darkpurple">
+      {(!web3Modal || !web3Modal.cachedProvider )&&(
+        <Button
+          style={{ height: "50px", fontSize: "20px", marginBottom: "40px" }}
+          key="loginbutton"
+          size="large"
+          onClick={loadWeb3Modal}
+          type="primary"
+          shape="round"
+        >
+          Connect Wallet to Use Tip Party!
+        </Button>
+      )}
+
       <h2 id="title">Tip Your Party!</h2>
       <h3>
         {" "}
@@ -382,6 +396,7 @@ export default function HostRoom({
           <LinkOutlined style={{ color: "#C9B8FF" }} />
         </button>
       </h3>
+
       <div
         className="Room"
         style={{
