@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
-import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -48,7 +48,7 @@ export default function HostRoom({
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
-  const explorer = chainId ?  NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const subs = useRef([]);
 
@@ -276,7 +276,7 @@ export default function HostRoom({
             description: (
               <div>
                 <p>
-                  Each user received {numericalAmount / allAddresses.length} {token} 
+                  Each user received {numericalAmount / allAddresses.length} {token}
                 </p>
                 <p>
                   Transaction link:{" "}
@@ -356,7 +356,31 @@ export default function HostRoom({
       <h2 id="title">Tip Your Party!</h2>
       <h3>
         {" "}
-        You are the <b>Host</b> for "<b>{room}</b>" room{" "}
+        You are a <b>Host</b> for "<b>{room}</b>" room{" "}
+        <a
+          onClick={() => {
+            try {
+              const el = document.createElement("input");
+              el.value = window.location.href;
+              document.body.appendChild(el);
+              el.select();
+              document.execCommand("copy");
+              document.body.removeChild(el);
+              return notification.success({
+                message: "Room link copied to clipboard",
+                placement: "topRight",
+              });
+            } catch (err) {
+              return notification.success({
+                message: "Failed to copy room link to clipboard",
+                placement: "topRight",
+              });
+            }
+          }}
+
+        >
+          <LinkOutlined style={{ color: "#C9B8FF" }} />
+        </a>
       </h3>
       <div
         className="Room"
