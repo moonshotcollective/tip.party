@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
-import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -545,6 +545,7 @@ export default function HostRoom({
                         type="primary"
                         ghost
                         loading={importLoading}
+                        icon={<div></div>}
                         onClick={async e => {
                           e.preventDefault();
                           if (networkTokenList) {
