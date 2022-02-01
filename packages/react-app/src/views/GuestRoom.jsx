@@ -179,7 +179,7 @@ export default function GuestRoom({
           type="primary"
           shape="round"
         >
-          Connect Wallet to Sign In!
+          Connect Wallet to Use Tip Party!
         </Button>
       )}
       <h2 id="title">Welcome to the Tip Party!</h2>

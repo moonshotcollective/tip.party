@@ -364,7 +364,7 @@ export default function HostRoom({
           type="primary"
           shape="round"
         >
-          Connect Wallet to Tip!
+          Connect Wallet to Use Tip Party!
         </Button>
       )}
 
