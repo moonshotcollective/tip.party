@@ -11,6 +11,7 @@ import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
 import { NETWORK } from "../constants";
+import axios from "axios";
 import "./HostRoom.css";
 
 export default function HostRoom({
@@ -46,6 +47,7 @@ export default function HostRoom({
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const allAddresses = [...addresses, ...importedAddresses];
   const [loadedTokenList, setLoadedTokenList] = useState({});
+  const [list, setList] = useState([]);
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
@@ -534,19 +536,26 @@ export default function HostRoom({
                       onCancel={() => setImportToken(false)}
                       okText="Import Token"
                       setImportToken={setImportToken}
+                      list={list}
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
-                      <a
-                        href="#"
-                        onClick={e => {
+                      <button
+                        className="text-purple-textPurple"
+                        onClick={async e => {
                           e.preventDefault();
-
+                          if (networkTokenList) {
+                            const res = await axios.get(networkTokenList);
+                            const { tokens } = res.data;
+                            setList(tokens);
+                          } else {
+                            setList([]);
+                          }
                           setImportToken(true);
                         }}
                       >
                         import ERC20 token...
-                      </a>
+                      </button>
                     </div>
                     <PayButton
                       style={{ marginTop: 20 }}
