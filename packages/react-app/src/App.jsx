@@ -541,7 +541,7 @@ function App(props) {
             networkDisplay={networkDisplay}
             hostToggleSwitch={
               room && (
-                <div className="flex flex-col mt-5 px-7">
+                <div className="flex flex-col mt-5 md:px-7 order-last md:order-first">
                   <Space>
                     <Button
                       size="large"

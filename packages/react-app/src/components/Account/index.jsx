@@ -79,12 +79,14 @@ export default function Account({
       modalButtons.push(
         <div key="first">
           {isValidAddress(address) ? (
-            <div className="flex flex-row">
+            <div>
+            <div className="flex flex-col md:flex-row  items-end">
               {hostToggleSwitch}
-              <div className="flex flex-col mr-4">
+              <div className="flex flex-col mt-2 md:mt-0">
                 <label className="text-base">Select Network:</label>
                 {networkSelect}
               </div>
+              <div className="flex md:ml-4 order-first md:order-last" >
               <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click">
                 <Address
                   address={address}
@@ -94,6 +96,8 @@ export default function Account({
                 />
               </Dropdown.Button>
               {networkDisplay}
+              </div>
+            </div>
             </div>
           ) : (
             ""
