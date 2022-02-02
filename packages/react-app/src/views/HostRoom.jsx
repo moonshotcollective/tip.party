@@ -13,6 +13,7 @@ import Confetti from "react-confetti";
 import { NETWORK } from "../constants";
 import axios from "axios";
 import "./HostRoom.css";
+import { useMemo } from "react";
 
 export default function HostRoom({
   appServer,
@@ -45,7 +46,8 @@ export default function HostRoom({
   const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const allAddresses = [...addresses, ...importedAddresses];
+  const allAddresses = useMemo(() => [...addresses, ...importedAddresses], [addresses, importedAddresses]);
+  const [sortedAddresses, setSortedAddresses] = useState([]);
   const [loadedTokenList, setLoadedTokenList] = useState({});
   const [list, setList] = useState([]);
   const [importLoading, setImportLoading] = useState(false);
@@ -55,6 +57,21 @@ export default function HostRoom({
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const subs = useRef([]);
+
+  useEffect(() => {
+    // moving current user to the top of the list
+    if (allAddresses && allAddresses.length > 0) {
+      console.log('address:', address)
+      const newAddresses = [...allAddresses];
+      newAddresses.forEach((add, index) => {
+        if (add.toLowerCase() === address.toLowerCase()) {
+          newAddresses.splice(index, 1);
+          newAddresses.unshift(add);
+        }
+      });
+      setSortedAddresses(newAddresses);
+    }
+  }, [address, allAddresses]);
 
   useEffect(() => {
     if (oldWriteContracts?.TokenDistributor) {
@@ -430,11 +447,11 @@ export default function HostRoom({
                         </div>
                       }
                     >
-                      {allAddresses.length === 0 && <h2>This room is currently empty </h2>}
-                      {allAddresses.length > 0 && (
+                      {sortedAddresses.length === 0 && <h2>This room is currently empty </h2>}
+                      {sortedAddresses.length > 0 && (
                         <List
                           bordered
-                          dataSource={allAddresses}
+                          dataSource={sortedAddresses}
                           renderItem={(item, index) => (
                             <List.Item key={`${item.toLowerCase()}-${index}`}>
                               <div

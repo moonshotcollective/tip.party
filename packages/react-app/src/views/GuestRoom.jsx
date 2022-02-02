@@ -31,6 +31,7 @@ export default function GuestRoom({
 
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
+  const [sortedAddresses, setSortedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -40,6 +41,21 @@ export default function GuestRoom({
   const { readContracts, writeContracts } = contracts;
 
   const subs = useRef([]);
+
+  useEffect(() => {
+    // moving current user to the top of the list
+    if (addresses && addresses.length > 0) {
+      console.log('address:', address)
+      const newAddresses = [...addresses];
+      newAddresses.forEach((add, index) => {
+        if (add.toLowerCase() === address.toLowerCase()) {
+          newAddresses.splice(index, 1);
+          newAddresses.unshift(add);
+        }
+      });
+      setSortedAddresses(newAddresses);
+    }
+  }, [addresses, address]);
 
   useEffect(() => {
     if (oldWriteContracts?.TokenDistributor) {
@@ -229,11 +245,11 @@ export default function GuestRoom({
                         </div>
                       }
                     >
-                      {addresses.length == 0 && <h2>This room is currently empty </h2>}
-                      {addresses.length > 0 && (
+                      {sortedAddresses.length === 0 && <h2>This room is currently empty </h2>}
+                      {sortedAddresses.length > 0 && (
                         <List
                           bordered
-                          dataSource={addresses}
+                          dataSource={sortedAddresses}
                           renderItem={(item, index) => (
                             <List.Item key={`${item.toLowerCase()}-${index}`}>
                               <div
