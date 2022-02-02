@@ -47,7 +47,6 @@ export default function HostRoom({
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const allAddresses = useMemo(() => [...addresses, ...importedAddresses], [addresses, importedAddresses]);
-  const [sortedAddresses, setSortedAddresses] = useState([]);
   const [loadedTokenList, setLoadedTokenList] = useState({});
   const [list, setList] = useState([]);
   const [importLoading, setImportLoading] = useState(false);
@@ -58,20 +57,22 @@ export default function HostRoom({
 
   const subs = useRef([]);
 
-  useEffect(() => {
-    // moving current user to the top of the list
-    if (allAddresses && allAddresses.length > 0) {
-      console.log('address:', address)
-      const newAddresses = [...allAddresses];
-      newAddresses.forEach((add, index) => {
-        if (add.toLowerCase() === address.toLowerCase()) {
-          newAddresses.splice(index, 1);
-          newAddresses.unshift(add);
-        }
-      });
-      setSortedAddresses(newAddresses);
-    }
-  }, [address, allAddresses]);
+  //removed current user to top for host room since that introduces many bugs
+
+  // useEffect(() => {
+  //   // moving current user to the top of the list
+  //   if (allAddresses && allAddresses.length > 0) {
+  //     console.log('address:', address)
+  //     const newAddresses = [...allAddresses];
+  //     newAddresses.forEach((add, index) => {
+  //       if (add.toLowerCase() === address.toLowerCase()) {
+  //         newAddresses.splice(index, 1);
+  //         newAddresses.unshift(add);
+  //       }
+  //     });
+  //     setSortedAddresses(newAddresses);
+  //   }
+  // }, [address, allAddresses]);
 
   useEffect(() => {
     if (oldWriteContracts?.TokenDistributor) {
@@ -92,6 +93,11 @@ export default function HostRoom({
     if (imports) {
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
+    }
+    const blacklistInStorage = localStorage.getItem(room+"blacklist");
+    if(blacklistInStorage){
+      const parsedBlacklist = JSON.parse(blacklistInStorage);
+      setBlacklist(parsedBlacklist);
     }
   }, [room]);
 
@@ -213,6 +219,19 @@ export default function HostRoom({
 
   const handleListUpdate = list => {
     const updatedList = new Set([...addresses, ...list]);
+
+
+  //removes addresses that are in blacklist
+  const blacklistInStorage = localStorage.getItem(room+"blacklist");
+  if(blacklistInStorage && updatedList){
+  const parsedBlacklist = JSON.parse(blacklistInStorage);
+    updatedList.forEach((addr) => {
+      if (parsedBlacklist.includes(addr.toLowerCase())) {
+        updatedList.delete(addr);
+      }
+    });
+  }
+
     // update addresses list
     setAddresses([...updatedList]);
   };
@@ -334,6 +353,7 @@ export default function HostRoom({
     const updatedAddressesList = [...addresses];
     updatedAddressesList.splice(index, 1);
     setAddresses([...updatedAddressesList]);
+    localStorage.setItem(room+"blacklist", JSON.stringify([...blacklist, addressChanged]));
     setBlacklist([...blacklist, addressChanged]);
   };
   const removeImportedAddress = index => {
@@ -447,11 +467,11 @@ export default function HostRoom({
                         </div>
                       }
                     >
-                      {sortedAddresses.length === 0 && <h2>This room is currently empty </h2>}
-                      {sortedAddresses.length > 0 && (
+                      {allAddresses.length === 0 && <h2>This room is currently empty </h2>}
+                      {allAddresses.length > 0 && (
                         <List
                           bordered
-                          dataSource={sortedAddresses}
+                          dataSource={allAddresses}
                           renderItem={(item, index) => (
                             <List.Item key={`${item.toLowerCase()}-${index}`}>
                               <div
