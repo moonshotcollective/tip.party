@@ -61,9 +61,10 @@ export default function HostRoom({
   useEffect(() => {
     // moving current user to the top of the list
     if (allAddresses && allAddresses.length > 0) {
+      console.log('address:', address)
       const newAddresses = [...allAddresses];
       newAddresses.forEach((add, index) => {
-        if (add === address) {
+        if (add.toLowerCase() === address.toLowerCase()) {
           newAddresses.splice(index, 1);
           newAddresses.unshift(add);
         }

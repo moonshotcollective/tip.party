@@ -45,9 +45,10 @@ export default function GuestRoom({
   useEffect(() => {
     // moving current user to the top of the list
     if (addresses && addresses.length > 0) {
+      console.log('address:', address)
       const newAddresses = [...addresses];
       newAddresses.forEach((add, index) => {
-        if (add === address) {
+        if (add.toLowerCase() === address.toLowerCase()) {
           newAddresses.splice(index, 1);
           newAddresses.unshift(add);
         }
