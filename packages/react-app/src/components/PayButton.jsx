@@ -17,7 +17,6 @@ export default function PayButton({
   readContracts,
   writeContracts,
   yourLocalBalance,
-  tokenListHandler,
   ethPayHandler,
   tokenPayHandler,
   nativeCurrency,
