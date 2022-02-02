@@ -210,7 +210,7 @@ export default function HostRoom({
     if (web3Modal.cachedProvider === "") {
       return notification.error({
         message: "Failed to Distribute!",
-        description: "Please Connect to a Wallet before distributing tokens",
+        description: "Please connect to a wallet before distributing tokens",
         placement: "bottomRight",
       });
     }
@@ -263,7 +263,7 @@ export default function HostRoom({
     if (web3Modal.cachedProvider === "") {
       return notification.error({
         message: "Failed to Distribute!",
-        description: "Please Connect to a Wallet before distributing tokens",
+        description: "Please connect to a wallet before distributing tokens",
         placement: "bottomRight",
       });
     }
