@@ -109,7 +109,7 @@ export default function Account({
         <Button
           key="loginbutton"
           style={{ verticalAlign: "top",   position: "fixed", top: 20, right: 10, width: width }}
-          size="medium"
+          size="large"
           onClick={loadWeb3Modal}
           key="second"
           type="primary"

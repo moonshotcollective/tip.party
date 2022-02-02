@@ -1,40 +1,44 @@
 name: Scaffold-eth Staging Surge Deployer workflow
 
 on:
-  pull_request:
-    types: [closed]
-    branches: [develop]
-  workflow_dispatch:
+    pull_request:
+        types: [closed]
+        branches: [develop]
+    workflow_dispatch:
 
 jobs:
-  deployer-job:
-    name: Deployer job
-    runs-on: ubuntu-latest
-    # if: github.event.pull_request.merged == true
-    steps:
-      - uses: actions/checkout@v2.1.0
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.x
-      - name: Build React App
-        run: |
-          cd packages/react-app/ && yarn
-          CI=false yarn run theme
-          CI=false yarn run build
-          cp build/index.html build/200.html
-        env:
-          REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/'
-          REACT_APP_NETWORK: 'rinkeby'
-          REACT_APP_FIRE_API: ${{ secrets.FIREBASEAPI }}
-          REACT_APP_FIRE_DOMAIN: ${{ secrets.FIREBASEDOMAIN }}
-          REACT_APP_FIRE_ID: ${{ secrets.FIREBASEID }}
-          REACT_APP_XDAI_NETWORK: ${{ secrets.REACT_APP_XDAI_NETWORK }}
-          REACT_APP_MAINNET_NETWORK: ${{ secrets.REACT_APP_MAINNET_NETWORK }}
+    deployer-job:
+        name: Deployer job
+        runs-on: ubuntu-latest
+        # if: github.event.pull_request.merged == true
+        steps:
+            - uses: actions/checkout@v2.1.0
+            - name: Use Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 16.x
+            - name: Build React App
+              run: |
+                  cd packages/react-app/ && yarn
+                  CI=false yarn run theme
+                  CI=false yarn run build
+                  cp build/index.html build/200.html
+              env:
+                  REACT_APP_SERVER: 'https://moonshot-backend.herokuapp.com/'
+                  REACT_APP_NETWORK: 'rinkeby'
+                  REACT_APP_FIRE_API: ${{ secrets.FIREBASEAPI }}
+                  REACT_APP_FIRE_DOMAIN: ${{ secrets.FIREBASEDOMAIN }}
+                  REACT_APP_FIRE_ID: ${{ secrets.FIREBASEID }}
+                  REACT_APP_XDAI_NETWORK: ${{ secrets.REACT_APP_XDAI_NETWORK }}
+                  REACT_APP_MAINNET_NETWORK: ${{ secrets.REACT_APP_MAINNET_NETWORK }}
+                  REACT_APP_RINKEBY_NETWORK: ${{ secrets.REACT_APP_RINKEBY_NETWORK }}
+                  REACT_APP_MATIC_NETWORK: ${{ secrets.REACT_APP_MATIC_NETWORK }}
+                  REACT_APP_ARBITRUM_NETWORK: ${{ secrets.REACT_APP_ARBITRUM_NETWORK }}
+                  REACT_APP_OPTIMISM_NETWORK: ${{ secrets.REACT_APP_OPTIMISM_NETWORK }}
 
-      - name: Deploy to surge
-        uses: dswistowski/surge-sh-action@v1
-        with:
-          domain: staging.${{ secrets.domain }}
-          project: './packages/react-app/build'
-          token: ${{ secrets.surge_token }}
+            - name: Deploy to surge
+              uses: dswistowski/surge-sh-action@v1
+              with:
+                  domain: staging.${{ secrets.domain }}
+                  project: './packages/react-app/build'
+                  token: ${{ secrets.surge_token }}

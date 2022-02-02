@@ -11,7 +11,7 @@ import { Account } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Rooms, Home } from "./views";
+import { Rooms, Home, WalletNotConnected } from "./views";
 
 // Wallets for wallet connect
 import Portis from "@portis/web3";
@@ -593,38 +593,57 @@ function App(props) {
 
         <main>
           <Switch>
-            <>
-              <Route exact path="/">
-                <Home
-                  writeContracts={writeContracts}
-                  readContracts={readContracts}
-                  address={address}
-                  mainnetProvider={mainnetProvider}
-                  tx={tx}
-                  isWalletConnected={isWalletConnected}
-                  nativeCurrency={targetNetwork.nativeCurrency}
-                />
-              </Route>
-              <Route path="/room/:room">
-                <Rooms
-                  address={address}
-                  appServer={appServer}
-                  web3Modal={web3Modal}
-                  userSigner={userSigner}
-                  mainnetProvider={mainnetProvider}
-                  readContracts={readContracts}
-                  writeContracts={writeContracts}
-                  localProvider={localProvider}
-                  yourLocalBalance={yourLocalBalance}
-                  chainId={localChainId || selectedChainId}
-                  selectedChainId={selectedChainId}
-                  tx={tx}
-                  nativeCurrency={targetNetwork.nativeCurrency}
-                  isHost={isHost}
-                  isWalletConnected={isWalletConnected}
-                />
-              </Route>
-              {/* This is used when testing out smart contracts:
+            {!isWalletConnected ? (
+              <WalletNotConnected
+                connector={
+                  <Account
+                    address={address}
+                    localProvider={localProvider}
+                    userSigner={userSigner}
+                    mainnetProvider={mainnetProvider}
+                    price={price}
+                    web3Modal={web3Modal}
+                    loadWeb3Modal={loadWeb3Modal}
+                    logoutOfWeb3Modal={logoutOfWeb3Modal}
+                    blockExplorer={blockExplorer}
+                    width={300}
+                  />
+                }
+              />
+            ) : (
+              <>
+                <Route exact path="/">
+                  <Home
+                    writeContracts={writeContracts}
+                    readContracts={readContracts}
+                    address={address}
+                    mainnetProvider={mainnetProvider}
+                    tx={tx}
+                    isWalletConnected={isWalletConnected}
+                    nativeCurrency={targetNetwork.nativeCurrency}
+                  />
+                </Route>
+                <Route path="/room/:room">
+                  <Rooms
+                    address={address}
+                    appServer={appServer}
+                    web3Modal={web3Modal}
+                    userSigner={userSigner}
+                    mainnetProvider={mainnetProvider}
+                    readContracts={readContracts}
+                    writeContracts={writeContracts}
+                    localProvider={localProvider}
+                    yourLocalBalance={yourLocalBalance}
+                    chainId={localChainId || selectedChainId}
+                    selectedChainId={selectedChainId}
+                    tx={tx}
+                    nativeCurrency={targetNetwork.nativeCurrency}
+                    networkTokenList={targetNetwork.networkTokenList}
+                    isHost={isHost}
+                    isWalletConnected={isWalletConnected}
+                  />
+                </Route>
+                {/* This is used when testing out smart contracts:
               <Route exact path="/contracts">
                 <Contract
                   name="TokenDistributor"
@@ -641,7 +660,8 @@ function App(props) {
                   blockExplorer={blockExplorer}
                 />
               </Route> */}
-            </>
+              </>
+            )}
           </Switch>
         </main>
       </BrowserRouter>
