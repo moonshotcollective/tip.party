@@ -207,6 +207,13 @@ export default function HostRoom({
   };
 
   const ethPayHandler = async () => {
+    if (web3Modal.cachedProvider === "") {
+      return notification.error({
+        message: "Failed to Distribute!",
+        description: "Please Connect to a Wallet before distributing tokens",
+        placement: "bottomRight",
+      });
+    }
     const result = tx(
       writeContracts.TokenDistributor.splitEth(allAddresses, room, {
         value: ethers.utils.parseEther(numericalAmount),
@@ -252,6 +259,14 @@ export default function HostRoom({
   };
 
   const tokenPayHandler = async opts => {
+
+    if (web3Modal.cachedProvider === "") {
+      return notification.error({
+        message: "Failed to Distribute!",
+        description: "Please Connect to a Wallet before distributing tokens",
+        placement: "bottomRight",
+      });
+    }
     const result = tx(
       writeContracts.TokenDistributor.splitTokenFromUser(
         allAddresses,
