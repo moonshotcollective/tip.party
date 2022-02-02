@@ -2,6 +2,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import React from "react";
 import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App";
 import "./index.css";
 
@@ -20,7 +21,9 @@ const client = new ApolloClient({
 ReactDOM.render(
   <ApolloProvider client={client}>
     <ThemeSwitcherProvider themeMap={themes} defaultTheme={"dark"}>
-      <App subgraphUri={subgraphUri} />
+      <Router>
+        <App subgraphUri={subgraphUri} />
+      </Router>
     </ThemeSwitcherProvider>
   </ApolloProvider>,
   document.getElementById("root"),
