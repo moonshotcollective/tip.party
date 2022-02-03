@@ -336,6 +336,7 @@ export default function HostRoom({
     setAddresses([...updatedAddressesList]);
     setBlacklist([...blacklist, addressChanged]);
   };
+
   const removeImportedAddress = index => {
     const updatedImportList = [...importedAddresses];
     updatedImportList.splice(index, 1);

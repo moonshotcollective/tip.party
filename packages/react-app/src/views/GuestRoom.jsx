@@ -7,6 +7,7 @@ import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
 import { useTokenImport } from "../hooks";
 import * as storage from "../utils/storage";
+import { NETWORK } from "../constants";
 
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -37,6 +38,9 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+  const [dbLoaded, setDbLoaded] = useState(false);
+  const [isHandlingTransaction, setHandlingTransaction] = useState(false);
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const { readContracts, writeContracts } = contracts;
 
@@ -73,11 +77,24 @@ export default function GuestRoom({
   useEffect(() => {
     // clear existing subscriptions
     subs.current.map(sub => sub());
-
     // start new subscriptions
     if (chainId) {
       subs.current.push(storage.watchRoom(room, handleListUpdate));
-      subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
+      if (!dbLoaded) {
+        subs.current.push(storage.watchRoomTx(room, chainId, loadTransactions));
+        setDbLoaded(true);
+      } else {
+        setHandlingTransaction(true);
+        if(isHandlingTransaction){
+
+        subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
+        }
+        setHandlingTransaction(false);
+        console.log("asdasd")
+
+      }
+
+      console.log(subs)
     }
   }, [room, chainId]);
 
@@ -94,8 +111,25 @@ export default function GuestRoom({
     setAddresses([...updatedList]);
   };
 
-  const handleTransactionUpdate = newTx => {
+  const loadTransactions = txs => {
+    const update = new Set([...txs, ...txHash]);
+    setTxHash([...update]);
+  };
+
+  const handleTransactionUpdate = async newTx => {
     const update = new Set([...newTx, ...txHash]);
+   console.log("hiiii")
+    if (newTx[0] !== txHash[0]) {
+      const tx = await localProvider.waitForTransaction(newTx[0], 1);
+      if (tx.status === 1) {
+        notification.success({
+          message: "Transaction was successful",
+          description: newTx[0] + " " + txHash[0],
+          placement: "topRight",
+          duration: 0,
+        });
+      }
+    }
     setTxHash([...update]);
   };
 
