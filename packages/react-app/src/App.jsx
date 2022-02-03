@@ -4,7 +4,7 @@ import WalletLink from "walletlink";
 import { Alert, Button, Menu, Select, Space } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, Route, Switch } from "react-router-dom";
+import { Link, Route, Switch, useLocation } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
 import { Account } from "./components";
@@ -159,6 +159,7 @@ function App(props) {
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isHost, setHost] = useState(false);
+  const [room, setRoom] = useState();
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -169,6 +170,12 @@ function App(props) {
       window.location.reload();
     }, 1);
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setRoom(location.pathname.slice(6));
+  }, [location]);
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
   const price = useExchangePrice(targetNetwork, mainnetProvider);
@@ -214,8 +221,6 @@ function App(props) {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
-
-  const room = window.location.pathname.slice(6);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
