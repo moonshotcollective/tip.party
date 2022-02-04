@@ -211,7 +211,7 @@ export default function HostRoom({
   };
 
   const handleConfetti = e => {
-    setNumberOfConfettiPieces(200);
+    setNumberOfConfettiPieces(400);
     setTimeout(() => {
       setNumberOfConfettiPieces(0);
     }, 4000);
@@ -429,7 +429,7 @@ export default function HostRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti recycle={true} run={true} height={document.body.scrollHeight} confettiSource={{x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY}} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
