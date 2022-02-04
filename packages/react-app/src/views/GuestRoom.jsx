@@ -222,7 +222,7 @@ export default function GuestRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti recycle={true} run={true} height={document.body.scrollHeight} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
