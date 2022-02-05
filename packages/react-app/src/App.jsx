@@ -157,7 +157,7 @@ function App(props) {
   //Sets the states to be used across Tip Party
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(true);
   const [isHost, setHost] = useState(false);
   const [room, setRoom] = useState();
 
