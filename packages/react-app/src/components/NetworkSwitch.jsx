@@ -1,5 +1,5 @@
 import React from "react";
-import { Dropdown, Menu } from "antd";
+import { Dropdown, Menu, Button } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 
 function NetworkSwitch({ networkOptions, selectedNetwork, setSelectedNetwork, NETWORKS, targetNetwork }) {
@@ -11,7 +11,6 @@ function NetworkSwitch({ networkOptions, selectedNetwork, setSelectedNetwork, NE
           <Menu.Item key={i}>
             <button
               onClick={async () => {
-                console.log("VIEW things ", i, targetNetwork.chainId, NETWORKS[i].chainId);
                 if (targetNetwork.chainId !== NETWORKS[i].chainId) {
                   window.localStorage.setItem("network", i);
                   setSelectedNetwork(i);
@@ -42,7 +41,7 @@ function NetworkSwitch({ networkOptions, selectedNetwork, setSelectedNetwork, NE
                 }
               }}
             >
-              <span style={{ textTransform: "capitalize" }}>{i}</span>
+              <span style={{ textTransform: "capitalize", color: NETWORKS[i].color }}>{i}</span>
             </button>
           </Menu.Item>
         ))}
@@ -51,9 +50,13 @@ function NetworkSwitch({ networkOptions, selectedNetwork, setSelectedNetwork, NE
 
   return (
     <div>
-      <Dropdown.Button overlay={menu} placement="bottomRight" trigger={["click"]} icon={<DownOutlined />} size="small">
-        <span style={{ textTransform: "capitalize", color: NETWORKS[selectedNetwork].color }}>{selectedNetwork}</span>
-      </Dropdown.Button>
+      <Dropdown overlay={menu} placement="bottomRight" trigger={["click"]}>
+        <Button size="large">
+          <span style={{ textTransform: "capitalize", color: NETWORKS[selectedNetwork].color }}>
+            {selectedNetwork} <DownOutlined />
+          </span>
+        </Button>
+      </Dropdown>
     </div>
   );
 }

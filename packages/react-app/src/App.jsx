@@ -133,7 +133,7 @@ function App(props) {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isHost, setHost] = useState(false);
   const [room, setRoom] = useState();
-  const [selectedNetwork, setSelectedNetwork] = useState(configuredNetworks[0]);
+  const [selectedNetwork, setSelectedNetwork] = useState(cachedNetwork || configuredNetworks[1]);
 
   if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
 
