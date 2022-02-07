@@ -16,3 +16,4 @@ export { default as useTokenList } from "./TokenList";
 export { default as useUserSigner } from "./UserSigner";
 export { default as useBurnerSigner } from "./BurnerSigner";
 export { default as useTokenImport } from "./TokenImport";
+export { default as useStaticJsonRPC } from "./useStaticJsonRPC";

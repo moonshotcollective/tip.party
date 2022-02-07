@@ -1,16 +1,24 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 //import Torus from "@toruslabs/torus-embed"
 import WalletLink from "walletlink";
-import { Alert, Button, Menu, Select, Space } from "antd";
+import { Alert, Button, Menu, Space } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account } from "./components";
+import { Account, NetworkSwitch } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
-import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
+import {
+  useBalance,
+  useContractLoader,
+  useExchangePrice,
+  useGasPrice,
+  useOnBlock,
+  useUserSigner,
+  useStaticJsonRPC,
+} from "./hooks";
 import { Rooms, Home, WalletNotConnected } from "./views";
 
 // Wallets for wallet connect
@@ -20,51 +28,8 @@ import Authereum from "authereum";
 const { ethers } = require("ethers");
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
-
-// Add more networks as the dapp expands to more networks
-//const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-const configuredNetworks = ["arbitrum", "mainnet", "matic", "optimism", "rinkeby", "xdai"];
-if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-  configuredNetworks.push("localhost");
-}
-
-const cachedNetwork = window.localStorage.getItem("network");
-if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
-
-/// 📡 What chain are your contracts deployed to?
-//let targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
-let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-
-// 🛰 providers
-if (DEBUG) console.log(`Connecting to ${cachedNetwork || "mainnet"}`);
-if (DEBUG) console.log(`Network info: ${targetNetwork}`);
-// const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
-// const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
-//
-// attempt to connect to our own scaffold eth rpc and if that fails fall back to infura...
-// Using StaticJsonRpcProvider as the chainId won't change see https://github.com/ethers-io/ethers.js/issues/901
-const scaffoldEthProvider = navigator.onLine
-  ? new ethers.providers.StaticJsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs")
-  : null;
-const poktMainnetProvider = navigator.onLine
-  ? new ethers.providers.StaticJsonRpcProvider(
-      "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-    )
-  : null;
-const mainnetInfura = navigator.onLine
-  ? new ethers.providers.StaticJsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs")
-  : null;
-// ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_I )
-
-// as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
-const localProviderUrlFromEnv = targetNetwork.rpcUrl;
-if (DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
-const localProvider = new ethers.providers.StaticJsonRpcProvider(localProviderUrlFromEnv);
-
-// 🔭 block explorer URL
-const blockExplorer = targetNetwork.blockExplorer;
 
 // Coinbase walletLink init
 const walletLink = new WalletLink({
@@ -146,13 +111,21 @@ const web3Modal = new Web3Modal({
   },
 });
 
+// 🛰 providers
+const providers = [
+  "https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs",
+  "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  "https://eth-mainnet.alchemyapi.io/v2/qCdzfF9UqXcJYIle-Ff-BN0MII8LjLQs",
+];
+
 function App(props) {
-  const mainnetProvider =
-    poktMainnetProvider && poktMainnetProvider._isProvider
-      ? poktMainnetProvider
-      : scaffoldEthProvider && scaffoldEthProvider._network
-      ? scaffoldEthProvider
-      : mainnetInfura;
+  // Add more networks as the dapp expands to more networks
+  const configuredNetworks = ["arbitrum", "mainnet", "polygon", "optimism", "rinkeby", "xdai"];
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    configuredNetworks.push("localhost");
+  }
+
+  const cachedNetwork = window.localStorage.getItem("network");
 
   //Sets the states to be used across Tip Party
   const [injectedProvider, setInjectedProvider] = useState();
@@ -160,6 +133,26 @@ function App(props) {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isHost, setHost] = useState(false);
   const [room, setRoom] = useState();
+  const [selectedNetwork, setSelectedNetwork] = useState(configuredNetworks[0]);
+
+  if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork);
+
+  /// 📡 What chain are your contracts deployed to?
+  //let targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
+  let targetNetwork = NETWORKS[selectedNetwork]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+
+  // 🛰 providers
+  if (DEBUG) console.log(`Connecting to ${selectedNetwork}`);
+  if (DEBUG) console.log(`Network info: ${targetNetwork}`);
+
+  // 🔭 block explorer URL
+  const blockExplorer = targetNetwork.blockExplorer;
+
+  // load all your providers
+  const localProvider = useStaticJsonRPC([
+    process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : targetNetwork.rpcUrl,
+  ]);
+  const mainnetProvider = useStaticJsonRPC(providers);
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -339,9 +332,6 @@ function App(props) {
                           ],
                         })
                         .catch();
-                      if (tx) {
-                        console.log(tx);
-                      }
                     }
                   }}
                 >
@@ -358,66 +348,6 @@ function App(props) {
   } else {
     networkDisplay = <span></span>;
   }
-
-  const options = [];
-  for (const id in NETWORKS) {
-    if (configuredNetworks.indexOf(id) > -1) {
-      options.push(
-        <Select.Option key={id} value={NETWORKS[id].name}>
-          <span style={{ color: NETWORKS[id].color, fontSize: 20 }}>{NETWORKS[id].name}</span>
-        </Select.Option>,
-      );
-    }
-  }
-
-  const networkSelect = (
-    <Select
-      size="large"
-      defaultValue={targetNetwork.name}
-      style={{ textAlign: "left", width: 140, fontSize: 30 }}
-      onChange={value => {
-        if (targetNetwork.chainId !== NETWORKS[value].chainId) {
-          window.localStorage.setItem("network", value);
-          setTimeout(async () => {
-            targetNetwork = NETWORKS[value];
-            const ethereum = window.ethereum;
-            const data = [
-              {
-                chainId: "0x" + targetNetwork.chainId.toString(16),
-                chainName: targetNetwork.name,
-                nativeCurrency: targetNetwork.nativeCurrency,
-                rpcUrls: [targetNetwork.rpcUrl],
-                blockExplorerUrls: [targetNetwork.blockExplorer],
-              },
-            ];
-            console.log("data", data);
-            // try to add new chain
-            try {
-              await ethereum.request({ method: "wallet_addEthereumChain", params: data });
-            } catch (error) {
-              // if failed, try a network switch instead
-              await ethereum
-                .request({
-                  method: "wallet_switchEthereumChain",
-                  params: [
-                    {
-                      chainId: "0x" + targetNetwork.chainId.toString(16),
-                    },
-                  ],
-                })
-                .catch();
-              if (tx) {
-                console.log(tx);
-              }
-            }
-            window.location.reload();
-          }, 1000);
-        }
-      }}
-    >
-      {options}
-    </Select>
-  );
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -542,7 +472,15 @@ function App(props) {
             loadWeb3Modal={loadWeb3Modal}
             logoutOfWeb3Modal={logoutOfWeb3Modal}
             blockExplorer={blockExplorer}
-            networkSelect={networkSelect}
+            networkSelect={
+              <NetworkSwitch
+                networkOptions={configuredNetworks}
+                selectedNetwork={selectedNetwork}
+                setSelectedNetwork={setSelectedNetwork}
+                NETWORKS={NETWORKS}
+                targetNetwork={targetNetwork}
+              />
+            }
             networkDisplay={networkDisplay}
             hostToggleSwitch={
               room && (

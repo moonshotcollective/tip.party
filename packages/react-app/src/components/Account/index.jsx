@@ -107,7 +107,6 @@ export default function Account({
           style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4, width: width }}
           size="large"
           onClick={loadWeb3Modal}
-          key="second"
           type="primary"
           shape="round"
         >
