@@ -6,4 +6,5 @@ module.exports = {
   signRoom,
   addRoomTx,
   addRoomToken,
+  filterEnsAddresses,
 };
