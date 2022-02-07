@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
-import { CloseOutlined, ExportOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -10,7 +10,10 @@ import * as storage from "../utils/storage";
 import { useTokenImport } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
+import { NETWORK } from "../constants";
+import axios from "axios";
 import "./HostRoom.css";
+import { useMemo } from "react";
 
 export default function HostRoom({
   appServer,
@@ -26,6 +29,7 @@ export default function HostRoom({
   selectedChainId,
   tx,
   nativeCurrency,
+  networkTokenList,
 }) {
   const { room } = useParams();
 
@@ -42,12 +46,33 @@ export default function HostRoom({
   const [importAddressModal, setImportAddressModal] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const allAddresses = [...addresses, ...importedAddresses];
+  const allAddresses = useMemo(() => [...addresses, ...importedAddresses], [addresses, importedAddresses]);
   const [loadedTokenList, setLoadedTokenList] = useState({});
+  const [list, setList] = useState([]);
+  const [importLoading, setImportLoading] = useState(false);
 
   const { readContracts, writeContracts } = contracts;
+  const numericalAmount = amount[0] === "." ? "0" + amount : amount;
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const subs = useRef([]);
+
+  //removed current user to top for host room since that introduces many bugs
+
+  // useEffect(() => {
+  //   // moving current user to the top of the list
+  //   if (allAddresses && allAddresses.length > 0) {
+  //     console.log('address:', address)
+  //     const newAddresses = [...allAddresses];
+  //     newAddresses.forEach((add, index) => {
+  //       if (add.toLowerCase() === address.toLowerCase()) {
+  //         newAddresses.splice(index, 1);
+  //         newAddresses.unshift(add);
+  //       }
+  //     });
+  //     setSortedAddresses(newAddresses);
+  //   }
+  // }, [address, allAddresses]);
 
   useEffect(() => {
     if (oldWriteContracts?.TokenDistributor) {
@@ -68,6 +93,11 @@ export default function HostRoom({
     if (imports) {
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
+    }
+    const blacklistInStorage = localStorage.getItem(room+"blacklist");
+    if(blacklistInStorage){
+      const parsedBlacklist = JSON.parse(blacklistInStorage);
+      setBlacklist(parsedBlacklist);
     }
   }, [room]);
 
@@ -95,7 +125,7 @@ export default function HostRoom({
     // clean validation for only numbers (including decimal numbers): https://stackoverflow.com/a/43067857
     const re = /^\d*\.?\d*$/;
 
-    if ((e.target.value === "" || re.test(e.target.value)) && e.target.value !== ".") {
+    if (e.target.value === "" || re.test(e.target.value)) {
       setAmount(e.target.value);
     }
   };
@@ -103,10 +133,7 @@ export default function HostRoom({
   const handleTokenImport = async tokenAddress => {
     const tokenSymbol = await loadContracts(tokenAddress);
     if (availableTokens.includes(tokenSymbol)) {
-      notification.error({
-        message: "The ERC20 token address is avaialable in the token drop down.",
-        placement: "topRight",
-      });
+      setToken(tokenSymbol);
     } else if (tokenSymbol) {
       setToken(tokenSymbol);
       const temp = {};
@@ -184,7 +211,7 @@ export default function HostRoom({
   };
 
   const handleConfetti = e => {
-    setNumberOfConfettiPieces(200);
+    setNumberOfConfettiPieces(400);
     setTimeout(() => {
       setNumberOfConfettiPieces(0);
     }, 4000);
@@ -192,6 +219,19 @@ export default function HostRoom({
 
   const handleListUpdate = list => {
     const updatedList = new Set([...addresses, ...list]);
+
+
+  //removes addresses that are in blacklist
+  const blacklistInStorage = localStorage.getItem(room+"blacklist");
+  if(blacklistInStorage && updatedList){
+  const parsedBlacklist = JSON.parse(blacklistInStorage);
+    updatedList.forEach((addr) => {
+      if (parsedBlacklist.includes(addr.toLowerCase())) {
+        updatedList.delete(addr);
+      }
+    });
+  }
+
     // update addresses list
     setAddresses([...updatedList]);
   };
@@ -204,7 +244,7 @@ export default function HostRoom({
   const ethPayHandler = async () => {
     const result = tx(
       writeContracts.TokenDistributor.splitEth(allAddresses, room, {
-        value: ethers.utils.parseEther(amount),
+        value: ethers.utils.parseEther(numericalAmount),
       }),
       async update => {
         await handleResponseHash(update);
@@ -222,7 +262,19 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / allAddresses.length + " " + token,
+            description: (
+              <div>
+                <p>
+                  Each user received {numericalAmount / allAddresses.length} {token}
+                </p>
+                <p>
+                  Transaction link:{" "}
+                  <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
+                    {update.hash.substr(0, 20)}
+                  </a>
+                </p>
+              </div>
+            ),
             placement: "topRight",
           });
           handleConfetti();
@@ -238,7 +290,7 @@ export default function HostRoom({
     const result = tx(
       writeContracts.TokenDistributor.splitTokenFromUser(
         allAddresses,
-        ethers.utils.parseUnits(amount, opts.decimals),
+        ethers.utils.parseUnits(numericalAmount, opts.decimals),
         opts.address,
         room,
       ),
@@ -258,7 +310,19 @@ export default function HostRoom({
           );
           notification.success({
             message: "Payout successful",
-            description: "Each user received " + amount / allAddresses.length + " " + token,
+            description: (
+              <div>
+                <p>
+                  Each user received {numericalAmount / allAddresses.length} {token}
+                </p>
+                <p>
+                  Transaction link:{" "}
+                  <a target="_blank" href={`${explorer}tx/${update.hash}`} rel="noopener noreferrer">
+                    {update.hash.substr(0, 20)}
+                  </a>
+                </p>
+              </div>
+            ),
             placement: "topRight",
           });
           handleConfetti();
@@ -289,6 +353,7 @@ export default function HostRoom({
     const updatedAddressesList = [...addresses];
     updatedAddressesList.splice(index, 1);
     setAddresses([...updatedAddressesList]);
+    localStorage.setItem(room+"blacklist", JSON.stringify([...blacklist, addressChanged]));
     setBlacklist([...blacklist, addressChanged]);
   };
   const removeImportedAddress = index => {
@@ -299,7 +364,7 @@ export default function HostRoom({
   };
 
   const copyToClipBoard = () => {
-    copy(addresses, {
+    copy(allAddresses, {
       debug: true,
       message: "Copied List to ClipBoard",
     });
@@ -312,7 +377,7 @@ export default function HostRoom({
   const exportMenu = (
     <Menu>
       <Menu.Item key="export_csv">
-        <CSVLink data={addresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
+        <CSVLink data={allAddresses.toString()} filename={`tip-party-addresses-${Date.now()}.csv`}>
           Export CSV
         </CSVLink>
       </Menu.Item>
@@ -329,7 +394,30 @@ export default function HostRoom({
       <h2 id="title">Tip Your Party!</h2>
       <h3>
         {" "}
-        You are the <b>Host</b> for "<b>{room}</b>" room{" "}
+        You are a <b>Host</b> for "<b>{room}</b>" room{" "}
+        <button
+          onClick={() => {
+            try {
+              const el = document.createElement("input");
+              el.value = window.location.href;
+              document.body.appendChild(el);
+              el.select();
+              document.execCommand("copy");
+              document.body.removeChild(el);
+              return notification.success({
+                message: "Room link copied to clipboard",
+                placement: "topRight",
+              });
+            } catch (err) {
+              return notification.success({
+                message: "Failed to copy room link to clipboard",
+                placement: "topRight",
+              });
+            }
+          }}
+        >
+          <LinkOutlined style={{ color: "#C9B8FF" }} />
+        </button>
       </h3>
       <div
         className="Room"
@@ -341,7 +429,7 @@ export default function HostRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti recycle={true} run={true} height={document.body.scrollHeight} confettiSource={{x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY}} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
@@ -373,14 +461,14 @@ export default function HostRoom({
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
-                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="hover">
                             <ExportOutlined />
                           </Dropdown>
                         </div>
                       }
                     >
-                      {addresses.length == 0 && <h2>This room is currently empty </h2>}
-                      {addresses.length > 0 && (
+                      {allAddresses.length === 0 && <h2>This room is currently empty </h2>}
+                      {allAddresses.length > 0 && (
                         <List
                           bordered
                           dataSource={allAddresses}
@@ -477,32 +565,48 @@ export default function HostRoom({
                     />
 
                     <TokenModal
+                      destroyOnClose={true}
                       visible={importToken}
-                      handleAddress={handleTokenImport}
+                      chainId={chainId}
+                      onChange={handleTokenImport}
+                      localProvider={localProvider}
+                      networkTokenList={networkTokenList}
                       onCancel={() => setImportToken(false)}
                       okText="Import Token"
+                      setImportToken={setImportToken}
+                      list={list}
                     />
 
                     <div style={{ width: "100%", marginTop: 7, display: "flex", justifyContent: "flex-end" }}>
-                      <a
-                        href="#"
-                        onClick={e => {
+                      <Button
+                        type="primary"
+                        ghost
+                        loading={importLoading}
+                        icon={<div></div>}
+                        onClick={async e => {
                           e.preventDefault();
-
+                          if (networkTokenList) {
+                            setImportLoading(true);
+                            const res = await axios.get(networkTokenList);
+                            setImportLoading(false);
+                            const { tokens } = res.data;
+                            setList(tokens);
+                          } else {
+                            setList([]);
+                          }
                           setImportToken(true);
                         }}
                       >
-                        import ERC20 token...
-                      </a>
+                        Import ERC-20 Token
+                      </Button>
                     </div>
                     <PayButton
                       style={{ marginTop: 20 }}
                       token={token}
                       appName="Tip.party"
-                      tokenListHandler={tokens => setAvailableTokens(tokens)}
                       callerAddress={address}
-                      maxApproval={amount}
-                      amount={amount}
+                      maxApproval={numericalAmount}
+                      amount={numericalAmount}
                       spender={spender}
                       yourLocalBalance={yourLocalBalance}
                       readContracts={readContracts}

@@ -36,18 +36,14 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
           fontSize: props.fontSize ? props.fontSize : 20,
         }}
       >
-        <div>
-          <Typography.Text copyable={{ text: hash }}>
+
             <a
-              style={{ color: currentTheme === "light" ? "#222222" : "#ddd" }}
               target="_blank"
               href={`${explorer}tx/${hash}`}
               rel="noopener noreferrer"
             >
-              {hash.substr(0, 10)}
+              {hash.substr(0, 20)}
             </a>
-          </Typography.Text>
-        </div>
         {loading ? (
           <div style={{ fontStyle: "italic", color: "#efefef" }}>In Progress...</div>
         ) : (

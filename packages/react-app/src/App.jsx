@@ -4,14 +4,14 @@ import WalletLink from "walletlink";
 import { Alert, Button, Menu, Select, Space } from "antd";
 import "antd/dist/antd.css";
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Link, Route, Switch } from "react-router-dom";
+import { Link, Route, Switch, useLocation } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
 import { Account } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
-import { Rooms, Home } from "./views";
+import { Rooms, Home, WalletNotConnected } from "./views";
 
 // Wallets for wallet connect
 import Portis from "@portis/web3";
@@ -157,8 +157,9 @@ function App(props) {
   //Sets the states to be used across Tip Party
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(true);
   const [isHost, setHost] = useState(false);
+  const [room, setRoom] = useState();
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -169,6 +170,12 @@ function App(props) {
       window.location.reload();
     }, 1);
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setRoom(location.pathname.slice(6));
+  }, [location]);
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
   const price = useExchangePrice(targetNetwork, mainnetProvider);
@@ -214,8 +221,6 @@ function App(props) {
 
   // If you want to make 🔐 write transactions to your contracts, use the userSigner:
   const writeContracts = useContractLoader(userSigner, { chainId: localChainId });
-
-  const room = window.location.pathname.slice(6);
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -281,7 +286,7 @@ function App(props) {
     const networkLocal = NETWORK(localChainId);
     if (selectedChainId === 1337 && localChainId === 31337) {
       networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 130, padding: 16 }}>
           <Alert
             message="⚠️ Wrong Network ID"
             description={
@@ -298,12 +303,14 @@ function App(props) {
       );
     } else {
       networkDisplay = (
-        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
+        <div style={{ zIndex: 2, position: "absolute", right: 0, top: 130, padding: 16 }}>
           <Alert
             message="⚠️ Wrong Network"
             description={
               <div>
-                You have <b>{networkSelected && networkSelected.name}</b> selected and you need to be on{" "}
+                <p>
+                  You have <b>{networkSelected && networkSelected.name}</b> selected.
+                </p>
                 <Button
                   onClick={async () => {
                     const ethereum = window.ethereum;
@@ -338,9 +345,8 @@ function App(props) {
                     }
                   }}
                 >
-                  <b>{networkLocal && networkLocal.name}</b>
+                  <b>Click here to switch to {networkLocal && networkLocal.name}</b>
                 </Button>
-                .
               </div>
             }
             type="error"
@@ -562,36 +568,54 @@ function App(props) {
           />
         </span>
       </div>
-      <BrowserRouter>
-        {targetNetwork.name === "localhost" && (
-          <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
-            <Menu.Item key="/">
+
+      {targetNetwork.name === "localhost" && (
+        <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
+          <Menu.Item key="/">
+            <Link
+              onClick={() => {
+                setRoute("/");
+              }}
+              to="/"
+            >
+              App
+            </Link>
+          </Menu.Item>
+          {targetNetwork.name === "localhost" && (
+            <Menu.Item key="/contracts">
               <Link
                 onClick={() => {
-                  setRoute("/");
+                  setRoute("/contracts");
                 }}
-                to="/"
+                to="/contracts"
               >
-                App
+                Contracts
               </Link>
             </Menu.Item>
-            {targetNetwork.name === "localhost" && (
-              <Menu.Item key="/contracts">
-                <Link
-                  onClick={() => {
-                    setRoute("/contracts");
-                  }}
-                  to="/contracts"
-                >
-                  Contracts
-                </Link>
-              </Menu.Item>
-            )}
-          </Menu>
-        )}
+          )}
+        </Menu>
+      )}
 
-        <main>
-          <Switch>
+      <main>
+        <Switch>
+          {!isWalletConnected ? (
+            <WalletNotConnected
+              connector={
+                <Account
+                  address={address}
+                  localProvider={localProvider}
+                  userSigner={userSigner}
+                  mainnetProvider={mainnetProvider}
+                  price={price}
+                  web3Modal={web3Modal}
+                  loadWeb3Modal={loadWeb3Modal}
+                  logoutOfWeb3Modal={logoutOfWeb3Modal}
+                  blockExplorer={blockExplorer}
+                  width={300}
+                />
+              }
+            />
+          ) : (
             <>
               <Route exact path="/">
                 <Home
@@ -602,6 +626,8 @@ function App(props) {
                   tx={tx}
                   isWalletConnected={isWalletConnected}
                   nativeCurrency={targetNetwork.nativeCurrency}
+                  isHost={isHost}
+                  setHost={setHost}
                 />
               </Route>
               <Route path="/room/:room">
@@ -619,6 +645,7 @@ function App(props) {
                   selectedChainId={selectedChainId}
                   tx={tx}
                   nativeCurrency={targetNetwork.nativeCurrency}
+                  networkTokenList={targetNetwork.networkTokenList}
                   isHost={isHost}
                   isWalletConnected={isWalletConnected}
                 />
@@ -641,9 +668,9 @@ function App(props) {
                 />
               </Route> */}
             </>
-          </Switch>
-        </main>
-      </BrowserRouter>
+          )}
+        </Switch>
+      </main>
     </div>
   );
 }

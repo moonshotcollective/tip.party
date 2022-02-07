@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown } from "antd";
-import { ExportOutlined } from "@ant-design/icons";
+import { ExportOutlined, LinkOutlined } from "@ant-design/icons";
 import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
@@ -31,6 +31,7 @@ export default function GuestRoom({
 
   const [spender, setSpender] = useState("");
   const [addresses, setAddresses] = useState([]);
+  const [sortedAddresses, setSortedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
   const [isSigning, setIsSigning] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
@@ -40,6 +41,21 @@ export default function GuestRoom({
   const { readContracts, writeContracts } = contracts;
 
   const subs = useRef([]);
+
+  useEffect(() => {
+    // moving current user to the top of the list
+    if (addresses && addresses.length > 0) {
+      console.log('address:', address)
+      const newAddresses = [...addresses];
+      newAddresses.forEach((add, index) => {
+        if (add.toLowerCase() === address.toLowerCase()) {
+          newAddresses.splice(index, 1);
+          newAddresses.unshift(add);
+        }
+      });
+      setSortedAddresses(newAddresses);
+    }
+  }, [addresses, address]);
 
   useEffect(() => {
     if (oldWriteContracts?.TokenDistributor) {
@@ -169,6 +185,33 @@ export default function GuestRoom({
   return (
     <div className="bg-purple-darkpurple">
       <h2 id="title">Welcome to the Tip Party!</h2>
+      <h3>
+        {" "}
+        You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
+        <button
+          onClick={() => {
+            try {
+              const el = document.createElement("input");
+              el.value = window.location.href;
+              document.body.appendChild(el);
+              el.select();
+              document.execCommand("copy");
+              document.body.removeChild(el);
+              return notification.success({
+                message: "Room link copied to clipboard",
+                placement: "topRight",
+              });
+            } catch (err) {
+              return notification.success({
+                message: "Failed to copy room link to clipboard",
+                placement: "topRight",
+              });
+            }
+          }}
+        >
+          <LinkOutlined style={{ color: "#C9B8FF" }} />
+        </button>
+      </h3>
       <div
         className="Room"
         style={{
@@ -179,14 +222,14 @@ export default function GuestRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti recycle={true} run={true} height={document.body.scrollHeight} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
               <div style={{ marginTop: 10 }}>
                 <div style={{ marginBottom: 20 }}>
                   <Button type="primary" size="large" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                    Sign Into "{room}" Room
+                    Sign Into "{room}" Room{" "}
                   </Button>
                 </div>
                 <div style={{ flex: 1 }}>
@@ -196,17 +239,17 @@ export default function GuestRoom({
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
-                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="click">
+                          <Dropdown overlay={exportMenu} placement="bottomRight" arrow trigger="hover">
                             <ExportOutlined />
                           </Dropdown>
                         </div>
                       }
                     >
-                      {addresses.length == 0 && <h2>This room is currently empty </h2>}
-                      {addresses.length > 0 && (
+                      {sortedAddresses.length === 0 && <h2>This room is currently empty </h2>}
+                      {sortedAddresses.length > 0 && (
                         <List
                           bordered
-                          dataSource={addresses}
+                          dataSource={sortedAddresses}
                           renderItem={(item, index) => (
                             <List.Item key={`${item.toLowerCase()}-${index}`}>
                               <div
