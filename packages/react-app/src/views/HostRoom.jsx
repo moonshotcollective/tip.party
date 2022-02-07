@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
-import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
 import { ethers } from "ethers";
@@ -14,6 +14,7 @@ import { NETWORK } from "../constants";
 import axios from "axios";
 import "./HostRoom.css";
 import { useMemo } from "react";
+import { GlobalContext } from "../context/GlobalState";
 
 export default function HostRoom({
   appServer,
@@ -57,6 +58,8 @@ export default function HostRoom({
 
   const subs = useRef([]);
 
+  const { isHost } = useContext(GlobalContext);
+
   //removed current user to top for host room since that introduces many bugs
 
   // useEffect(() => {
@@ -94,8 +97,8 @@ export default function HostRoom({
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
     }
-    const blacklistInStorage = localStorage.getItem(room+"blacklist");
-    if(blacklistInStorage){
+    const blacklistInStorage = localStorage.getItem(room + "blacklist");
+    if (blacklistInStorage) {
       const parsedBlacklist = JSON.parse(blacklistInStorage);
       setBlacklist(parsedBlacklist);
     }
@@ -220,17 +223,16 @@ export default function HostRoom({
   const handleListUpdate = list => {
     const updatedList = new Set([...addresses, ...list]);
 
-
-  //removes addresses that are in blacklist
-  const blacklistInStorage = localStorage.getItem(room+"blacklist");
-  if(blacklistInStorage && updatedList){
-  const parsedBlacklist = JSON.parse(blacklistInStorage);
-    updatedList.forEach((addr) => {
-      if (parsedBlacklist.includes(addr.toLowerCase())) {
-        updatedList.delete(addr);
-      }
-    });
-  }
+    //removes addresses that are in blacklist
+    const blacklistInStorage = localStorage.getItem(room + "blacklist");
+    if (blacklistInStorage && updatedList) {
+      const parsedBlacklist = JSON.parse(blacklistInStorage);
+      updatedList.forEach(addr => {
+        if (parsedBlacklist.includes(addr.toLowerCase())) {
+          updatedList.delete(addr);
+        }
+      });
+    }
 
     // update addresses list
     setAddresses([...updatedList]);
@@ -353,7 +355,7 @@ export default function HostRoom({
     const updatedAddressesList = [...addresses];
     updatedAddressesList.splice(index, 1);
     setAddresses([...updatedAddressesList]);
-    localStorage.setItem(room+"blacklist", JSON.stringify([...blacklist, addressChanged]));
+    localStorage.setItem(room + "blacklist", JSON.stringify([...blacklist, addressChanged]));
     setBlacklist([...blacklist, addressChanged]);
   };
   const removeImportedAddress = index => {
@@ -429,7 +431,14 @@ export default function HostRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} height={document.body.scrollHeight} confettiSource={{x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY}} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti
+          recycle={true}
+          run={true}
+          height={document.body.scrollHeight}
+          confettiSource={{ x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY }}
+          numberOfPieces={numberOfConfettiPieces}
+          tweenDuration={3000}
+        />
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">

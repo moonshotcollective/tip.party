@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import { HostRoom, GuestRoom } from ".";
+import { GlobalContext } from "../context/GlobalState";
 
 export default function Rooms({
   appServer,
@@ -15,9 +16,9 @@ export default function Rooms({
   selectedChainId,
   tx,
   nativeCurrency,
-  isHost,
   networkTokenList,
 }) {
+  const { isHost } = useContext(GlobalContext);
   return (
     <div>
       <div>

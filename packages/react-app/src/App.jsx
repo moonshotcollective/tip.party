@@ -3,7 +3,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import WalletLink from "walletlink";
 import { Alert, Button, Menu, Select, Space } from "antd";
 import "antd/dist/antd.css";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useContext } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
@@ -12,6 +12,7 @@ import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
 import { Rooms, Home, WalletNotConnected } from "./views";
+import { GlobalContext } from "./context/GlobalState";
 
 // Wallets for wallet connect
 import Portis from "@portis/web3";
@@ -158,8 +159,9 @@ function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState("0x0000000000000000000000000000000000000000");
   const [isWalletConnected, setIsWalletConnected] = useState(true);
-  const [isHost, setHost] = useState(false);
   const [room, setRoom] = useState();
+
+  const { isHost, setHost } = useContext(GlobalContext);
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -626,8 +628,6 @@ function App(props) {
                   tx={tx}
                   isWalletConnected={isWalletConnected}
                   nativeCurrency={targetNetwork.nativeCurrency}
-                  isHost={isHost}
-                  setHost={setHost}
                 />
               </Route>
               <Route path="/room/:room">
@@ -646,7 +646,6 @@ function App(props) {
                   tx={tx}
                   nativeCurrency={targetNetwork.nativeCurrency}
                   networkTokenList={targetNetwork.networkTokenList}
-                  isHost={isHost}
                   isWalletConnected={isWalletConnected}
                 />
               </Route>
