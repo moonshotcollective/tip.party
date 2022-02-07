@@ -34,6 +34,7 @@ module.exports = functions.https.onCall(async (data, context) => {
   const { provider, addresses } = data;
 
   const validAddresses = [];
+  const blacklistAddresses = [];
 
   for (const address in addresses) {
     const ens = useLookupAddress(provider, address);
@@ -41,8 +42,10 @@ module.exports = functions.https.onCall(async (data, context) => {
     const validEnsCheck = ensSplit && ensSplit[ensSplit.length - 1] === "eth";
     if (validEnsCheck) {
       validAddresses.push(address);
+    } else {
+      blacklistAddresses.push(address);
     }
   }
 
-  return { validAddresses };
+  return { validAddresses, blacklistAddresses };
 });
