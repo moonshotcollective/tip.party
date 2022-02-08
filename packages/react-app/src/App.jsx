@@ -28,7 +28,7 @@ import Authereum from "authereum";
 const { ethers } = require("ethers");
 
 // 😬 Sorry for all the console logging
-const DEBUG = false;
+const DEBUG = true;
 const NETWORKCHECK = true;
 
 // Coinbase walletLink init
@@ -120,12 +120,14 @@ const providers = [
 
 function App(props) {
   // Add more networks as the dapp expands to more networks
-  const configuredNetworks = ["arbitrum", "mainnet", "polygon", "optimism", "rinkeby", "xdai"];
+  const configuredNetworks = ["mainnet", "polygon", "arbitrum", "optimism", "rinkeby", "xdai"];
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
     configuredNetworks.push("localhost");
   }
 
-  const cachedNetwork = window.localStorage.getItem("network");
+  const cachedNetwork = configuredNetworks.includes(window.localStorage.getItem("network"))
+    ? window.localStorage.getItem("network")
+    : "mainnet";
 
   //Sets the states to be used across Tip Party
   const [injectedProvider, setInjectedProvider] = useState();
