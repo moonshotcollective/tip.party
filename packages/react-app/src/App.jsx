@@ -28,7 +28,7 @@ import Authereum from "authereum";
 const { ethers } = require("ethers");
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
 
 // Coinbase walletLink init
