@@ -25,19 +25,20 @@ function NetworkSwitch({ networkOptions, selectedNetwork, setSelectedNetwork, NE
                       blockExplorerUrls: [targetNetwork.blockExplorer],
                     },
                   ];
-                  console.log("data", data);
-                  await ethereum
-                    .request({
+                  try {
+                    await ethereum.request({
                       method: "wallet_switchEthereumChain",
-                      params: [
-                        {
-                          chainId: "0x" + targetNetwork.chainId.toString(16),
-                        },
-                      ],
-                    })
-                    .catch(error => {
-                      alert("VIEW ERROR ", error);
+                      params: [{ chainId: "0x" + targetNetwork.chainId.toString(16) }],
                     });
+                  } catch (switchError) {
+                    // if failed, try a network switch instead
+                    await ethereum
+                      .request({
+                        method: "wallet_addEthereumChain",
+                        params: data,
+                      })
+                      .catch();
+                  }
                 }
               }}
             >
