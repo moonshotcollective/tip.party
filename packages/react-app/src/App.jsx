@@ -260,7 +260,7 @@ function App(props) {
     }
 
     if (readContracts) {
-      setIsWalletConnected(AddressHelper.isValidAddress(address));
+      setIsWalletConnected(!!web3Modal.cachedProvider);
     }
   }, [
     mainnetProvider,
