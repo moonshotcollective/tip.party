@@ -169,8 +169,10 @@ export default function HostRoom({
       if (!ethers.utils.isAddress(element)) {
         try {
           let addr = await mainnetProvider.resolveName(element);
+          addr = addr.toLowerCase();
           if (addr) {
             if (allAddresses.includes(addr)) {
+              setAddressImportLoading(false);
               return notification.error({
                 message: "Failed to Add Address",
                 description: element + " is already included!",
@@ -185,6 +187,7 @@ export default function HostRoom({
             throw "error";
           }
         } catch (e) {
+          setAddressImportLoading(false);
           return notification.error({
             message: "Failed to Add Address",
             description: element + " is not a valid Ethereum address",
@@ -193,6 +196,7 @@ export default function HostRoom({
         }
       }
       if (allAddresses.includes(element)) {
+        setAddressImportLoading(false);
         return notification.error({
           message: "Failed to Add Address",
           description: element + " is already included!",
