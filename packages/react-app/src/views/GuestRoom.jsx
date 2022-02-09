@@ -45,7 +45,7 @@ export default function GuestRoom({
   useEffect(() => {
     // moving current user to the top of the list
     if (addresses && addresses.length > 0) {
-      console.log('address:', address)
+      console.log("address:", address);
       const newAddresses = [...addresses];
       newAddresses.forEach((add, index) => {
         if (add.toLowerCase() === address.toLowerCase()) {
@@ -81,12 +81,45 @@ export default function GuestRoom({
     }
   }, [room, chainId]);
 
+  useEffect(() => {
+    if (isSignedIn) {
+      handleHashes(localProvider);
+    }
+  }, [isSignedIn,txHash]);
+
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
     setTimeout(() => {
       setNumberOfConfettiPieces(0);
     }, 4000);
   };
+
+  const handleHashes = async provider => {
+    try{ 
+    //loops through each transaction
+    txHash.forEach(async hash => {
+      //gets whether if the user has viewed the notification
+      storage.watchTxNotifiers(room, hash, async result => {
+        //if the resulting array includes the addresss
+        if (!result.includes(address.toLowerCase())) {
+          //wait for transaction and check if it is complete
+          const tx = await provider.waitForTransaction(hash, 1);
+          if (tx.status === 1) {
+            notification.success({ message: `Payout from ${tx.from} was successful` });
+            // send user address to firebase as notified
+            await storage.addTxNotifier(room, hash, address.toLowerCase());
+          }
+        }
+      });
+    });
+  } catch(e) {
+
+    }
+  };
+
+
+
+
 
   const handleListUpdate = list => {
     const updatedList = new Set([...addresses, ...list]);
@@ -222,7 +255,13 @@ export default function GuestRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} height={document.body.scrollHeight} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti
+          recycle={true}
+          run={true}
+          height={document.body.scrollHeight}
+          numberOfPieces={numberOfConfettiPieces}
+          tweenDuration={3000}
+        />
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
