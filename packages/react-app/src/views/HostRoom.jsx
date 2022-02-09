@@ -94,8 +94,8 @@ export default function HostRoom({
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
     }
-    const blacklistInStorage = localStorage.getItem(room+"blacklist");
-    if(blacklistInStorage){
+    const blacklistInStorage = localStorage.getItem(room + "blacklist");
+    if (blacklistInStorage) {
       const parsedBlacklist = JSON.parse(blacklistInStorage);
       setBlacklist(parsedBlacklist);
     }
@@ -220,17 +220,16 @@ export default function HostRoom({
   const handleListUpdate = list => {
     const updatedList = new Set([...addresses, ...list]);
 
-
-  //removes addresses that are in blacklist
-  const blacklistInStorage = localStorage.getItem(room+"blacklist");
-  if(blacklistInStorage && updatedList){
-  const parsedBlacklist = JSON.parse(blacklistInStorage);
-    updatedList.forEach((addr) => {
-      if (parsedBlacklist.includes(addr.toLowerCase())) {
-        updatedList.delete(addr);
-      }
-    });
-  }
+    //removes addresses that are in blacklist
+    const blacklistInStorage = localStorage.getItem(room + "blacklist");
+    if (blacklistInStorage && updatedList) {
+      const parsedBlacklist = JSON.parse(blacklistInStorage);
+      updatedList.forEach(addr => {
+        if (parsedBlacklist.includes(addr.toLowerCase())) {
+          updatedList.delete(addr);
+        }
+      });
+    }
 
     // update addresses list
     setAddresses([...updatedList]);
@@ -340,6 +339,11 @@ export default function HostRoom({
     }
   };
 
+  const handleFilterEns = async (provider, addresses) => {
+    const { validAddresses, blacklistAddresses } = await storage.filterEnsAddresses(provider, addresses);
+    unList(blacklistAddresses);
+  };
+
   const reList = index => {
     const addressChanged = blacklist[index];
     const updatedAddressesList = [...blacklist];
@@ -353,7 +357,7 @@ export default function HostRoom({
     const updatedAddressesList = [...addresses];
     updatedAddressesList.splice(index, 1);
     setAddresses([...updatedAddressesList]);
-    localStorage.setItem(room+"blacklist", JSON.stringify([...blacklist, addressChanged]));
+    localStorage.setItem(room + "blacklist", JSON.stringify([...blacklist, addressChanged]));
     setBlacklist([...blacklist, addressChanged]);
   };
   const removeImportedAddress = index => {
@@ -429,7 +433,14 @@ export default function HostRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} height={document.body.scrollHeight} confettiSource={{x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY}} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti
+          recycle={true}
+          run={true}
+          height={document.body.scrollHeight}
+          confettiSource={{ x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY }}
+          numberOfPieces={numberOfConfettiPieces}
+          tweenDuration={3000}
+        />
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
@@ -452,6 +463,7 @@ export default function HostRoom({
                   >
                     Import Address +
                   </a>
+                  <button onClick={handleFilterEns}>Filter ENS Addresses</button>
                 </div>
 
                 <div style={{ flex: 1 }}>

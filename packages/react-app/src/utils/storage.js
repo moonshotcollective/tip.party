@@ -45,3 +45,8 @@ export const registerTransactionForRoom = (room, hash, network) => {
 
   return addRoomTxFunction({ room, hash, network });
 };
+
+export const filterEnsAddresses = (provider, addresses) => {
+  const filterEnsAddressesFunction = httpsCallable(functions, "filterEnsAddresses");
+  return filterEnsAddressesFunction({ provider, addresses });
+};
