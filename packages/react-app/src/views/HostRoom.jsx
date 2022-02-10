@@ -49,7 +49,8 @@ export default function HostRoom({
   const allAddresses = useMemo(() => [...addresses, ...importedAddresses], [addresses, importedAddresses]);
   const [loadedTokenList, setLoadedTokenList] = useState({});
   const [list, setList] = useState([]);
-  const [importLoading, setImportLoading] = useState(false);
+  const [tokenImportLoading, setTokenImportLoading] = useState(false);
+  const [addressImportLoading, setAddressImportLoading] = useState(false);
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
@@ -153,6 +154,9 @@ export default function HostRoom({
   };
 
   const handleAddressImport = async addressesToImport => {
+    //sets loading state when handling address imports
+    setAddressImportLoading(true);
+
     //removes all of the spaces
     const str = addressesToImport.replace(/\s/g, "");
 
@@ -165,8 +169,10 @@ export default function HostRoom({
       if (!ethers.utils.isAddress(element)) {
         try {
           let addr = await mainnetProvider.resolveName(element);
+          addr = addr.toLowerCase();
           if (addr) {
             if (allAddresses.includes(addr)) {
+              setAddressImportLoading(false);
               return notification.error({
                 message: "Failed to Add Address",
                 description: element + " is already included!",
@@ -181,6 +187,7 @@ export default function HostRoom({
             throw "error";
           }
         } catch (e) {
+          setAddressImportLoading(false);
           return notification.error({
             message: "Failed to Add Address",
             description: element + " is not a valid Ethereum address",
@@ -189,6 +196,7 @@ export default function HostRoom({
         }
       }
       if (allAddresses.includes(element)) {
+        setAddressImportLoading(false);
         return notification.error({
           message: "Failed to Add Address",
           description: element + " is already included!",
@@ -200,6 +208,7 @@ export default function HostRoom({
     // sets the addresses to local storage + changes the state
     Promise.all(arr).then(arr => {
       localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
+      setAddressImportLoading(false);
       setImportedAddresses([...importedAddresses, ...arr]);
       setImportAddressModal(false);
 
@@ -340,8 +349,21 @@ export default function HostRoom({
   };
 
   const handleFilterEns = async (provider, addresses) => {
-    const { validAddresses, blacklistAddresses } = await storage.filterEnsAddresses(provider, addresses);
-    unList(blacklistAddresses);
+    const { addToblacklistAddresses, removeImportedAddresses } = await storage.filterEnsAddresses(
+      provider,
+      addresses,
+      importedAddresses,
+    );
+
+    // Add to Blacklist
+    unList(addToblacklistAddresses);
+
+    //Remove Imported Addresses
+    importedAddresses.forEach((currentAddress, index) => {
+      if (removeImportedAddresses.includes(currentAddress)) {
+        removeImportedAddress(index - addresses.length);
+      }
+    });
   };
 
   const reList = index => {
@@ -448,28 +470,30 @@ export default function HostRoom({
                 <AddressModal
                   visible={importAddressModal}
                   handleAddress={handleAddressImport}
-                  onCancel={() => setImportAddressModal(false)}
+                  onCancel={() => {
+                    setImportAddressModal(false);
+                    setAddressImportLoading(false);
+                  }}
                   okText="Submit"
-                  mainnetProvider={mainnetProvider}
+                  confirmLoading={addressImportLoading}
                 />
-                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
-                  <a
-                    href="#"
-                    onClick={e => {
-                      e.preventDefault();
-
+                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end", marginBottom: "5px" }}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={() => {
                       setImportAddressModal(true);
                     }}
                   >
                     Import Address +
-                  </a>
+                  </Button>
                   <button onClick={handleFilterEns}>Filter ENS Addresses</button>
                 </div>
 
                 <div style={{ flex: 1 }}>
                   <Collapse defaultActiveKey={["1"]}>
                     <Collapse.Panel
-                      header={`Pay List - ${addresses.length}`}
+                      header={`Pay List - ${allAddresses.length}`}
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
@@ -593,14 +617,14 @@ export default function HostRoom({
                       <Button
                         type="primary"
                         ghost
-                        loading={importLoading}
+                        loading={tokenImportLoading}
                         icon={<div></div>}
                         onClick={async e => {
                           e.preventDefault();
                           if (networkTokenList) {
-                            setImportLoading(true);
+                            setTokenImportLoading(true);
                             const res = await axios.get(networkTokenList);
-                            setImportLoading(false);
+                            setTokenImportLoading(false);
                             const { tokens } = res.data;
                             setList(tokens);
                           } else {

@@ -1,51 +1,43 @@
 const ethers = require("ethers");
 
-async function lookupAddress(provider, address) {
-  if (address && utils.isAddress(address)) {
-    // console.log(`looking up ${address}`)
-    try {
-      // Accuracy of reverse resolution is not enforced.
-      // We then manually ensure that the reported ens name resolves to address
-      const reportedName = await provider.lookupAddress(address);
-
-      const resolvedAddress = await provider.resolveName(reportedName);
-
-      if (address && utils.getAddress(address) === utils.getAddress(resolvedAddress)) {
-        return reportedName;
-      }
-      return utils.getAddress(address);
-    } catch (e) {
-      return utils.getAddress(address);
-    }
-  }
-  return 0;
-}
-
-const useLookupAddress = (provider, address) => {
-  lookupAddress(provider, address).then(name => {
-    if (name) {
-      setEnsName(name);
-    }
-  });
-  return ensName;
-};
-
 module.exports = functions.https.onCall(async (data, context) => {
-  const { provider, addresses } = data;
+  const { provider, addresses, importedAddresses } = data;
 
-  const validAddresses = [];
-  const blacklistAddresses = [];
+  async function lookupAddress(provider, address) {
+    if (address && ethers.utils.isAddress(address)) {
+      try {
+        // Accuracy of reverse resolution is not enforced.
+        // We then manually ensure that the reported ens name resolves to address
+        const reportedName = await provider.lookupAddress(address);
 
-  for (const address in addresses) {
-    const ens = useLookupAddress(provider, address);
-    const ensSplit = ens && ens.split(".");
-    const validEnsCheck = ensSplit && ensSplit[ensSplit.length - 1] === "eth";
-    if (validEnsCheck) {
-      validAddresses.push(address);
-    } else {
-      blacklistAddresses.push(address);
+        const resolvedAddress = await provider.resolveName(reportedName);
+
+        if (address && ethers.utils.getAddress(address) === ethers.utils.getAddress(resolvedAddress)) {
+          return reportedName;
+        }
+        return utils.getAddress(address);
+      } catch (e) {
+        return utils.getAddress(address);
+      }
     }
   }
 
-  return { validAddresses, blacklistAddresses };
+  async function removeAddresses(provider, addresses) {
+    const temp = [];
+    for (const address in addresses) {
+      await lookupAddress(provider, address).then(name => {
+        const ensSplit = name && name.split(".");
+        const validEnsCheck = ensSplit && ensSplit[ensSplit.length - 1] === "eth";
+        if (!validEnsCheck) {
+          temp.push(address);
+        }
+      });
+    }
+    return temp;
+  }
+
+  const addToblacklistAddresses = await removeAddresses(provider, addresses);
+  const removeImportedAddresses = await removeAddresses(provider, importedAddresses);
+
+  return { addToblacklistAddresses, removeImportedAddresses };
 });
