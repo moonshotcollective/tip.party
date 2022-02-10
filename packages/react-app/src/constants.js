@@ -4,7 +4,8 @@ export const INFURA_ID = "460f40a260564ac4a4f4b3fffb032dad";
 // export const INFURA_ID = "7b0e75d38d424750b92791477924d133";
 
 // MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
-export const ETHERSCAN_KEY = "PSW8C433Q667DVEX5BCRMGNAH9FSGFZ7Q8";
+export const ETHERSCAN_KEY = process.env.ETHERSCAN_API_KEY
+
 
 // BLOCKNATIVE ID FOR Notify.js:
 export const BLOCKNATIVE_DAPPID = "0b58206a-f3c0-4701-a62f-73c7243e8c77";
@@ -248,6 +249,8 @@ export const NETWORKS = {
     blockExplorer: "https://etherscan.io/",
     nativeCurrency: "ETH",
     networkTokenList: "https://tokens.coingecko.com/uniswap/all.json",
+    apiUrl:"https://api.etherscan.io/api",
+    apiKey:ETHERSCAN_KEY,
   },
   kovan: {
     name: "kovan",
@@ -266,6 +269,8 @@ export const NETWORKS = {
     faucet: "https://faucet.rinkeby.io/",
     blockExplorer: "https://rinkeby.etherscan.io/",
     nativeCurrency: "ETH",
+    apiUrl:"https://api-rinkeby.etherscan.io/api",
+    apiKey: ETHERSCAN_KEY,
   },
   ropsten: {
     name: "ropsten",
@@ -317,6 +322,7 @@ export const NETWORKS = {
     faucet: "https://faucet.matic.network/",
     blockExplorer: "https://explorer-mainnet.maticvigil.com//",
     nativeCurrency: "MATIC",
+    apiUrl: "https://api.polygonscan.com/api"
   },
   mumbai: {
     name: "mumbai",
@@ -362,6 +368,7 @@ export const NETWORKS = {
     gasPrice: 0,
     nativeCurrency: "ETH",
     networkTokenList: "https://bridge.arbitrum.io/token-list-42161.json",
+    apiUrl: "https://api.arbiscan.io/api",
   },
   localOptimismL1: {
     name: "localOptimismL1",
@@ -395,6 +402,7 @@ export const NETWORKS = {
     rpcUrl: process.env.REACT_APP_OPTIMISM_NETWORK,
     nativeCurrency: "ETH",
     networkTokenList: "https://static.optimism.io/optimism.tokenlist.json",
+    apiUrl:"https://api-optimistic.etherscan.io/api"
   },
   localAvalanche: {
     name: "localAvalanche",
