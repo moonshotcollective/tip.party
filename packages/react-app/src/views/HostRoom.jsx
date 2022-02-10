@@ -348,22 +348,19 @@ export default function HostRoom({
     }
   };
 
-  const handleFilterEns = async (provider, addresses) => {
-    const { addToblacklistAddresses, removeImportedAddresses } = await storage.filterEnsAddresses(
-      provider,
-      addresses,
-      importedAddresses,
-    );
+  const handleFilterEns = async (provider, roomAddresses, localAddresses) => {
+    const data = await storage.filterEnsAddresses(provider, roomAddresses, localAddresses);
+    if (data) {
+      // Add to Blacklist
+      unList(data.addToblacklistAddresses);
 
-    // Add to Blacklist
-    unList(addToblacklistAddresses);
-
-    //Remove Imported Addresses
-    importedAddresses.forEach((currentAddress, index) => {
-      if (removeImportedAddresses.includes(currentAddress)) {
-        removeImportedAddress(index - addresses.length);
-      }
-    });
+      //Remove Imported Addresses
+      importedAddresses.forEach((currentAddress, index) => {
+        if (data.removeImportedAddresses.includes(currentAddress)) {
+          removeImportedAddress(index - addresses.length);
+        }
+      });
+    }
   };
 
   const reList = index => {
@@ -487,7 +484,16 @@ export default function HostRoom({
                   >
                     Import Address +
                   </Button>
-                  <button onClick={handleFilterEns}>Filter ENS Addresses</button>
+                  <Button
+                    type="primary"
+                    size="small"
+                    style={{ marginLeft: 10 }}
+                    onClick={async () => {
+                      await handleFilterEns(process.env.REACT_APP_MAINNET_NETWORK, addresses, importedAddresses);
+                    }}
+                  >
+                    Filter ENS Addresses
+                  </Button>
                 </div>
 
                 <div style={{ flex: 1 }}>
