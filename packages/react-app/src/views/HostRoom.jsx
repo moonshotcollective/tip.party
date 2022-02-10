@@ -403,7 +403,9 @@ export default function HostRoom({
       <h3>
         {" "}
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
-        <button
+        <Button
+          type="primary"
+          ghost
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -413,19 +415,19 @@ export default function HostRoom({
               document.execCommand("copy");
               document.body.removeChild(el);
               return notification.success({
-                message: "Room link copied to clipboard",
+                message: "Share link copied to clipboard",
                 placement: "topRight",
               });
             } catch (err) {
               return notification.success({
-                message: "Failed to copy room link to clipboard",
+                message: "Failed to copy share link to clipboard",
                 placement: "topRight",
               });
             }
           }}
         >
-          <LinkOutlined style={{ color: "#C9B8FF" }} />
-        </button>
+          Invite <LinkOutlined />
+        </Button>
       </h3>
       <div
         className="Room"
