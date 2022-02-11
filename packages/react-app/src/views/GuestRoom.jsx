@@ -45,7 +45,7 @@ export default function GuestRoom({
   useEffect(() => {
     // moving current user to the top of the list
     if (addresses && addresses.length > 0) {
-      console.log('address:', address)
+      console.log("address:", address);
       const newAddresses = [...addresses];
       newAddresses.forEach((add, index) => {
         if (add.toLowerCase() === address.toLowerCase()) {
@@ -128,7 +128,9 @@ export default function GuestRoom({
     setIsSigning(true);
 
     // sign roomId using wallet
-    let signature = await userSigner.signMessage(room);
+    let signature = await userSigner.signMessage(
+      `This action will sign you in as a guest in the room ${room} in order to receive tips. This action does not cost tokens.`,
+    );
 
     try {
       // sign into room
@@ -222,7 +224,13 @@ export default function GuestRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} height={document.body.scrollHeight} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti
+          recycle={true}
+          run={true}
+          height={document.body.scrollHeight}
+          numberOfPieces={numberOfConfettiPieces}
+          tweenDuration={3000}
+        />
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
