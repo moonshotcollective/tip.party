@@ -14,7 +14,7 @@ export default function Home({ isHost, setHost, ...props }) {
     const slugifiedRoom = slugify(room.toLowerCase(), "_");
     if (isHost) {
       setIsCreatingRoom(true);
-      storage.watchRoom(room, result => {
+      storage.watchRoom(slugifiedRoom, result => {
         setIsCreatingRoom(false);
         if (result && result.length > 0) {
           return notification.error({
