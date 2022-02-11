@@ -197,7 +197,9 @@ export default function GuestRoom({
             Sign into "<b>{room}</b>" room to be a Guest
           </div>
         )}
-        <button
+        <Button
+          type="primary"
+          size="medium"
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -218,8 +220,8 @@ export default function GuestRoom({
             }
           }}
         >
-          <LinkOutlined style={{ color: "#C9B8FF" }} />
-        </button>
+          Invite <LinkOutlined />
+        </Button>
       </h3>
       <div
         className="Room"
