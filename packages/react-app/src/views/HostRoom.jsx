@@ -405,7 +405,7 @@ export default function HostRoom({
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
         <Button
           type="primary"
-          ghost
+          size="medium"
           onClick={() => {
             try {
               const el = document.createElement("input");
