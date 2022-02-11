@@ -40,11 +40,10 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const [receivedHashes,setReceivedHashes] = useState([]);
-
+  const [receivedHashes, setReceivedHashes] = useState([]);
+  
+  
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
-  const apiUrl = chainId ? NETWORK(chainId).apiUrl : "";
-  const apiKey = chainId ? NETWORK(chainId).apiKey : "";
 
   const { readContracts, writeContracts } = contracts;
 
@@ -111,19 +110,27 @@ export default function GuestRoom({
         storage.watchTxNotifiers(room, hash, async result => {
           //if the resulting array doesn't include the addresss
           if (!result.includes(address.toLowerCase())) {
+
             //wait for transaction and check if it is complete
             const tx = await provider.waitForTransaction(hash, 1);
             if (tx.status === 1) {
+              
               const blockNum = "0x" + tx.blockNumber.toString(16);
+
+              //Uses the alchemy api function
+              //Returns any token transfer a user received within the block
               const receivedTransfers = fetchTransaction(chainId, blockNum, address);
+
               Promise.resolve(receivedTransfers).then(async recievedTransfers => {
+                
+                //checks whether user has received tokens or the notification already
                 const hasReceivedTokens = recievedTransfers.length > 0 ? true : false;
                 const hasReceivedNotification = receivedHashes.includes(hash);
-                
-
+              
                 if (hasReceivedTokens && !hasReceivedNotification) {
 
-                  setReceivedHashes([...receivedHashes, hash]);
+                  setReceivedHashes(...receivedHashes,hash);
+
                   const value = recievedTransfers[0].value;
                   const asset = recievedTransfers[0].asset;
 
