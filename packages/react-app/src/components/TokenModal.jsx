@@ -85,8 +85,8 @@ export default function TokenModal({ list, setImportToken, onChange, chainId = 1
     setValue(e);
   };
 
-  const onOk = e => {
-    onChange(e.value);
+  const onOk = () => {
+    onChange(value?.value || value);
     setImportToken(false);
   };
 
