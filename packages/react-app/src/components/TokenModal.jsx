@@ -12,7 +12,6 @@ const loadERC20 = async (address, p) => {
     const r = new ethers.Contract(address, ERC20ABI, p);
     const name = await r.name?.();
     const symbol = await r.symbol?.();
-
     return { name, symbol };
   } catch (error) {
     return {};
@@ -87,7 +86,7 @@ export default function TokenModal({ list, setImportToken, onChange, chainId = 1
   };
 
   const onOk = () => {
-    onChange(value.value);
+    onChange(value?.value || value);
     setImportToken(false);
   };
 
