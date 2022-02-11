@@ -13,14 +13,15 @@ function ImportModal({ handleAddress, ...props }) {
 
   return (
     <Modal title="Import Addresses" centered {...props} onOk={onOk}>
-      <p>Note: Imported addresses can only be seen by the current host.</p>
-      <p>When adding addresses in bulk, separate addresses with commas.</p>
+      <p>Imported addresses can only be seen by you. Separate addresses by commas when adding in bulk</p>
       <TextArea
         autoSize
         autoComplete="off"
         placeholder="Enter Addresses"
         value={addresses}
-        onChange={e =>{setAddresses(e.target.value)}}
+        onChange={e => {
+          setAddresses(e.target.value);
+        }}
       />
     </Modal>
   );
