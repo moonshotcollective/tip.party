@@ -21,7 +21,7 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
     checkTx();
   }, []);
 
-  const explorer = NETWORK(chainId).blockExplorer || `https://etherscan.io/`;
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   return (
     <div style={{ width: "100%" }}>

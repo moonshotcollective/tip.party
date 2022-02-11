@@ -9,6 +9,7 @@ import { useTokenImport } from "../hooks";
 import axios from "axios";
 import * as storage from "../utils/storage";
 import { NETWORK } from "../constants";
+import fetchTransaction from "../helpers/txHandler";
 
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -111,33 +112,38 @@ export default function GuestRoom({
             //wait for transaction and check if it is complete
             const tx = await provider.waitForTransaction(hash, 1);
             if (tx.status === 1) {
-              //gets list of each subsequent transaction where the tokens were transferred to an address
-              const internalTxs = await axios.get(
-                `${apiUrl}?module=account&action=txlistinternal&txhash=${hash}&apikey=${apiKey}`,
-              );
+              const blockNum = "0x" + tx.blockNumber.toString(16);
+              const receivedTransfers = fetchTransaction(chainId, blockNum, address);
+              Promise.resolve(receivedTransfers).then(async recievedTransfers => {
 
-              console.log(internalTxs);
+                const hasReceivedTokens = recievedTransfers.length > 0 ? true : false;
 
-              //Checks if the user has received the payment
-              const hasReceivedTokens = internalTxs.data.result ? internalTxs.data.result.some(e => e.to === address.toLowerCase()) : false;
+                if (hasReceivedTokens) {
 
-              if (hasReceivedTokens) {
-                notification.success({
-                  message: `Payout from ${tx.from} was successful`,
-                  description: (
-                    <p>
-                      Transaction link:{" "}
-                      <a target="_blank" href={`${explorer}tx/${hash}`} rel="noopener noreferrer">
-                        {hash.substr(0, 20)}
-                      </a>
-                    </p>
-                  ),
-                  duration: 0,
-                });
+                  const value = recievedTransfers[0].value;
+                  const asset =  recievedTransfers[0].asset;
 
-                // send user address to firebase as notified
-                await storage.addTxNotifier(room, hash, address.toLowerCase());
-              }
+
+                  notification.success({
+                    message: `You received ${value + " " + asset}!`,
+                    description: (
+                      <div>
+                      <p>
+                        Transaction link:{" "}
+                        <a target="_blank" href={`${explorer}tx/${hash}`} rel="noopener noreferrer">
+                          {hash.substr(0, 20)}
+                        </a>
+                      </p>
+                      </div>
+                    ),
+                    duration: 0,
+                  });
+
+                  // send user address to firebase as notified
+                  await storage.addTxNotifier(room, hash, address.toLowerCase());
+                }
+              });
+              
             }
           }
         });
