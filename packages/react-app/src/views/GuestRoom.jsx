@@ -124,7 +124,7 @@ export default function GuestRoom({
                 const hasReceivedNotification = receivedHashes.includes(hash);
 
                 if (hasReceivedTokens && !hasReceivedNotification) {
-                  setReceivedHashes(...receivedHashes, hash);
+                  setReceivedHashes([...receivedHashes, hash]);
 
                   const value = recievedTransfers[0].value;
                   const asset = recievedTransfers[0].asset;
