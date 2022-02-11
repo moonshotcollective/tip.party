@@ -45,7 +45,7 @@ export default function GuestRoom({
   useEffect(() => {
     // moving current user to the top of the list
     if (addresses && addresses.length > 0) {
-      console.log('address:', address)
+      console.log("address:", address);
       const newAddresses = [...addresses];
       newAddresses.forEach((add, index) => {
         if (add.toLowerCase() === address.toLowerCase()) {
@@ -186,8 +186,15 @@ export default function GuestRoom({
     <div className="bg-purple-darkpurple">
       <h2 id="title">Welcome to the Tip Party!</h2>
       <h3>
-        {" "}
-        You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
+        {isSignedIn ? (
+          <div>
+            You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
+          </div>
+        ) : (
+          <div>
+            Sign into "<b>{room}</b>" room to be a Guest
+          </div>
+        )}
         <button
           onClick={() => {
             try {
@@ -222,7 +229,13 @@ export default function GuestRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} height={document.body.scrollHeight} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti
+          recycle={true}
+          run={true}
+          height={document.body.scrollHeight}
+          numberOfPieces={numberOfConfettiPieces}
+          tweenDuration={3000}
+        />
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
