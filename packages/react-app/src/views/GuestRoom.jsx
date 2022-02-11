@@ -5,7 +5,7 @@ import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
-import { useTokenImport } from "../hooks";
+import { useTokenImport, useOnBlock } from "../hooks";
 import axios from "axios";
 import * as storage from "../utils/storage";
 import { NETWORK } from "../constants";
@@ -40,6 +40,7 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+  const [receivedHashes,setReceivedHashes] = useState([]);
 
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
   const apiUrl = chainId ? NETWORK(chainId).apiUrl : "";
@@ -88,11 +89,12 @@ export default function GuestRoom({
     }
   }, [room, chainId]);
 
-  useEffect(() => {
+  useOnBlock(localProvider, () => {
+    console.log("new block")
     if (isSignedIn) {
       handleHashes(localProvider);
     }
-  }, [isSignedIn, txHash]);
+  });
 
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
@@ -115,25 +117,26 @@ export default function GuestRoom({
               const blockNum = "0x" + tx.blockNumber.toString(16);
               const receivedTransfers = fetchTransaction(chainId, blockNum, address);
               Promise.resolve(receivedTransfers).then(async recievedTransfers => {
-
                 const hasReceivedTokens = recievedTransfers.length > 0 ? true : false;
+                const hasReceivedNotification = receivedHashes.includes(hash);
+                
 
-                if (hasReceivedTokens) {
+                if (hasReceivedTokens && !hasReceivedNotification) {
 
+                  setReceivedHashes([...receivedHashes, hash]);
                   const value = recievedTransfers[0].value;
-                  const asset =  recievedTransfers[0].asset;
-
+                  const asset = recievedTransfers[0].asset;
 
                   notification.success({
                     message: `You received ${value + " " + asset}!`,
                     description: (
                       <div>
-                      <p>
-                        Transaction link:{" "}
-                        <a target="_blank" href={`${explorer}tx/${hash}`} rel="noopener noreferrer">
-                          {hash.substr(0, 20)}
-                        </a>
-                      </p>
+                        <p>
+                          Transaction link:{" "}
+                          <a target="_blank" href={`${explorer}tx/${hash}`} rel="noopener noreferrer">
+                            {hash.substr(0, 20)}
+                          </a>
+                        </p>
                       </div>
                     ),
                     duration: 0,
@@ -143,7 +146,6 @@ export default function GuestRoom({
                   await storage.addTxNotifier(room, hash, address.toLowerCase());
                 }
               });
-              
             }
           }
         });
