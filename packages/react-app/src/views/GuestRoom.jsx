@@ -129,7 +129,7 @@ export default function GuestRoom({
 
     // sign roomId using wallet
     let signature = await userSigner.signMessage(
-      `This action will sign you in as a guest in the room ${room} in order to receive tips. This action does not cost tokens.`,
+      `This action will sign you in as a guest in the room "${room}" in order to receive tips. This action does not cost tokens.`,
     );
 
     try {
