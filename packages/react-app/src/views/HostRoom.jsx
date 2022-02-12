@@ -404,7 +404,7 @@ export default function HostRoom({
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
         <Button
           type="primary"
-          size="small"
+          size="medium"
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -425,7 +425,13 @@ export default function HostRoom({
             }
           }}
         >
-          Invite <LinkOutlined />
+          Invite{" "}
+          <LinkOutlined
+            style={{
+              display: "inline-block",
+              verticalAlign: "middle",
+            }}
+          />
         </Button>
       </h3>
       <div

@@ -268,7 +268,7 @@ export default function GuestRoom({
         )}{" "}
         <Button
           type="primary"
-          size="small"
+          size="medium"
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -289,7 +289,13 @@ export default function GuestRoom({
             }
           }}
         >
-          Invite <LinkOutlined />
+          Invite{" "}
+          <LinkOutlined
+            style={{
+              display: "inline-block",
+              verticalAlign: "middle",
+            }}
+          />
         </Button>
       </h3>
       <div
