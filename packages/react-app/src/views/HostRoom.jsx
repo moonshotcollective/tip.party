@@ -461,16 +461,17 @@ export default function HostRoom({
                   okText="Submit"
                   confirmLoading={addressImportLoading}
                 />
-                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end", marginBottom: "5px" }}>
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() => {
+                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                  <a
+                    href="#"
+                    onClick={e => {
+                      e.preventDefault();
+
                       setImportAddressModal(true);
                     }}
                   >
                     Import Address +
-                  </Button>
+                  </a>
                 </div>
 
                 <div style={{ flex: 1 }}>
