@@ -398,14 +398,13 @@ export default function HostRoom({
   );
 
   return (
-    <div className="bg-purple-darkpurple">
+    <div className="bg-purple-darkpurple justify-center">
       <h2 id="title">Tip Your Party!</h2>
       <h3>
-        {" "}
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
         <Button
           type="primary"
-          size="medium"
+          size="small"
           onClick={() => {
             try {
               const el = document.createElement("input");

@@ -254,21 +254,21 @@ export default function GuestRoom({
   );
 
   return (
-    <div className="bg-purple-darkpurple">
+    <div className="bg-purple-darkpurple justify-center">
       <h2 id="title">Welcome to the Tip Party!</h2>
       <h3>
         {isSignedIn ? (
-          <div>
-            You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
-          </div>
+          <>
+            You are a <b>Guest</b> in "<b>{room}</b>" room
+          </>
         ) : (
-          <div>
+          <>
             Sign into "<b>{room}</b>" room to be a Guest
-          </div>
-        )}
+          </>
+        )}{" "}
         <Button
           type="primary"
-          size="medium"
+          size="small"
           onClick={() => {
             try {
               const el = document.createElement("input");
