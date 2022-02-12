@@ -5,8 +5,11 @@ import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
-import { useTokenImport } from "../hooks";
+import { useTokenImport, useOnBlock } from "../hooks";
+import axios from "axios";
 import * as storage from "../utils/storage";
+import { NETWORK } from "../constants";
+import fetchTransaction from "../helpers/txHandler";
 
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -37,6 +40,9 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+  const [receivedHashes, setReceivedHashes] = useState([]);
+
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const { readContracts, writeContracts } = contracts;
 
@@ -81,11 +87,74 @@ export default function GuestRoom({
     }
   }, [room, chainId]);
 
+  useOnBlock(localProvider, () => {
+    console.log("new block");
+    if (isSignedIn) {
+      handleHashes(localProvider);
+    }
+  });
+
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
     setTimeout(() => {
       setNumberOfConfettiPieces(0);
     }, 4000);
+  };
+
+  const handleHashes = async provider => {
+    try {
+      //loops through each transaction
+      txHash.forEach(async hash => {
+        //gets whether if the user has viewed the notification
+        storage.watchTxNotifiers(room, hash, async result => {
+          //if the resulting array doesn't include the addresss
+          if (!result.includes(address.toLowerCase())) {
+            //wait for transaction and check if it is complete
+            const tx = await provider.waitForTransaction(hash, 1);
+            if (tx.status === 1) {
+              const blockNum = "0x" + tx.blockNumber.toString(16);
+
+              //Uses the alchemy api function
+              //Returns any token transfer a user received within the block
+              const receivedTransfers = fetchTransaction(chainId, blockNum, address);
+
+              Promise.resolve(receivedTransfers).then(async recievedTransfers => {
+                //checks whether user has received tokens or the notification already
+                const hasReceivedTokens = recievedTransfers.length > 0 ? true : false;
+                const hasReceivedNotification = receivedHashes.includes(hash);
+
+                if (hasReceivedTokens && !hasReceivedNotification) {
+                  setReceivedHashes([...receivedHashes, hash]);
+
+                  const value = recievedTransfers[0].value;
+                  const asset = recievedTransfers[0].asset;
+
+                  notification.success({
+                    message: `You received ${value + " " + asset}!`,
+                    description: (
+                      <div>
+                        <p>
+                          Transaction link:{" "}
+                          <a target="_blank" href={`${explorer}tx/${hash}`} rel="noopener noreferrer">
+                            {hash.substr(0, 20)}
+                          </a>
+                        </p>
+                      </div>
+                    ),
+                    duration: 0,
+                  });
+
+                  // send user address to firebase as notified
+                  await storage.addTxNotifier(room, hash, address.toLowerCase());
+                }
+              });
+            }
+          }
+        });
+      });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const handleListUpdate = list => {

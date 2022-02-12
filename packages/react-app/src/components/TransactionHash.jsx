@@ -11,7 +11,7 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
   const checkTx = async () => {
     const _tx = await localProvider.waitForTransaction(hash, 1);
 
-    console.log(txData);
+    console.log(_tx);
     updateTxData(_tx);
     updateLoading(false);
   };
@@ -21,7 +21,7 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
     checkTx();
   }, []);
 
-  const explorer = NETWORK(chainId).blockExplorer || `https://etherscan.io/`;
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   return (
     <div style={{ width: "100%" }}>
