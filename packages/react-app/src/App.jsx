@@ -228,9 +228,7 @@ function App(props) {
   const mainnetContracts = useContractLoader(mainnetProvider);
 
   // If you want to call a function on a new block
-  useOnBlock(mainnetProvider, () => {
-    console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
-  });
+ 
 
   const appServer = process.env.REACT_APP_SERVER;
 
@@ -243,28 +241,7 @@ function App(props) {
   // 🧫 DEBUG 👨🏻‍🔬
   //
   useEffect(() => {
-    if (
-      DEBUG &&
-      mainnetProvider &&
-      address &&
-      selectedChainId &&
-      yourLocalBalance &&
-      yourMainnetBalance &&
-      readContracts &&
-      writeContracts &&
-      mainnetContracts
-    ) {
-      console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
-      console.log("🌎 mainnetProvider", mainnetProvider);
-      console.log("🏠 localChainId", localChainId);
-      console.log("👩‍💼 selected address:", address);
-      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
-      console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
-      console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-      console.log("📝 readContracts", readContracts);
-      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("🔐 writeContracts", writeContracts);
-    }
+
     if(readContracts){
       setIsWalletConnected(!!userSigner);
     }
@@ -278,6 +255,7 @@ function App(props) {
     readContracts,
     writeContracts,
     mainnetContracts,
+    userSigner
   ]);
 
   let networkDisplay = "";
@@ -323,7 +301,6 @@ function App(props) {
                         blockExplorerUrls: [targetNetwork.blockExplorer],
                       },
                     ];
-                    console.log("data", data);
                     // try to add new chain
                     try {
                       await ethereum.request({ method: "wallet_addEthereumChain", params: data });
@@ -390,7 +367,6 @@ function App(props) {
                 blockExplorerUrls: [targetNetwork.blockExplorer],
               },
             ];
-            console.log("data", data);
             // try to add new chain
             try {
               await ethereum.request({ method: "wallet_addEthereumChain", params: data });
@@ -424,18 +400,15 @@ function App(props) {
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
 
     provider.on("chainChanged", chainId => {
-      console.log(`chain changed to ${chainId}! updating providers`);
       setInjectedProvider(new ethers.providers.Web3Provider(provider));
     });
 
     provider.on("accountsChanged", () => {
-      console.log(`account changed!`);
       setInjectedProvider(new ethers.providers.Web3Provider(provider));
     });
 
     // Subscribe to session disconnection
     provider.on("disconnect", (code, reason) => {
-      console.log(code, reason);
       logoutOfWeb3Modal();
     });
   }, [setInjectedProvider]);
