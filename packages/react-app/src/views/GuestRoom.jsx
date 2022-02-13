@@ -128,9 +128,10 @@ export default function GuestRoom({
 
                   const value = recievedTransfers[0].value;
                   const asset = recievedTransfers[0].asset;
+                  const message = value && asset ? `You received ${value + " " + asset}!` : "You received tokens!"
 
                   notification.success({
-                    message: `You received ${value + " " + asset}!`,
+                    message: message,
                     description: (
                       <div>
                         <p>
