@@ -12,7 +12,7 @@ export default function Home({ isHost, setHost, ...props }) {
 
   const handleJoinRoom = ({ room }) => {
     const slugifiedRoom = slugify(room.toLowerCase(), "_");
-    if (isHost && isCreatingRoom) {
+    if (isCreatingRoom) {
       storage
         .watchRoom(slugifiedRoom, result => {
           setIsCreatingRoom(false);
