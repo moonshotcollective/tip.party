@@ -13,18 +13,20 @@ export default function Home({ isHost, setHost, ...props }) {
   const handleJoinRoom = ({ room }) => {
     const slugifiedRoom = slugify(room.toLowerCase(), "_");
     if (isHost && isCreatingRoom) {
-      storage.watchRoom(slugifiedRoom, result => {
-        if (result && result.length > 0) {
-          notification.error({
-            message: "This Room Exists!",
-            description: "Join room instead or enter a different room name",
-            placement: "topRight",
-          });
-        } else {
-          history.push({ pathname: `/room/${slugifiedRoom}` });
-        }
-        setIsCreatingRoom(false);
-      });
+      storage
+        .watchRoom(slugifiedRoom, result => {
+          setIsCreatingRoom(false);
+          if (result && result.length > 0) {
+            notification.error({
+              message: "This Room Exists!",
+              description: "Join room instead or enter a different room name",
+              placement: "topRight",
+            });
+          } else {
+            history.push({ pathname: `/room/${slugifiedRoom}` });
+          }
+        })
+        .catch(() => setIsCreatingRoom(false));
     } else {
       history.push({ pathname: `/room/${slugifiedRoom}` });
     }
