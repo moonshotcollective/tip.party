@@ -82,7 +82,7 @@ export default function Account({
             <div className="flex flex-row">
               {hostToggleSwitch}
               <div className="flex flex-col mr-4">
-                <label className="text-base">Select Network:</label>
+                <label className="md:text-base">Select Network:</label>
                 {networkSelect}
               </div>
               <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click">
