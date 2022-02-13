@@ -398,10 +398,9 @@ export default function HostRoom({
   );
 
   return (
-    <div className="bg-purple-darkpurple">
+    <div className="bg-purple-darkpurple justify-center">
       <h2 id="title">Tip Your Party!</h2>
       <h3>
-        {" "}
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
         <Button
           type="primary"
@@ -426,7 +425,13 @@ export default function HostRoom({
             }
           }}
         >
-          Invite <LinkOutlined />
+          Invite{" "}
+          <LinkOutlined
+            style={{
+              display: "inline-block",
+              verticalAlign: "middle",
+            }}
+          />
         </Button>
       </h3>
       <div
