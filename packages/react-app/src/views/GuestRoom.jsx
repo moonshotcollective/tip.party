@@ -201,14 +201,17 @@ export default function GuestRoom({
     let signatureError;
     let signature = await userSigner.signMessage(room).catch(error => {
       if (error) {
-        signatureError = error;
-        console.log("Signature Error: ", error.code, error.message);
+        signatureError = `Error: ${error.code} ${error.message}`;
       }
     });
 
     if (signatureError) {
       setIsSigning(false);
-      return;
+      return notification.error({
+        message: "Signature Error",
+        description: signatureError,
+        placement: "bottomRight",
+      });
     }
 
     try {
