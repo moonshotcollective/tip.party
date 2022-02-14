@@ -15,3 +15,4 @@ admin.initializeApp();
 exports.signRoom = handlers.signRoom;
 exports.addRoomTx = handlers.addRoomTx;
 exports.addRoomToken = handlers.addRoomToken;
+exports.addTxNotifier = handlers.addTxNotifier;

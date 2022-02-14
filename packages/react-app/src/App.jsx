@@ -265,10 +265,10 @@ function App(props) {
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("🔐 writeContracts", writeContracts);
     }
-
-    if (readContracts) {
-      setIsWalletConnected(AddressHelper.isValidAddress(address));
+    if(readContracts){
+      setIsWalletConnected(!!userSigner);
     }
+
   }, [
     mainnetProvider,
     address,

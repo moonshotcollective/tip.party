@@ -49,7 +49,8 @@ export default function HostRoom({
   const allAddresses = useMemo(() => [...addresses, ...importedAddresses], [addresses, importedAddresses]);
   const [loadedTokenList, setLoadedTokenList] = useState({});
   const [list, setList] = useState([]);
-  const [importLoading, setImportLoading] = useState(false);
+  const [tokenImportLoading, setTokenImportLoading] = useState(false);
+  const [addressImportLoading, setAddressImportLoading] = useState(false);
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
@@ -94,8 +95,8 @@ export default function HostRoom({
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
     }
-    const blacklistInStorage = localStorage.getItem(room+"blacklist");
-    if(blacklistInStorage){
+    const blacklistInStorage = localStorage.getItem(room + "blacklist");
+    if (blacklistInStorage) {
       const parsedBlacklist = JSON.parse(blacklistInStorage);
       setBlacklist(parsedBlacklist);
     }
@@ -153,6 +154,9 @@ export default function HostRoom({
   };
 
   const handleAddressImport = async addressesToImport => {
+    //sets loading state when handling address imports
+    setAddressImportLoading(true);
+
     //removes all of the spaces
     const str = addressesToImport.replace(/\s/g, "");
 
@@ -165,8 +169,10 @@ export default function HostRoom({
       if (!ethers.utils.isAddress(element)) {
         try {
           let addr = await mainnetProvider.resolveName(element);
+          addr = addr.toLowerCase();
           if (addr) {
             if (allAddresses.includes(addr)) {
+              setAddressImportLoading(false);
               return notification.error({
                 message: "Failed to Add Address",
                 description: element + " is already included!",
@@ -181,6 +187,7 @@ export default function HostRoom({
             throw "error";
           }
         } catch (e) {
+          setAddressImportLoading(false);
           return notification.error({
             message: "Failed to Add Address",
             description: element + " is not a valid Ethereum address",
@@ -189,6 +196,7 @@ export default function HostRoom({
         }
       }
       if (allAddresses.includes(element)) {
+        setAddressImportLoading(false);
         return notification.error({
           message: "Failed to Add Address",
           description: element + " is already included!",
@@ -200,6 +208,7 @@ export default function HostRoom({
     // sets the addresses to local storage + changes the state
     Promise.all(arr).then(arr => {
       localStorage.setItem(room, JSON.stringify([...importedAddresses, ...arr]));
+      setAddressImportLoading(false);
       setImportedAddresses([...importedAddresses, ...arr]);
       setImportAddressModal(false);
 
@@ -220,17 +229,16 @@ export default function HostRoom({
   const handleListUpdate = list => {
     const updatedList = new Set([...addresses, ...list]);
 
-
-  //removes addresses that are in blacklist
-  const blacklistInStorage = localStorage.getItem(room+"blacklist");
-  if(blacklistInStorage && updatedList){
-  const parsedBlacklist = JSON.parse(blacklistInStorage);
-    updatedList.forEach((addr) => {
-      if (parsedBlacklist.includes(addr.toLowerCase())) {
-        updatedList.delete(addr);
-      }
-    });
-  }
+    //removes addresses that are in blacklist
+    const blacklistInStorage = localStorage.getItem(room + "blacklist");
+    if (blacklistInStorage && updatedList) {
+      const parsedBlacklist = JSON.parse(blacklistInStorage);
+      updatedList.forEach(addr => {
+        if (parsedBlacklist.includes(addr.toLowerCase())) {
+          updatedList.delete(addr);
+        }
+      });
+    }
 
     // update addresses list
     setAddresses([...updatedList]);
@@ -353,7 +361,7 @@ export default function HostRoom({
     const updatedAddressesList = [...addresses];
     updatedAddressesList.splice(index, 1);
     setAddresses([...updatedAddressesList]);
-    localStorage.setItem(room+"blacklist", JSON.stringify([...blacklist, addressChanged]));
+    localStorage.setItem(room + "blacklist", JSON.stringify([...blacklist, addressChanged]));
     setBlacklist([...blacklist, addressChanged]);
   };
   const removeImportedAddress = index => {
@@ -390,12 +398,13 @@ export default function HostRoom({
   );
 
   return (
-    <div className="bg-purple-darkpurple">
+    <div className="bg-purple-darkpurple justify-center">
       <h2 id="title">Tip Your Party!</h2>
       <h3>
-        {" "}
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
-        <button
+        <Button
+          type="primary"
+          size="medium"
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -405,19 +414,25 @@ export default function HostRoom({
               document.execCommand("copy");
               document.body.removeChild(el);
               return notification.success({
-                message: "Room link copied to clipboard",
+                message: "Invite link copied to clipboard",
                 placement: "topRight",
               });
             } catch (err) {
               return notification.success({
-                message: "Failed to copy room link to clipboard",
+                message: "Failed to copy invite link to clipboard",
                 placement: "topRight",
               });
             }
           }}
         >
-          <LinkOutlined style={{ color: "#C9B8FF" }} />
-        </button>
+          Invite{" "}
+          <LinkOutlined
+            style={{
+              display: "inline-block",
+              verticalAlign: "middle",
+            }}
+          />
+        </Button>
       </h3>
       <div
         className="Room"
@@ -429,7 +444,14 @@ export default function HostRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} height={document.body.scrollHeight} confettiSource={{x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY}} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti
+          recycle={true}
+          run={true}
+          height={document.body.scrollHeight}
+          confettiSource={{ x: 0, y: 0, w: document.body.scrollWidth, h: window.scrollY }}
+          numberOfPieces={numberOfConfettiPieces}
+          tweenDuration={3000}
+        />
         <div>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
@@ -437,9 +459,12 @@ export default function HostRoom({
                 <AddressModal
                   visible={importAddressModal}
                   handleAddress={handleAddressImport}
-                  onCancel={() => setImportAddressModal(false)}
+                  onCancel={() => {
+                    setImportAddressModal(false);
+                    setAddressImportLoading(false);
+                  }}
                   okText="Submit"
-                  mainnetProvider={mainnetProvider}
+                  confirmLoading={addressImportLoading}
                 />
                 <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
                   <a
@@ -457,7 +482,7 @@ export default function HostRoom({
                 <div style={{ flex: 1 }}>
                   <Collapse defaultActiveKey={["1"]}>
                     <Collapse.Panel
-                      header={`Pay List - ${addresses.length}`}
+                      header={`Pay List - ${allAddresses.length}`}
                       key="1"
                       extra={
                         <div onClick={e => e.stopPropagation()}>
@@ -581,14 +606,14 @@ export default function HostRoom({
                       <Button
                         type="primary"
                         ghost
-                        loading={importLoading}
+                        loading={tokenImportLoading}
                         icon={<div></div>}
                         onClick={async e => {
                           e.preventDefault();
                           if (networkTokenList) {
-                            setImportLoading(true);
+                            setTokenImportLoading(true);
                             const res = await axios.get(networkTokenList);
-                            setImportLoading(false);
+                            setTokenImportLoading(false);
                             const { tokens } = res.data;
                             setList(tokens);
                           } else {
@@ -626,7 +651,7 @@ export default function HostRoom({
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
                 <Card title={txHash.length > 0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
-                  {txHash.length == 0 && <h2>No payouts have been administered for this room </h2>}
+                  {txHash.length == 0 && <h2>No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}</h2>}
                   {txHash.length > 0 && (
                     <List
                       bordered

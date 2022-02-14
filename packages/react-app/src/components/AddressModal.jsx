@@ -1,6 +1,7 @@
-import { Modal } from "antd";
+import { Modal, Input } from "antd";
 import React, { useState } from "react";
 import { AddressInput } from ".";
+const { TextArea } = Input;
 
 function ImportModal({ handleAddress, ...props }) {
   const [addresses, setAddresses] = useState("");
@@ -12,14 +13,15 @@ function ImportModal({ handleAddress, ...props }) {
 
   return (
     <Modal title="Import Addresses" centered {...props} onOk={onOk}>
-      <p>Note: Imported addresses can only be seen by the current host.</p>
-      <p>When adding addresses in bulk, separate addresses with commas.</p>
-      <AddressInput
-        autoFocus
+      <p>Note: Imported addresses can only be seen by you. Separate addresses by commas when adding in bulk.</p>
+      <TextArea
+        autoSize
+        autoComplete="off"
         placeholder="Enter Addresses"
         value={addresses}
-        onChange={setAddresses}
-        ensProvider={props.mainnetProvider}
+        onChange={e => {
+          setAddresses(e.target.value);
+        }}
       />
     </Modal>
   );

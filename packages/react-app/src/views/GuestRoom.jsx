@@ -5,8 +5,11 @@ import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
-import { useTokenImport } from "../hooks";
+import { useTokenImport, useOnBlock } from "../hooks";
+import axios from "axios";
 import * as storage from "../utils/storage";
+import { NETWORK } from "../constants";
+import fetchTransaction from "../helpers/txHandler";
 
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -37,6 +40,9 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+  const [receivedHashes, setReceivedHashes] = useState([]);
+
+  const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
   const { readContracts, writeContracts } = contracts;
 
@@ -45,7 +51,7 @@ export default function GuestRoom({
   useEffect(() => {
     // moving current user to the top of the list
     if (addresses && addresses.length > 0) {
-      console.log('address:', address)
+      console.log("address:", address);
       const newAddresses = [...addresses];
       newAddresses.forEach((add, index) => {
         if (add.toLowerCase() === address.toLowerCase()) {
@@ -81,11 +87,75 @@ export default function GuestRoom({
     }
   }, [room, chainId]);
 
+  useOnBlock(localProvider, () => {
+    console.log("new block");
+    if (isSignedIn) {
+      handleHashes(localProvider);
+    }
+  });
+
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
     setTimeout(() => {
       setNumberOfConfettiPieces(0);
     }, 4000);
+  };
+
+  const handleHashes = async provider => {
+    try {
+      //loops through each transaction
+      txHash.forEach(async hash => {
+        //gets whether if the user has viewed the notification
+        storage.watchTxNotifiers(room, hash, async result => {
+          //if the resulting array doesn't include the addresss
+          if (!result.includes(address.toLowerCase())) {
+            //wait for transaction and check if it is complete
+            const tx = await provider.waitForTransaction(hash, 1);
+            if (tx.status === 1) {
+              const blockNum = "0x" + tx.blockNumber.toString(16);
+
+              //Uses the alchemy api function
+              //Returns any token transfer a user received within the block
+              const receivedTransfers = fetchTransaction(chainId, blockNum, address);
+
+              Promise.resolve(receivedTransfers).then(async recievedTransfers => {
+                //checks whether user has received tokens or the notification already
+                const hasReceivedTokens = recievedTransfers.length > 0 ? true : false;
+                const hasReceivedNotification = receivedHashes.includes(hash);
+
+                if (hasReceivedTokens && !hasReceivedNotification) {
+                  setReceivedHashes([...receivedHashes, hash]);
+
+                  const value = recievedTransfers[0].value;
+                  const asset = recievedTransfers[0].asset;
+                  const message = value && asset ? `You received ${value + " " + asset}!` : "You received tokens!"
+
+                  notification.success({
+                    message: message,
+                    description: (
+                      <div>
+                        <p>
+                          Transaction link:{" "}
+                          <a target="_blank" href={`${explorer}tx/${hash}`} rel="noopener noreferrer">
+                            {hash.substr(0, 20)}
+                          </a>
+                        </p>
+                      </div>
+                    ),
+                    duration: 0,
+                  });
+
+                  // send user address to firebase as notified
+                  await storage.addTxNotifier(room, hash, address.toLowerCase());
+                }
+              });
+            }
+          }
+        });
+      });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const handleListUpdate = list => {
@@ -183,12 +253,21 @@ export default function GuestRoom({
   );
 
   return (
-    <div className="bg-purple-darkpurple">
+    <div className="bg-purple-darkpurple justify-center">
       <h2 id="title">Welcome to the Tip Party!</h2>
       <h3>
-        {" "}
-        You are a <b>Guest</b> in "<b>{room}</b>" room{" "}
-        <button
+        {isSignedIn ? (
+          <>
+            You are a <b>Guest</b> in "<b>{room}</b>" room
+          </>
+        ) : (
+          <>
+            Sign into "<b>{room}</b>" room to be a Guest
+          </>
+        )}{" "}
+        <Button
+          type="primary"
+          size="medium"
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -198,19 +277,25 @@ export default function GuestRoom({
               document.execCommand("copy");
               document.body.removeChild(el);
               return notification.success({
-                message: "Room link copied to clipboard",
+                message: "Invite link copied to clipboard",
                 placement: "topRight",
               });
             } catch (err) {
               return notification.success({
-                message: "Failed to copy room link to clipboard",
+                message: "Failed to copy invite link to clipboard",
                 placement: "topRight",
               });
             }
           }}
         >
-          <LinkOutlined style={{ color: "#C9B8FF" }} />
-        </button>
+          Invite{" "}
+          <LinkOutlined
+            style={{
+              display: "inline-block",
+              verticalAlign: "middle",
+            }}
+          />
+        </Button>
       </h3>
       <div
         className="Room"
@@ -222,7 +307,13 @@ export default function GuestRoom({
           paddingBottom: 40,
         }}
       >
-        <Confetti recycle={true} run={true} height={document.body.scrollHeight} numberOfPieces={numberOfConfettiPieces} tweenDuration={3000} />
+        <Confetti
+          recycle={true}
+          run={true}
+          height={document.body.scrollHeight}
+          numberOfPieces={numberOfConfettiPieces}
+          tweenDuration={3000}
+        />
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
@@ -277,7 +368,7 @@ export default function GuestRoom({
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
                 <Card title={txHash.length > 0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
-                  {txHash.length == 0 && <h2>No payouts have been administered for this room </h2>}
+                {txHash.length == 0 && <h2>No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}</h2>}
                   {txHash.length > 0 && (
                     <List
                       bordered
