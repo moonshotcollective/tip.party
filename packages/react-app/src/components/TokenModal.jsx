@@ -92,7 +92,7 @@ export default function TokenModal({ list, setImportToken, onChange, chainId = 1
 
   return (
     <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
-      <p>Look Up ERC-20 Token or Enter Token Address</p>
+      {props.networkTokenList ? <p>Look Up ERC-20 Token</p> : <p>Enter Token Address</p>}
       <Select
         showSearch
         size="large"
