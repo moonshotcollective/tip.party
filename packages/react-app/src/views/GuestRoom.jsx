@@ -368,7 +368,7 @@ export default function GuestRoom({
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
                 <Card title={txHash.length > 0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
-                  {txHash.length == 0 && <h2>No payouts have been administered for this room </h2>}
+                {txHash.length == 0 && <h2>No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}</h2>}
                   {txHash.length > 0 && (
                     <List
                       bordered
