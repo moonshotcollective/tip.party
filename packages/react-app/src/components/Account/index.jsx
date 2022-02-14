@@ -96,7 +96,7 @@ export default function Account({
               {networkDisplay}
             </div>
           ) : (
-            <p>You need to sign into Metamask!</p>
+            <p>You need to sign into your Ethereum wallet!</p>
           )}
         </div>,
       );
