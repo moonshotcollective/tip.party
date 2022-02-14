@@ -614,6 +614,7 @@ function App(props) {
                   width={300}
                 />
               }
+              web3Modal={web3Modal}
             />
           ) : (
             <>
