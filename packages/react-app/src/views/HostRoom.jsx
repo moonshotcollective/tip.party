@@ -404,7 +404,7 @@ export default function HostRoom({
         You are a <b>Host</b> for "<b>{room}</b>" room{" "}
         <Button
           type="primary"
-          size="medium"
+          size="small"
           onClick={() => {
             try {
               const el = document.createElement("input");
@@ -651,7 +651,11 @@ export default function HostRoom({
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
                 <Card title={txHash.length > 0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
-                  {txHash.length == 0 && <h2>No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}</h2>}
+                  {txHash.length == 0 && (
+                    <h2>
+                      No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}
+                    </h2>
+                  )}
                   {txHash.length > 0 && (
                     <List
                       bordered
