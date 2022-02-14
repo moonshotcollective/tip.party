@@ -277,12 +277,12 @@ export default function GuestRoom({
               document.execCommand("copy");
               document.body.removeChild(el);
               return notification.success({
-                message: "Room link copied to clipboard",
+                message: "Invite link copied to clipboard",
                 placement: "topRight",
               });
             } catch (err) {
               return notification.success({
-                message: "Failed to copy room link to clipboard",
+                message: "Failed to copy invite link to clipboard",
                 placement: "topRight",
               });
             }
