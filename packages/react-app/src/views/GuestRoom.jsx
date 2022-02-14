@@ -264,38 +264,7 @@ export default function GuestRoom({
           <>
             Sign into "<b>{room}</b>" room to be a Guest
           </>
-        )}{" "}
-        <Button
-          type="primary"
-          size="medium"
-          onClick={() => {
-            try {
-              const el = document.createElement("input");
-              el.value = window.location.href;
-              document.body.appendChild(el);
-              el.select();
-              document.execCommand("copy");
-              document.body.removeChild(el);
-              return notification.success({
-                message: "Invite link copied to clipboard",
-                placement: "topRight",
-              });
-            } catch (err) {
-              return notification.success({
-                message: "Failed to copy invite link to clipboard",
-                placement: "topRight",
-              });
-            }
-          }}
-        >
-          Invite{" "}
-          <LinkOutlined
-            style={{
-              display: "inline-block",
-              verticalAlign: "middle",
-            }}
-          />
-        </Button>
+        )}
       </h3>
       <div
         className="Room"
