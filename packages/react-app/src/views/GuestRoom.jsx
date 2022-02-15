@@ -128,7 +128,7 @@ export default function GuestRoom({
 
                   const value = recievedTransfers[0].value;
                   const asset = recievedTransfers[0].asset;
-                  const message = value && asset ? `You received ${value + " " + asset}!` : "You received tokens!"
+                  const message = value && asset ? `You received ${value + " " + asset}!` : "You received tokens!";
 
                   notification.success({
                     message: message,
@@ -198,7 +198,21 @@ export default function GuestRoom({
     setIsSigning(true);
 
     // sign roomId using wallet
-    let signature = await userSigner.signMessage(room);
+    let signatureError;
+    let signature = await userSigner.signMessage(room).catch(error => {
+      if (error) {
+        signatureError = `Error: ${error.code} ${error.message}`;
+      }
+    });
+
+    if (signatureError) {
+      setIsSigning(false);
+      return notification.error({
+        message: "Signature Error",
+        description: signatureError,
+        placement: "bottomRight",
+      });
+    }
 
     try {
       // sign into room
@@ -337,7 +351,11 @@ export default function GuestRoom({
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
                 <Card title={txHash.length > 0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
-                {txHash.length == 0 && <h2>No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}</h2>}
+                  {txHash.length == 0 && (
+                    <h2>
+                      No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}
+                    </h2>
+                  )}
                   {txHash.length > 0 && (
                     <List
                       bordered
