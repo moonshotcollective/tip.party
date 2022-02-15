@@ -87,12 +87,11 @@ export default function GuestRoom({
     }
   }, [room, chainId]);
 
-  useOnBlock(localProvider, () => {
-    console.log("new block");
+  useEffect(() => {
     if (isSignedIn) {
       handleHashes(localProvider);
     }
-  });
+  },[isSignedIn, address, txHash]);
 
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
