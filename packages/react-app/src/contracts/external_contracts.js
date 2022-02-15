@@ -788,46 +788,14 @@ const DAIABI = [
 module.exports = {
   1: {
     contracts: {
-      DAI: {
-        address: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-        abi: DAIABI,
-      },
-      UNI: {
-        address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-        abi: ERC20ABI,
-      },
       GTC: {
         address: "0xde30da39c46104798bb5aa3fe8b9e0e1f348163f",
-        abi: ERC20ABI,
-      },
-      ROBOT: {
-        address: "0xfb5453340c03db5ade474b27e68b6a9c6b2823eb",
-        abi: ERC20ABI,
-      },
-      SPORK: {
-        address: "0xb624FdE1a972B1C89eC1dAD691442d5E8E891469",
-        abi: ERC20ABI,
-      },
-      WORK: {
-        address: "0x1482295Df16e7761d128B9823B61785D43CA038B",
-        abi: ERC20ABI,
-      },
-      HAUS: {
-        address: "0xf2051511B9b121394FA75B8F7d4E7424337af687",
-        abi: ERC20ABI,
-      },
-      RAID: {
-        address: "0x154e35c2b0024b3e079c5c5e4fc31c979c189ccb",
         abi: ERC20ABI,
       },
     },
   },
   4: {
     contracts: {
-      DAI: {
-        address: "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa",
-        abi: DAIABI,
-      },
       GTC: {
         address: "0x6538f2e2e35fbbaddf602ad6637b27b98fcbd582", // using DummyToken as GTC on Rinkeby
         abi: ERC20ABI,
