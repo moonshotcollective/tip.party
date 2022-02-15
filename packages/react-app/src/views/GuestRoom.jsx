@@ -195,6 +195,14 @@ export default function GuestRoom({
       });
     }
 
+    if (addresses.length >= 255) {
+      return notification.error({
+        message: "Failed to Sign In!",
+        description: "Room is at capacity!" ,
+        placement: "bottomRight",
+      });
+    }
+
     setIsSigning(true);
 
     // sign roomId using wallet
