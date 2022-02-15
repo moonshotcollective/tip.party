@@ -20,12 +20,12 @@ import Authereum from "authereum";
 const { ethers } = require("ethers");
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
 //const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-const configuredNetworks = ["arbitrum", "mainnet", "matic", "optimism", "rinkeby", "xdai"];
+const configuredNetworks = ["mainnet", "matic" ,"arbitrum","optimism", "rinkeby"];
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
@@ -35,7 +35,7 @@ if (DEBUG) console.log("📡 Connecting to New Cached Network: ", cachedNetwork)
 
 /// 📡 What chain are your contracts deployed to?
 //let targetNetwork = NETWORKS[cachedNetwork || "mainnet"];
-let targetNetwork = NETWORKS[cachedNetwork || "rinkeby"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+let targetNetwork = NETWORKS[cachedNetwork || "mainnet"]; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 🛰 providers
 if (DEBUG) console.log(`Connecting to ${cachedNetwork || "mainnet"}`);
@@ -265,10 +265,10 @@ function App(props) {
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("🔐 writeContracts", writeContracts);
     }
-
-    if (readContracts) {
-      setIsWalletConnected(AddressHelper.isValidAddress(address));
+    if(readContracts){
+      setIsWalletConnected(!!userSigner);
     }
+
   }, [
     mainnetProvider,
     address,
@@ -614,6 +614,7 @@ function App(props) {
                   width={300}
                 />
               }
+              web3Modal={web3Modal}
             />
           ) : (
             <>

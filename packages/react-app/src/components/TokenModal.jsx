@@ -12,7 +12,6 @@ const loadERC20 = async (address, p) => {
     const r = new ethers.Contract(address, ERC20ABI, p);
     const name = await r.name?.();
     const symbol = await r.symbol?.();
-
     return { name, symbol };
   } catch (error) {
     return {};
@@ -87,14 +86,13 @@ export default function TokenModal({ list, setImportToken, onChange, chainId = 1
   };
 
   const onOk = () => {
-    onChange(value.value);
+    onChange(value?.value || value);
     setImportToken(false);
   };
 
   return (
     <Modal title="Import ERC-20 Token" centered {...props} onOk={onOk}>
-      <p>Look Up ERC-20 Token or Enter Token Address</p>
-      <p>Note: Imported tokens can only be seen by the current host</p>
+      {props.networkTokenList ? <p>Look Up ERC-20 Token</p> : <p>Enter Token Address</p>}
       <Select
         showSearch
         size="large"
