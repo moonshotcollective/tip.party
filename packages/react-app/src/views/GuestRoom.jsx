@@ -40,7 +40,7 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const [receivedHashes, setReceivedHashes] = useState([]);
+  const receivedHashes= useRef([]);
 
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
@@ -87,12 +87,11 @@ export default function GuestRoom({
     }
   }, [room, chainId]);
 
-  useOnBlock(localProvider, () => {
-    console.log("new block");
+  useEffect(() => {
     if (isSignedIn) {
       handleHashes(localProvider);
     }
-  });
+  },[isSignedIn, address, txHash]);
 
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
@@ -121,10 +120,10 @@ export default function GuestRoom({
               Promise.resolve(receivedTransfers).then(async recievedTransfers => {
                 //checks whether user has received tokens or the notification already
                 const hasReceivedTokens = recievedTransfers.length > 0 ? true : false;
-                const hasReceivedNotification = receivedHashes.includes(hash);
+                const hasReceivedNotification = receivedHashes.current.includes(hash);
 
                 if (hasReceivedTokens && !hasReceivedNotification) {
-                  setReceivedHashes([...receivedHashes, hash]);
+                  receivedHashes.current.push(hash);
 
                   const value = recievedTransfers[0].value;
                   const asset = recievedTransfers[0].asset;
