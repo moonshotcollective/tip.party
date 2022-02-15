@@ -163,6 +163,16 @@ export default function HostRoom({
     //Splits the string into an array of addresses
     let arr = str.split(",");
 
+    // Check if more than max capacity addresses are being imported
+    if (arr.length + allAddresses.length >= 256) {
+      setAddressImportLoading(false);
+      return notification.error({
+        message: "Failed to Add Addresses",
+        description: "Room is at capacity!",
+        placement: "bottomRight",
+      });
+    }
+
     //loop through each element in array
     for (let index = 0; index < arr.length; index++) {
       const element = arr[index];
@@ -250,12 +260,12 @@ export default function HostRoom({
   };
 
   const ethPayHandler = async () => {
-    if(chainId !== selectedChainId){
+    if (chainId !== selectedChainId) {
       setAmount(0);
       return notification.error({
         message: "Networks do not match, please try again",
         placement: "topRight",
-      })
+      });
     }
     const result = tx(
       writeContracts.TokenDistributor.splitEth(allAddresses, room, {
@@ -302,12 +312,12 @@ export default function HostRoom({
   };
 
   const tokenPayHandler = async opts => {
-    if(chainId !== selectedChainId){
+    if (chainId !== selectedChainId) {
       setAmount(0);
       return notification.error({
         message: "Networks do not match, please try again",
         placement: "topRight",
-      })
+      });
     }
     const result = tx(
       writeContracts.TokenDistributor.splitTokenFromUser(
