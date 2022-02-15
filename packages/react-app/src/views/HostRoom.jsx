@@ -250,6 +250,13 @@ export default function HostRoom({
   };
 
   const ethPayHandler = async () => {
+    if(chainId !== selectedChainId){
+      setAmount(0);
+      return notification.error({
+        message: "Networks do not match, please try again",
+        placement: "topRight",
+      })
+    }
     const result = tx(
       writeContracts.TokenDistributor.splitEth(allAddresses, room, {
         value: ethers.utils.parseEther(numericalAmount),
@@ -295,6 +302,13 @@ export default function HostRoom({
   };
 
   const tokenPayHandler = async opts => {
+    if(chainId !== selectedChainId){
+      setAmount(0);
+      return notification.error({
+        message: "Networks do not match, please try again",
+        placement: "topRight",
+      })
+    }
     const result = tx(
       writeContracts.TokenDistributor.splitTokenFromUser(
         allAddresses,
