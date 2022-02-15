@@ -4,8 +4,7 @@ export const INFURA_ID = "460f40a260564ac4a4f4b3fffb032dad";
 // export const INFURA_ID = "7b0e75d38d424750b92791477924d133";
 
 // MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
-export const ETHERSCAN_KEY = "etherscsan"
-
+export const ETHERSCAN_KEY = "etherscsan";
 
 // BLOCKNATIVE ID FOR Notify.js:
 export const BLOCKNATIVE_DAPPID = "0b58206a-f3c0-4701-a62f-73c7243e8c77";
@@ -249,7 +248,6 @@ export const NETWORKS = {
     blockExplorer: "https://etherscan.io/",
     nativeCurrency: "ETH",
     networkTokenList: "https://tokens.coingecko.com/uniswap/all.json",
-
   },
   kovan: {
     name: "kovan",
@@ -268,7 +266,6 @@ export const NETWORKS = {
     faucet: "https://faucet.rinkeby.io/",
     blockExplorer: "https://rinkeby.etherscan.io/",
     nativeCurrency: "ETH",
-
   },
   ropsten: {
     name: "ropsten",
@@ -307,7 +304,7 @@ export const NETWORKS = {
     gasPrice: 1000000000,
     rpcUrl: process.env.REACT_APP_MATIC_NETWORK,
     faucet: "https://faucet.matic.network/",
-    blockExplorer: "https://explorer-mainnet.maticvigil.com//",
+    blockExplorer: "https://polygonscan.com/",
     nativeCurrency: "MATIC",
   },
   polygon: {
@@ -318,7 +315,7 @@ export const NETWORKS = {
     gasPrice: 1000000000,
     rpcUrl: process.env.REACT_APP_MATIC_NETWORK,
     faucet: "https://faucet.matic.network/",
-    blockExplorer: "https://explorer-mainnet.maticvigil.com//",
+    blockExplorer: "https://polygonscan.com/",
     nativeCurrency: "MATIC",
   },
   mumbai: {
@@ -329,7 +326,7 @@ export const NETWORKS = {
     gasPrice: 1000000000,
     rpcUrl: "https://rpc-mumbai.maticvigil.com",
     faucet: "https://faucet.matic.network/",
-    blockExplorer: "https://mumbai-explorer.matic.today/",
+    blockExplorer: "https://mumbai.polygonscan.com/",
     nativeCurrency: "MATIC",
   },
   localArbitrum: {
