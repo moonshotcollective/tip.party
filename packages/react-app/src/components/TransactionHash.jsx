@@ -11,7 +11,6 @@ export default function TransactionHash({ hash, localProvider, chainId, ...props
   const checkTx = async () => {
     const _tx = await localProvider.waitForTransaction(hash, 1);
 
-    console.log(_tx);
     updateTxData(_tx);
     updateLoading(false);
   };

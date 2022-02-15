@@ -48,7 +48,6 @@ export default function TokenModal({ list, setImportToken, onChange, chainId = 1
   }, [JSON.stringify(searchResults)]);
 
   const handleSearch = async val => {
-    console.log("View result ", props.networkTokenList, list);
     let collectionResult = [];
 
     if (val.length > 0) {
