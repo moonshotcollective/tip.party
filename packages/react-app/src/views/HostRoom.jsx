@@ -164,7 +164,7 @@ export default function HostRoom({
     let arr = str.split(",");
 
     // Check if more than max capacity addresses are being imported
-    if (arr.length + addresses.length >= 256) {
+    if (arr.length + allAddresses.length >= 256) {
       setAddressImportLoading(false);
       return notification.error({
         message: "Failed to Add Addresses",
