@@ -91,6 +91,7 @@ export default function Address(props) {
         title={text}
         description={props.extra}
         key="meta"
+        style={{ display: "flex", alignItems: "center" }}
       />
     </div>
   );
