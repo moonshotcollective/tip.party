@@ -24,6 +24,7 @@ module.exports = {
           imgText: "#8C65F7",
           textPurple: "#6F3FF5",
           darkpurple: "#0B0228",
+          lightPurple: "#C9B8FF",
         },
         brown: {
           "dark-brown": "#262626",
