@@ -495,7 +495,7 @@ function App(props) {
   }
 
   return (
-    <div className="App md:pb-4 sm:pb-20 bg-purple-darkpurple flex flex-col h-screen overflow-hidden">
+    <div className="App md:pb-4 sm:pb-20 bg-purple-darkpurple flex flex-col h-screen">
       <div className="p-10 mx-auto flex flex-wrap w-full">
         <a
           href="/"
@@ -595,7 +595,7 @@ function App(props) {
         </Menu>
       )}
 
-      <main className="flex-1 overflow-y-scroll">
+      <main className="flex-1">
         <Switch>
           {!isWalletConnected ? (
             <WalletNotConnected
