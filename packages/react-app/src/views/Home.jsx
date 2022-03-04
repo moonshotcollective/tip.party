@@ -16,7 +16,7 @@ export default function Home({ isHost, setHost, ...props }) {
       storage
         .watchRoom(slugifiedRoom, result => {
           setIsCreatingRoom(false);
-          if (result && result.length > 0) {
+          if (result && result.length > 0 && window.location.pathname === "/") {
             notification.error({
               message: "This Room Exists!",
               description: "Join room instead or enter a different room name",

@@ -343,7 +343,7 @@ export default function GuestRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={14} />
+                                <Address address={item} ensProvider={mainnetProvider} fontSize={28} />
                               </div>
                             </List.Item>
                           )}

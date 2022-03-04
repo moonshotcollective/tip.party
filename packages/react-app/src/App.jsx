@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
 import Web3Modal from "web3modal";
 import "./App.css";
-import { Account } from "./components";
+import { Account, Footer } from "./components";
 import { INFURA_ID, NETWORK, NETWORKS } from "./constants";
 import { Transactor, Address as AddressHelper } from "./helpers";
 import { useBalance, useContractLoader, useExchangePrice, useGasPrice, useOnBlock, useUserSigner } from "./hooks";
@@ -25,7 +25,7 @@ const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
 //const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-const configuredNetworks = ["mainnet", "matic" ,"arbitrum","optimism", "rinkeby"];
+const configuredNetworks = ["mainnet", "matic", "arbitrum", "optimism", "rinkeby"];
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
@@ -265,10 +265,9 @@ function App(props) {
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
       console.log("🔐 writeContracts", writeContracts);
     }
-    if(readContracts){
+    if (readContracts) {
       setIsWalletConnected(!!userSigner);
     }
-
   }, [
     mainnetProvider,
     address,
@@ -496,13 +495,13 @@ function App(props) {
   }
 
   return (
-    <div className="App pb-20 bg-purple-darkpurple">
-      <div className="p-10 mx-auto flex flex-wrap">
+    <div className="App md:pb-4 sm:pb-20 bg-purple-darkpurple flex flex-col h-screen">
+      <div className="p-10 mx-auto flex flex-wrap w-full">
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 navbar-title"
+          className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0 sm: navbar-title"
         >
           <div className="flex flex-col">
             <div className="flex flex-row text-2xl lg:text-5xl">
@@ -596,7 +595,7 @@ function App(props) {
         </Menu>
       )}
 
-      <main>
+      <main className="flex-1">
         <Switch>
           {!isWalletConnected ? (
             <WalletNotConnected
@@ -672,6 +671,7 @@ function App(props) {
           )}
         </Switch>
       </main>
+      <Footer />
     </div>
   );
 }
