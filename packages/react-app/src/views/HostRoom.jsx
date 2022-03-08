@@ -39,7 +39,7 @@ export default function HostRoom({
   const [addresses, setAddresses] = useState([]);
   const [importedAddresses, setImportedAddresses] = useState([]);
   const [txHash, setTxHash] = useState([]);
-  const [blacklist, setBlacklist] = useState([]);
+  const [blocklist, setBlocklist] = useState([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [availableTokens, setAvailableTokens] = useState([]);
   const [importToken, setImportToken] = useState(false);
@@ -95,10 +95,10 @@ export default function HostRoom({
       const parsedImports = JSON.parse(imports);
       setImportedAddresses(parsedImports);
     }
-    const blacklistInStorage = localStorage.getItem(room + "blacklist");
-    if (blacklistInStorage) {
-      const parsedBlacklist = JSON.parse(blacklistInStorage);
-      setBlacklist(parsedBlacklist);
+    const blocklistInStorage = localStorage.getItem(room + "blocklist");
+    if (blocklistInStorage) {
+      const parsedBlocklist = JSON.parse(blocklistInStorage);
+      setBlocklist(parsedBlocklist);
     }
   }, [room]);
 
@@ -239,12 +239,12 @@ export default function HostRoom({
   const handleListUpdate = list => {
     const updatedList = new Set([...addresses, ...list]);
 
-    //removes addresses that are in blacklist
-    const blacklistInStorage = localStorage.getItem(room + "blacklist");
-    if (blacklistInStorage && updatedList) {
-      const parsedBlacklist = JSON.parse(blacklistInStorage);
+    //removes addresses that are in blocklist
+    const blocklistInStorage = localStorage.getItem(room + "blocklist");
+    if (blocklistInStorage && updatedList) {
+      const parsedBlocklist = JSON.parse(blocklistInStorage);
       updatedList.forEach(addr => {
-        if (parsedBlacklist.includes(addr.toLowerCase())) {
+        if (parsedBlocklist.includes(addr.toLowerCase())) {
           updatedList.delete(addr);
         }
       });
@@ -373,10 +373,10 @@ export default function HostRoom({
   };
 
   const reList = index => {
-    const addressChanged = blacklist[index];
-    const updatedAddressesList = [...blacklist];
+    const addressChanged = blocklist[index];
+    const updatedAddressesList = [...blocklist];
     updatedAddressesList.splice(index, 1);
-    setBlacklist([...updatedAddressesList]);
+    setBlocklist([...updatedAddressesList]);
     setAddresses([...addresses, addressChanged]);
   };
 
@@ -385,8 +385,8 @@ export default function HostRoom({
     const updatedAddressesList = [...addresses];
     updatedAddressesList.splice(index, 1);
     setAddresses([...updatedAddressesList]);
-    localStorage.setItem(room + "blacklist", JSON.stringify([...blacklist, addressChanged]));
-    setBlacklist([...blacklist, addressChanged]);
+    localStorage.setItem(room + "blocklist", JSON.stringify([...blocklist, addressChanged]));
+    setBlocklist([...blocklist, addressChanged]);
   };
   const removeImportedAddress = index => {
     const updatedImportList = [...importedAddresses];
@@ -551,14 +551,14 @@ export default function HostRoom({
                         />
                       )}
                     </Collapse.Panel>
-                    {blacklist.length > 0 && (
+                    {blocklist.length > 0 && (
                       <Collapse.Panel
-                        header="Blacklist"
+                        header="Blocklist"
                         key="2"
                         extra={
                           <Popover
-                            title="Blacklist:"
-                            content="Addresses in the blacklist are temporarily removed from the pay list and will not be included in the payout."
+                            title="Blocklist:"
+                            content="Addresses in the blocklist are temporarily removed from the pay list and will not be included in the payout."
                           >
                             <InfoCircleOutlined />
                           </Popover>
@@ -566,7 +566,7 @@ export default function HostRoom({
                       >
                         <List
                           bordered
-                          dataSource={blacklist}
+                          dataSource={blocklist}
                           renderItem={(item, index) => (
                             <List.Item>
                               <div

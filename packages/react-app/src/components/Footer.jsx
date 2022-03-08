@@ -30,7 +30,7 @@ const Footer = () => {
         <p className="text-lg text-gray-500 md:ml-4 sm:ml-6 sm:mt-4 mt-2 text-white font-spacemono">
           <span className="text-purple-lightPurple">|</span>{" "}
           <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLSep_a_2iaW22tFCnHxa_iJJDKzPYkofBnMJfXr7HiZmmvt24A/viewform"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfJqZ7ua9e-6kYdSVk5QBOr9UXeccofjmQgvFZqa_fYINywFw/viewform"
             className="text-purple-lightPurple underline"
           >
             Share Your Feedback

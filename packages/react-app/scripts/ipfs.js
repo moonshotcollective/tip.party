@@ -37,7 +37,7 @@ const publishHashToIPNS = async ipfsHash => {
 
 const nodeMayAllowPublish = ipfsClient => {
   // You must have your own IPFS node in order to publish an IPNS name
-  // This contains a blacklist of known nodes which do not allow users to publish IPNS names.
+  // This contains a blocklist of known nodes which do not allow users to publish IPNS names.
   const nonPublishingNodes = ["ipfs.infura.io"];
   const { host } = ipfsClient.getEndpointConfig();
   return !nonPublishingNodes.some(nodeUrl => host.includes(nodeUrl));
