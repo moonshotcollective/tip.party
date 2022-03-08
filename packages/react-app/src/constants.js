@@ -282,7 +282,7 @@ export const NETWORKS = {
     chainId: 5,
     faucet: "https://goerli-faucet.slock.it/",
     blockExplorer: "https://goerli.etherscan.io/",
-    rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
+    rpcUrl: process.env.REACT_APP_GOERLI_NETWORK,
     nativeCurrency: "ETH",
   },
   xdai: {
