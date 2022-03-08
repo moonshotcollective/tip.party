@@ -35,6 +35,7 @@ jobs:
                   REACT_APP_MATIC_NETWORK: ${{ secrets.REACT_APP_MATIC_NETWORK }}
                   REACT_APP_ARBITRUM_NETWORK: ${{ secrets.REACT_APP_ARBITRUM_NETWORK }}
                   REACT_APP_OPTIMISM_NETWORK: ${{ secrets.REACT_APP_OPTIMISM_NETWORK }}
+                  REACT_APP_GOERLI_NETWORK: ${{ secrets.REACT_APP_GOERLI_NETWORK }}
 
             - name: Deploy to surge
               uses: dswistowski/surge-sh-action@v1
