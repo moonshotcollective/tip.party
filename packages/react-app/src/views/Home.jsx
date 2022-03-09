@@ -4,6 +4,7 @@ import { useHistory } from "react-router";
 import slugify from "slugify";
 import * as storage from "../utils/storage";
 import "./Home.css";
+const randomWords = require('random-words');
 
 export default function Home({ isHost, setHost, ...props }) {
   let history = useHistory();
@@ -33,6 +34,7 @@ export default function Home({ isHost, setHost, ...props }) {
   };
 
   return (
+    <div>
     <div className="Home bg-purple-darkpurple" style={{ margin: "20px auto", width: 500, padding: 60 }}>
       <div>
         <h2 id="joinRoom">Party Time!</h2>
@@ -90,6 +92,22 @@ export default function Home({ isHost, setHost, ...props }) {
           </Form>
         </div>
       </div>
+
+    </div>
+    <h2> Can't think of a room name? -{">"}
+    <Button
+    type="link"
+    onClick={() => {
+      const word = randomWords();
+      localStorage.setItem(word + "userType", "host");
+      setHost(true);
+
+      handleJoinRoom({room: word});
+    }}
+    >
+      Generate Random Room
+    </Button>
+    </h2>
     </div>
   );
 }
