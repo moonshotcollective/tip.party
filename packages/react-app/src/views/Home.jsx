@@ -98,11 +98,11 @@ export default function Home({ isHost, setHost, ...props }) {
     <Button
     type="link"
     onClick={() => {
-      const word = randomWords();
-      localStorage.setItem(word + "userType", "host");
+      const roomName = randomWords() + "-" + randomWords();
+      localStorage.setItem(roomName + "userType", "host");
       setHost(true);
 
-      handleJoinRoom({room: word});
+      handleJoinRoom({room: roomName});
     }}
     >
       Generate Random Room
