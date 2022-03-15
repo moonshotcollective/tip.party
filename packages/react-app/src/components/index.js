@@ -25,3 +25,4 @@ export { default as TokenList } from "./TokenList";
 export { default as NetworkSwitch } from "./NetworkSwitch";
 export { default as NetworkDisplay } from "./NetworkDisplay";
 export { default as Footer } from "./Footer";
+export { default as AddressResolved } from "./AddressResolved";
