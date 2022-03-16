@@ -698,7 +698,7 @@ export default function HostRoom({
                               <div className="text-purple-textPurple text-sm">Distributor</div>
                               <div className="text-purple-textPurple text-sm">Status</div>
                             </div>
-                            <Divider style={{ borderColor: "#6F3FF5" }} />
+                            <Divider style={{ borderColor: "#6F3FF5", marginTop: "0", marginBottom: "0" }} />
                           </>
                         }
                         bordered

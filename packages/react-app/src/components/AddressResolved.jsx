@@ -38,7 +38,7 @@ export default function Address(props) {
   return (
     <a
       className="text-left"
-      style={{ fontSize: props.fontSize ? props.fontSize : 20 }}
+      style={{ fontSize: props.fontSize ? props.fontSize : 20, textDecoration: "underline" }}
       target="_blank"
       href={etherscanLink}
       rel="noopener noreferrer"

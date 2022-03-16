@@ -34,7 +34,12 @@ export default function TransactionHash({ mainnetProvider, hash, localProvider, 
           textAlign: "left",
         }}
       >
-        <a target="_blank" href={`${explorer}tx/${hash}`} rel="noopener noreferrer">
+        <a
+          target="_blank"
+          href={`${explorer}tx/${hash}`}
+          rel="noopener noreferrer"
+          style={{ textDecoration: "underline" }}
+        >
           {hash.substr(0, 6)}
         </a>
         {txData && txData.from && (
