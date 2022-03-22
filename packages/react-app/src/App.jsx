@@ -25,7 +25,7 @@ const NETWORKCHECK = true;
 
 // Add more networks as the dapp expands to more networks
 //const configuredNetworks = ["mainnet", "rinkeby", "xdai", "matic", "mainnetAvalanche"];
-const configuredNetworks = ["mainnet", "matic", "arbitrum", "goerli", "optimism", "rinkeby"];
+const configuredNetworks = ["mainnet", "matic", "arbitrum", "optimism", "xdai", "rinkeby", "goerli"];
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
   configuredNetworks.push("localhost");
 }
@@ -359,11 +359,13 @@ function App(props) {
   }
 
   const options = [];
-  for (const id in NETWORKS) {
-    if (configuredNetworks.indexOf(id) > -1) {
+  const networkList = Object.keys(NETWORKS);
+  for (var i = 0; i < configuredNetworks.length; i++) {
+    const networkName = configuredNetworks[i];
+    if (networkList.indexOf(networkName) > -1) {
       options.push(
-        <Select.Option key={id} value={NETWORKS[id].name}>
-          <span style={{ color: NETWORKS[id].color, fontSize: 20 }}>{NETWORKS[id].name}</span>
+        <Select.Option key={networkName} value={NETWORKS[networkName].name}>
+          <span style={{ color: NETWORKS[networkName].color, fontSize: 20 }}>{NETWORKS[networkName].name}</span>
         </Select.Option>,
       );
     }

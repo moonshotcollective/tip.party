@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag } from "antd";
+import { Button, List, notification, Card, Input, Collapse, Tabs, Menu, Dropdown, Popover, Tag, Divider } from "antd";
 import { CloseOutlined, ExportOutlined, InfoCircleOutlined, LinkOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { Address, PayButton, TransactionHash, AddressModal, TokenModal, TokenList } from "../components";
 import { useParams } from "react-router-dom";
@@ -495,7 +495,6 @@ export default function HostRoom({
                     href="#"
                     onClick={e => {
                       e.preventDefault();
-
                       setImportAddressModal(true);
                     }}
                   >
@@ -675,32 +674,54 @@ export default function HostRoom({
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
                 <Card title={txHash.length > 0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
-                  {txHash.length == 0 && (
+                  {txHash.length === 0 && (
                     <h2>
                       No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}
                     </h2>
                   )}
                   {txHash.length > 0 && (
-                    <List
-                      bordered
-                      dataSource={txHash}
-                      renderItem={(item, index) => (
-                        <List.Item>
-                          <div
-                            style={{
-                              width: "100%",
-                            }}
-                          >
-                            <TransactionHash
-                              localProvider={localProvider}
-                              chainId={chainId}
-                              hash={item}
-                              fontSize={14}
-                            />
-                          </div>
-                        </List.Item>
-                      )}
-                    />
+                    <>
+                      <List
+                        header={
+                          <>
+                            <div
+                              style={{
+                                flex: 1,
+                                display: "flex",
+                                width: "100%",
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                paddingLeft: 10,
+                              }}
+                            >
+                              <div className="text-purple-textPurple text-sm">TxHash</div>
+                              <div className="text-purple-textPurple text-sm">Distributor</div>
+                              <div className="text-purple-textPurple text-sm">Status</div>
+                            </div>
+                            <Divider style={{ borderColor: "#6F3FF5", marginTop: "0", marginBottom: "0" }} />
+                          </>
+                        }
+                        bordered
+                        dataSource={txHash}
+                        renderItem={(item, index) => (
+                          <List.Item>
+                            <div
+                              style={{
+                                width: "100%",
+                              }}
+                            >
+                              <TransactionHash
+                                localProvider={localProvider}
+                                chainId={chainId}
+                                hash={item}
+                                fontSize={14}
+                                mainnetProvider={mainnetProvider}
+                              />
+                            </div>
+                          </List.Item>
+                        )}
+                      />
+                    </>
                   )}
                 </Card>
               </div>

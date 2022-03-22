@@ -47,6 +47,7 @@
     "node-watch": "^0.7.1",
     "postcss": "^8.0.0",
     "qrcode.react": "^1.0.0",
+    "random-words": "^1.1.2",
     "react": "^17.0.2",
     "react-blockies": "^1.4.1",
     "react-confetti": "^6.0.1",

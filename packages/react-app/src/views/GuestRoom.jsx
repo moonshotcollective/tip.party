@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown } from "antd";
+import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown, Divider } from "antd";
 import { ExportOutlined, LinkOutlined } from "@ant-design/icons";
 import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
@@ -40,7 +40,7 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const receivedHashes= useRef([]);
+  const receivedHashes = useRef([]);
 
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
@@ -91,7 +91,7 @@ export default function GuestRoom({
     if (isSignedIn) {
       handleHashes(localProvider);
     }
-  },[isSignedIn, address, txHash]);
+  }, [isSignedIn, address, txHash]);
 
   const handleConfetti = e => {
     setNumberOfConfettiPieces(200);
@@ -197,7 +197,7 @@ export default function GuestRoom({
     if (addresses.length >= 255) {
       return notification.error({
         message: "Failed to Sign In!",
-        description: "Room is at capacity!" ,
+        description: "Room is at capacity!",
         placement: "bottomRight",
       });
     }
@@ -358,13 +358,32 @@ export default function GuestRoom({
               {/* Transactions */}
               <div style={{ marginBottom: 25, flex: 1 }}>
                 <Card title={txHash.length > 0 ? "Payout Transactions" : ""} style={{ width: "100%" }}>
-                  {txHash.length == 0 && (
+                  {txHash.length === 0 && (
                     <h2>
                       No payouts have been administered for this room {chainId ? "on " + NETWORK(chainId).name : ""}
                     </h2>
                   )}
                   {txHash.length > 0 && (
                     <List
+                      header={
+                        <>
+                          <div
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              width: "100%",
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              paddingLeft: 5,
+                            }}
+                          >
+                            <div className="text-purple-textPurple text-sm">TxHash</div>
+                            <div className="text-purple-textPurple text-sm">Distributor</div>
+                            <div className="text-purple-textPurple text-sm">Status</div>
+                          </div>
+                          <Divider style={{ borderColor: "#6F3FF5", marginTop: "0", marginBottom: "0" }} />
+                        </>
+                      }
                       bordered
                       dataSource={txHash}
                       renderItem={(item, index) => (
@@ -379,6 +398,7 @@ export default function GuestRoom({
                               chainId={chainId}
                               hash={item}
                               fontSize={14}
+                              mainnetProvider={mainnetProvider}
                             />
                           </div>
                         </List.Item>
