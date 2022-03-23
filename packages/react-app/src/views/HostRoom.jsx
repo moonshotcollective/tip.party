@@ -532,7 +532,12 @@ export default function HostRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={28} />
+                                <Address
+                                  address={item}
+                                  ensProvider={mainnetProvider}
+                                  fontSize={28}
+                                  userAddress={address.toLowerCase()}
+                                />
                                 {importedAddresses.includes(item) && <Tag color="grey">imported</Tag>}
                                 <Button
                                   onClick={() => {
@@ -578,7 +583,12 @@ export default function HostRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={28} />
+                                <Address
+                                  address={item}
+                                  ensProvider={mainnetProvider}
+                                  fontSize={28}
+                                  userAddress={address.toLowerCase()}
+                                />
                                 <Button onClick={() => reList(index)} size="medium">
                                   <CloseOutlined />
                                 </Button>

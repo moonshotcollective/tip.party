@@ -68,7 +68,7 @@ export default function Address(props) {
   const text = (
     <Text>
       <a
-        style={{ color: currentTheme === "light" ? "#222222" : "#ddd", fontSize: 20 }}
+        style={{ color: props.address === props.userAddress ? "#FFCC00" : "#ddd", fontSize: 20 }}
         target="_blank"
         href={etherscanLink}
         rel="noopener noreferrer"
