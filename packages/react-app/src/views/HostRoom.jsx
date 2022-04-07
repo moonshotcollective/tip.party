@@ -7,13 +7,14 @@ import { ethers } from "ethers";
 import { CSVLink } from "react-csv";
 import copy from "copy-to-clipboard";
 import * as storage from "../utils/storage";
-import { useTokenImport } from "../hooks";
+import { useTokenImport, useLookupAddress } from "../hooks";
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
 import { NETWORK } from "../constants";
 import axios from "axios";
 import "./HostRoom.css";
 import { useMemo } from "react";
+import { utils } from "ethers";
 
 export default function HostRoom({
   appServer,
@@ -51,6 +52,7 @@ export default function HostRoom({
   const [list, setList] = useState([]);
   const [tokenImportLoading, setTokenImportLoading] = useState(false);
   const [addressImportLoading, setAddressImportLoading] = useState(false);
+  const [ensFilterLoading, setEnsFilterLoading] = useState(false);
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
@@ -377,6 +379,7 @@ export default function HostRoom({
     const updatedAddressesList = [...blocklist];
     updatedAddressesList.splice(index, 1);
     setBlocklist([...updatedAddressesList]);
+    localStorage.setItem(room + "blocklist", JSON.stringify([...updatedAddressesList]));
     setAddresses([...addresses, addressChanged]);
   };
 
@@ -403,6 +406,35 @@ export default function HostRoom({
     notification.success({
       message: "Copied List To ClipBoard",
       placement: "bottomRight",
+    });
+  };
+
+  const filterEns = async () => {
+    setEnsFilterLoading(true);
+    let blocklistAdded = [];
+    
+
+    for (let i = 0; i < addresses.length; i++) {
+      const addr = addresses[i];
+      const reportedName = await mainnetProvider.lookupAddress(addr);
+
+      //const resolvedAddress =  await mainnetProvider.resolveName(reportedName);
+
+      if (!reportedName) {
+        //updatedAddressList.splice(i, 1);
+        blocklistAdded.push(addr);
+      }
+    }
+    const updatedAddressList = addresses.filter(addr =>  !blocklistAdded.includes(addr));
+
+    setAddresses([...updatedAddressList]);
+    setBlocklist([...blocklist, ...blocklistAdded]);
+    localStorage.setItem(room + "blocklist", JSON.stringify([...blocklist, ...blocklistAdded]));
+    setEnsFilterLoading(false);
+
+    return notification.success({
+      message: "Non-ENS Names successfully filtered out",
+      placement: "topRight",
     });
   };
 
@@ -490,6 +522,17 @@ export default function HostRoom({
                   okText="Submit"
                   confirmLoading={addressImportLoading}
                 />
+                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                  <Button
+                    size="small"
+                    loading={ensFilterLoading}
+                    onClick={async () => {
+                      await filterEns();
+                    }}
+                  >
+                    Remove Non-ENS Addresses
+                  </Button>
+                </div>
                 <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
                   <a
                     href="#"
