@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown, Divider } from "antd";
+import { Button, List, notification, Card, Collapse, Tabs, Menu, Dropdown, Divider, Modal } from "antd";
 import { ExportOutlined, LinkOutlined } from "@ant-design/icons";
 import { Address, TransactionHash } from "../components";
 import { useParams } from "react-router-dom";
@@ -42,6 +42,8 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
+  const [isTwitterVerified, setTwitterVerified] = useState(false);
+  const [modal, setModal] = useState(false);
   const receivedHashes = useRef([]);
 
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
@@ -203,50 +205,52 @@ export default function GuestRoom({
         placement: "bottomRight",
       });
     }
+    if (!isTwitterVerified) {
+      setModal(true);
+    }
+      setIsSigning(true);
 
-    setIsSigning(true);
+      // sign roomId using wallet
+      let signatureError;
+      let signature = await userSigner.signMessage(room).catch(error => {
+        if (error) {
+          signatureError = `Error: ${error.code} ${error.message}`;
+        }
+      });
 
-    // sign roomId using wallet
-    let signatureError;
-    let signature = await userSigner.signMessage(room).catch(error => {
-      if (error) {
-        signatureError = `Error: ${error.code} ${error.message}`;
+      if (signatureError) {
+        setIsSigning(false);
+        return notification.error({
+          message: "Signature Error",
+          description: signatureError,
+          placement: "bottomRight",
+        });
       }
-    });
 
-    if (signatureError) {
+      try {
+        // sign into room
+        await storage.signIntoRoom(room, signature);
+
+        // notify user of signIn
+        setIsSignedIn(true);
+
+        notification.success({
+          message: "Signed in successfully",
+          placement: "bottomRight",
+        });
+        handleConfetti();
+        setAddresses([...addresses, address]);
+      } catch (error) {
+        setIsSigning(false);
+
+        return notification.error({
+          message: "Failed to Sign!",
+          description: `Connection issue ${error}`,
+          placement: "bottomRight",
+        });
+      }
+
       setIsSigning(false);
-      return notification.error({
-        message: "Signature Error",
-        description: signatureError,
-        placement: "bottomRight",
-      });
-    }
-
-    try {
-      // sign into room
-      await storage.signIntoRoom(room, signature);
-
-      // notify user of signIn
-      setIsSignedIn(true);
-
-      notification.success({
-        message: "Signed in successfully",
-        placement: "bottomRight",
-      });
-      handleConfetti();
-      setAddresses([...addresses, address]);
-    } catch (error) {
-      setIsSigning(false);
-
-      return notification.error({
-        message: "Failed to Sign!",
-        description: `Connection issue ${error}`,
-        placement: "bottomRight",
-      });
-    }
-
-    setIsSigning(false);
   };
 
   const copyToClipBoard = () => {
@@ -306,7 +310,21 @@ export default function GuestRoom({
           numberOfPieces={numberOfConfettiPieces}
           tweenDuration={3000}
         />
+
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+          <Modal
+            title="Verify yourself through Twitter!"
+            onOk={() => {
+              setTwitterVerified(true);
+              setModal(false);
+            }}
+            onCancel={() => {
+              setModal(false);
+            }}
+            visible={modal}
+          >
+            Hi
+          </Modal>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
               <div style={{ marginTop: 10 }}>
