@@ -377,6 +377,7 @@ export default function HostRoom({
     const updatedAddressesList = [...blocklist];
     updatedAddressesList.splice(index, 1);
     setBlocklist([...updatedAddressesList]);
+    localStorage.setItem(room + "blocklist", JSON.stringify([...updatedAddressesList]));
     setAddresses([...addresses, addressChanged]);
   };
 
