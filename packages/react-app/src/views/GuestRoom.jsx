@@ -29,6 +29,8 @@ export default function GuestRoom({
   selectedChainId,
   tx,
   nativeCurrency,
+  isWalletConnected,
+  loadWeb3Modal,
 }) {
   const { room } = useParams();
 
@@ -309,9 +311,28 @@ export default function GuestRoom({
             <Tabs.TabPane tab="Room" key="1">
               <div style={{ marginTop: 10 }}>
                 <div style={{ marginBottom: 20 }}>
-                  <Button type="primary" size="large" onClick={handleSignIn} disabled={isSignedIn} loading={isSigning}>
-                    Sign Into "{room}" Room{" "}
-                  </Button>
+                  {isWalletConnected ? (
+                    <Button
+                      type="primary"
+                      size="large"
+                      onClick={handleSignIn}
+                      disabled={isSignedIn}
+                      loading={isSigning}
+                    >
+                      Sign Into "{room}" Room{" "}
+                    </Button>
+                  ) : (
+                    <Button
+                      key="loginbutton"
+                      style={{ width: "80%" }}
+                      size="large"
+                      onClick={loadWeb3Modal}
+                      type="primary"
+                      shape="round"
+                    >
+                      Connect Wallet to Sign In
+                    </Button>
+                  )}
                 </div>
                 <div style={{ flex: 1 }}>
                   <Collapse defaultActiveKey={["1"]}>
