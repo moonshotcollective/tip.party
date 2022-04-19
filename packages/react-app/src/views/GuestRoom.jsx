@@ -10,6 +10,7 @@ import axios from "axios";
 import * as storage from "../utils/storage";
 import { NETWORK } from "../constants";
 import fetchTransaction from "../helpers/txHandler";
+import twitterAuthStep1 from "../helpers/twitterAuthStep1";
 
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -208,6 +209,7 @@ export default function GuestRoom({
     if (!isTwitterVerified) {
       setModal(true);
     }
+    if (isTwitterVerified) {
       setIsSigning(true);
 
       // sign roomId using wallet
@@ -251,6 +253,7 @@ export default function GuestRoom({
       }
 
       setIsSigning(false);
+    }
   };
 
   const copyToClipBoard = () => {
@@ -313,7 +316,7 @@ export default function GuestRoom({
 
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
           <Modal
-            title="Verify yourself through Twitter!"
+            title="Verify your address through Twitter!"
             onOk={() => {
               setTwitterVerified(true);
               setModal(false);
@@ -323,7 +326,12 @@ export default function GuestRoom({
             }}
             visible={modal}
           >
-            Hi
+            <Button onClick={async () =>{
+              await twitterAuthStep1();
+
+            }}>
+              Verify yourself
+            </Button>
           </Modal>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
