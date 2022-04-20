@@ -599,25 +599,6 @@ function App(props) {
 
       <main className="flex-1">
         <Switch>
-          {!isWalletConnected ? (
-            <WalletNotConnected
-              connector={
-                <Account
-                  address={address}
-                  localProvider={localProvider}
-                  userSigner={userSigner}
-                  mainnetProvider={mainnetProvider}
-                  price={price}
-                  web3Modal={web3Modal}
-                  loadWeb3Modal={loadWeb3Modal}
-                  logoutOfWeb3Modal={logoutOfWeb3Modal}
-                  blockExplorer={blockExplorer}
-                  width={300}
-                />
-              }
-              web3Modal={web3Modal}
-            />
-          ) : (
             <>
               <Route exact path="/">
                 <Home
@@ -650,6 +631,7 @@ function App(props) {
                   networkTokenList={targetNetwork.networkTokenList}
                   isHost={isHost}
                   isWalletConnected={isWalletConnected}
+                  loadWeb3Modal={loadWeb3Modal}
                 />
               </Route>
               {/* This is used when testing out smart contracts:
@@ -670,7 +652,6 @@ function App(props) {
                 />
               </Route> */}
             </>
-          )}
         </Switch>
       </main>
       <Footer />

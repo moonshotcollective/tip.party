@@ -30,6 +30,8 @@ export default function HostRoom({
   tx,
   nativeCurrency,
   networkTokenList,
+  isWalletConnected,
+  loadWeb3Modal
 }) {
   const { room } = useParams();
 
@@ -377,6 +379,7 @@ export default function HostRoom({
     const updatedAddressesList = [...blocklist];
     updatedAddressesList.splice(index, 1);
     setBlocklist([...updatedAddressesList]);
+    localStorage.setItem(room + "blocklist", JSON.stringify([...updatedAddressesList]));
     setAddresses([...addresses, addressChanged]);
   };
 
@@ -532,7 +535,12 @@ export default function HostRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={28} />
+                                <Address
+                                  address={item}
+                                  ensProvider={mainnetProvider}
+                                  fontSize={28}
+                                  userAddress={address.toLowerCase()}
+                                />
                                 {importedAddresses.includes(item) && <Tag color="grey">imported</Tag>}
                                 <Button
                                   onClick={() => {
@@ -578,7 +586,12 @@ export default function HostRoom({
                                   alignItems: "center",
                                 }}
                               >
-                                <Address address={item} ensProvider={mainnetProvider} fontSize={28} />
+                                <Address
+                                  address={item}
+                                  ensProvider={mainnetProvider}
+                                  fontSize={28}
+                                  userAddress={address.toLowerCase()}
+                                />
                                 <Button onClick={() => reList(index)} size="medium">
                                   <CloseOutlined />
                                 </Button>
@@ -648,24 +661,37 @@ export default function HostRoom({
                         Import ERC-20 Token
                       </Button>
                     </div>
-                    <PayButton
-                      style={{ marginTop: 20 }}
-                      token={token}
-                      appName="Tip.party"
-                      callerAddress={address}
-                      maxApproval={numericalAmount}
-                      amount={numericalAmount}
-                      spender={spender}
-                      yourLocalBalance={yourLocalBalance}
-                      readContracts={readContracts}
-                      writeContracts={writeContracts}
-                      ethPayHandler={ethPayHandler}
-                      tokenPayHandler={tokenPayHandler}
-                      nativeCurrency={nativeCurrency}
-                      loadContracts={loadContracts}
-                      loadedTokenList={loadedTokenList}
-                      userSigner={userSigner}
-                    />
+                    {isWalletConnected ? (
+                      <PayButton
+                        style={{ marginTop: 20 }}
+                        token={token}
+                        appName="Tip.party"
+                        callerAddress={address}
+                        maxApproval={numericalAmount}
+                        amount={numericalAmount}
+                        spender={spender}
+                        yourLocalBalance={yourLocalBalance}
+                        readContracts={readContracts}
+                        writeContracts={writeContracts}
+                        ethPayHandler={ethPayHandler}
+                        tokenPayHandler={tokenPayHandler}
+                        nativeCurrency={nativeCurrency}
+                        loadContracts={loadContracts}
+                        loadedTokenList={loadedTokenList}
+                        userSigner={userSigner}
+                      />
+                    ) : (
+                      <Button
+                        key="loginbutton"
+                        style={{ marginTop: 20, width: "80%" }}
+                        size="large"
+                        onClick={loadWeb3Modal}
+                        type="primary"
+                        shape="round"
+                      >
+                        Connect Wallet to Distribute
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
