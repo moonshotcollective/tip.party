@@ -32,6 +32,7 @@ export default function GuestRoom({
   nativeCurrency,
   isWalletConnected,
   loadWeb3Modal,
+  twitterName
 }) {
   const { room } = useParams();
 
@@ -43,7 +44,6 @@ export default function GuestRoom({
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [numberOfConfettiPieces, setNumberOfConfettiPieces] = useState(0);
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
-  const [isTwitterVerified, setTwitterVerified] = useState(false);
   const [modal, setModal] = useState(false);
   const receivedHashes = useRef([]);
 
@@ -104,6 +104,10 @@ export default function GuestRoom({
       setNumberOfConfettiPieces(0);
     }, 4000);
   };
+
+  const redirect = params =>{
+    window.location.href = `https://api.twitter.com/oauth/authorize?${params}`;
+  }
 
   const handleHashes = async provider => {
     try {
@@ -206,10 +210,10 @@ export default function GuestRoom({
         placement: "bottomRight",
       });
     }
-    if (!isTwitterVerified) {
+    if (!twitterName) {
       setModal(true);
     }
-    if (isTwitterVerified) {
+    else{
       setIsSigning(true);
 
       // sign roomId using wallet
@@ -318,7 +322,6 @@ export default function GuestRoom({
           <Modal
             title="Verify your address through Twitter!"
             onOk={() => {
-              setTwitterVerified(true);
               setModal(false);
             }}
             onCancel={() => {
@@ -326,8 +329,11 @@ export default function GuestRoom({
             }}
             visible={modal}
           >
-            <Button onClick={async () =>{
-              await twitterAuthStep1();
+            <Button onClick={ () =>{
+              localStorage.setItem("lastRoom", room);
+              twitterAuthStep1(redirect);
+              
+              
 
             }}>
               Verify yourself

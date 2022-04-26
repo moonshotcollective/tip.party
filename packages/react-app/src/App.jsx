@@ -17,6 +17,7 @@ import { Rooms, Home, WalletNotConnected } from "./views";
 import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
+import TwitterVerify from "./views/TwitterVerify";
 const { ethers } = require("ethers");
 
 // 😬 Sorry for all the console logging
@@ -160,6 +161,7 @@ function App(props) {
   const [isWalletConnected, setIsWalletConnected] = useState(true);
   const [isHost, setHost] = useState(false);
   const [room, setRoom] = useState();
+  const [twitterName, setTwitterName] =  useState("");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -175,6 +177,7 @@ function App(props) {
 
   useEffect(() => {
     setRoom(location.pathname.slice(6));
+    setTwitterName(localStorage.getItem("twitterName"));
   }, [location]);
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
@@ -569,6 +572,7 @@ function App(props) {
           />
         </span>
       </div>
+      Twitter Username: {twitterName}
 
       {targetNetwork.name === "localhost" && (
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
@@ -632,7 +636,12 @@ function App(props) {
                   isHost={isHost}
                   isWalletConnected={isWalletConnected}
                   loadWeb3Modal={loadWeb3Modal}
+                  twitterName={twitterName}
                 />
+              </Route>
+              <Route path="/twitter">
+                  <TwitterVerify
+                  />
               </Route>
               {/* This is used when testing out smart contracts:
               <Route exact path="/contracts">

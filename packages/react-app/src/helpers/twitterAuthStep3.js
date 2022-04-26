@@ -1,8 +1,8 @@
 import axios from "axios";
-export default function twitterAuthStep1(callback) {
+export default function twitterAuthStep3(params, callback) {
   var config = {
     method: "get",
-    url: "http://localhost:4000/",
+    url: `http://localhost:4000/twitter${params}`
   };
 
   axios(config)
@@ -13,5 +13,4 @@ export default function twitterAuthStep1(callback) {
     .catch(function (error) {
       console.log(error);
     });
-
 }
