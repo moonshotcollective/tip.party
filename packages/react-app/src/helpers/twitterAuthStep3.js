@@ -2,7 +2,7 @@ import axios from "axios";
 export default function twitterAuthStep3(params, callback) {
   var config = {
     method: "get",
-    url: `http://localhost:4000/twitter${params}`
+    url: `${process.env.REACT_APP_SERVER}/twitter${params}`
   };
 
   axios(config)

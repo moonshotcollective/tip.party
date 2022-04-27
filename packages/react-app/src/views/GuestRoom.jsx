@@ -32,7 +32,7 @@ export default function GuestRoom({
   nativeCurrency,
   isWalletConnected,
   loadWeb3Modal,
-  twitterName
+  twitterName,
 }) {
   const { room } = useParams();
 
@@ -105,9 +105,9 @@ export default function GuestRoom({
     }, 4000);
   };
 
-  const redirect = params =>{
+  const redirect = params => {
     window.location.href = `https://api.twitter.com/oauth/authorize?${params}`;
-  }
+  };
 
   const handleHashes = async provider => {
     try {
@@ -212,8 +212,7 @@ export default function GuestRoom({
     }
     if (!twitterName) {
       setModal(true);
-    }
-    else{
+    } else {
       setIsSigning(true);
 
       // sign roomId using wallet
@@ -329,13 +328,12 @@ export default function GuestRoom({
             }}
             visible={modal}
           >
-            <Button onClick={ () =>{
-              localStorage.setItem("lastRoom", room);
-              twitterAuthStep1(redirect);
-              
-              
-
-            }}>
+            <Button
+              onClick={() => {
+                localStorage.setItem("lastRoom", room);
+                twitterAuthStep1(redirect);
+              }}
+            >
               Verify yourself
             </Button>
           </Modal>

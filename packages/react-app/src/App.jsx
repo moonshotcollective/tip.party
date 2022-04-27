@@ -161,7 +161,7 @@ function App(props) {
   const [isWalletConnected, setIsWalletConnected] = useState(true);
   const [isHost, setHost] = useState(false);
   const [room, setRoom] = useState();
-  const [twitterName, setTwitterName] =  useState("");
+  const [twitterName, setTwitterName] = useState("");
 
   const logoutOfWeb3Modal = async () => {
     await web3Modal.clearCachedProvider();
@@ -572,7 +572,7 @@ function App(props) {
           />
         </span>
       </div>
-      Twitter Username: {twitterName}
+      {twitterName}
 
       {targetNetwork.name === "localhost" && (
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
@@ -603,47 +603,46 @@ function App(props) {
 
       <main className="flex-1">
         <Switch>
-            <>
-              <Route exact path="/">
-                <Home
-                  writeContracts={writeContracts}
-                  readContracts={readContracts}
-                  address={address}
-                  mainnetProvider={mainnetProvider}
-                  tx={tx}
-                  isWalletConnected={isWalletConnected}
-                  nativeCurrency={targetNetwork.nativeCurrency}
-                  isHost={isHost}
-                  setHost={setHost}
-                />
-              </Route>
-              <Route path="/room/:room">
-                <Rooms
-                  address={address}
-                  appServer={appServer}
-                  web3Modal={web3Modal}
-                  userSigner={userSigner}
-                  mainnetProvider={mainnetProvider}
-                  readContracts={readContracts}
-                  writeContracts={writeContracts}
-                  localProvider={localProvider}
-                  yourLocalBalance={yourLocalBalance}
-                  chainId={localChainId || selectedChainId}
-                  selectedChainId={selectedChainId}
-                  tx={tx}
-                  nativeCurrency={targetNetwork.nativeCurrency}
-                  networkTokenList={targetNetwork.networkTokenList}
-                  isHost={isHost}
-                  isWalletConnected={isWalletConnected}
-                  loadWeb3Modal={loadWeb3Modal}
-                  twitterName={twitterName}
-                />
-              </Route>
-              <Route path="/twitter">
-                  <TwitterVerify
-                  />
-              </Route>
-              {/* This is used when testing out smart contracts:
+          <>
+            <Route exact path="/">
+              <Home
+                writeContracts={writeContracts}
+                readContracts={readContracts}
+                address={address}
+                mainnetProvider={mainnetProvider}
+                tx={tx}
+                isWalletConnected={isWalletConnected}
+                nativeCurrency={targetNetwork.nativeCurrency}
+                isHost={isHost}
+                setHost={setHost}
+              />
+            </Route>
+            <Route path="/room/:room">
+              <Rooms
+                address={address}
+                appServer={appServer}
+                web3Modal={web3Modal}
+                userSigner={userSigner}
+                mainnetProvider={mainnetProvider}
+                readContracts={readContracts}
+                writeContracts={writeContracts}
+                localProvider={localProvider}
+                yourLocalBalance={yourLocalBalance}
+                chainId={localChainId || selectedChainId}
+                selectedChainId={selectedChainId}
+                tx={tx}
+                nativeCurrency={targetNetwork.nativeCurrency}
+                networkTokenList={targetNetwork.networkTokenList}
+                isHost={isHost}
+                isWalletConnected={isWalletConnected}
+                loadWeb3Modal={loadWeb3Modal}
+                twitterName={twitterName}
+              />
+            </Route>
+            <Route path="/twitter">
+              <TwitterVerify />
+            </Route>
+            {/* This is used when testing out smart contracts:
               <Route exact path="/contracts">
                 <Contract
                   name="TokenDistributor"
@@ -660,7 +659,7 @@ function App(props) {
                   blockExplorer={blockExplorer}
                 />
               </Route> */}
-            </>
+          </>
         </Switch>
       </main>
       <Footer />

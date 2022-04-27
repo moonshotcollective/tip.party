@@ -8,8 +8,7 @@ export default function TwitterVerify() {
   const url = window.location.href;
   const params = url.substring(url.indexOf("?"));
 
-
-  function callback(res){
+  function callback(res) {
     const index = res.indexOf("screen_name=") + 12;
     const username = res.substring(index);
     localStorage.setItem("twitterName", username);
@@ -17,15 +16,13 @@ export default function TwitterVerify() {
     history.push(`/room/${room}`);
   }
 
-
   useEffect(() => {
     twitterAuthStep3(params, callback);
-
   });
 
   return (
     <div>
-        <h1>Verifying your Twitter</h1>
+      <h1>Verifying your Twitter</h1>
     </div>
   );
 }

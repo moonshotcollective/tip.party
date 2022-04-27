@@ -31,7 +31,7 @@ export default function HostRoom({
   nativeCurrency,
   networkTokenList,
   isWalletConnected,
-  loadWeb3Modal
+  loadWeb3Modal,
 }) {
   const { room } = useParams();
 
