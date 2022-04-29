@@ -53,6 +53,8 @@ export default function HostRoom({
   const [list, setList] = useState([]);
   const [tokenImportLoading, setTokenImportLoading] = useState(false);
   const [addressImportLoading, setAddressImportLoading] = useState(false);
+  const [verified, setVerified] =useState({});
+
 
   const { readContracts, writeContracts } = contracts;
   const numericalAmount = amount[0] === "." ? "0" + amount : amount;
@@ -119,7 +121,7 @@ export default function HostRoom({
 
     // start new subscriptions
     if (chainId) {
-      subs.current.push(storage.watchRoom(room, handleListUpdate));
+      subs.current.push(storage.watchRoom2(room, handleListUpdate));
       subs.current.push(storage.watchRoomTx(room, chainId, handleTransactionUpdate));
     }
   }, [room, chainId]);
@@ -239,21 +241,20 @@ export default function HostRoom({
   };
 
   const handleListUpdate = list => {
-    const updatedList = new Set([...addresses, ...list]);
+    console.log(list);
+    // update addresses list
+    const list1 = list.map(x => x[0]);
+    console.log(list1+"joo")
+    let verifiers  = {};
 
-    //removes addresses that are in blocklist
-    const blocklistInStorage = localStorage.getItem(room + "blocklist");
-    if (blocklistInStorage && updatedList) {
-      const parsedBlocklist = JSON.parse(blocklistInStorage);
-      updatedList.forEach(addr => {
-        if (parsedBlocklist.includes(addr.toLowerCase())) {
-          updatedList.delete(addr);
-        }
-      });
+    //mapping the address to see if it is verified
+    for(const element of list){
+      verifiers[element[0]] = element[1] ? true : false;
     }
 
-    // update addresses list
+    const updatedList = new Set([...addresses, ...list1]);
     setAddresses([...updatedList]);
+    setVerified({...verified, ...verifiers});
   };
 
   const handleTransactionUpdate = newTx => {
@@ -542,6 +543,7 @@ export default function HostRoom({
                                   userAddress={address.toLowerCase()}
                                 />
                                 {importedAddresses.includes(item) && <Tag color="grey">imported</Tag>}
+                                {verified[item] && <Tag color="green">verified</Tag>}
                                 <Button
                                   onClick={() => {
                                     if (importedAddresses.includes(item))

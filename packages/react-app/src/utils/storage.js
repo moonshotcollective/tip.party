@@ -23,8 +23,19 @@ const watchCollection = (coll, cb, id = true) => {
   });
 };
 
+const watchCollection2 = (coll, cb, id = true) => {
+  return onSnapshot(coll, docs => {
+    const res = [];
+    docs.forEach(doc => res.push([doc.id, doc.data().isVerified]));
+    cb && cb(res);
+  });
+};
+
 export const watchRoom = (room, cb) => {
   return watchCollection(getCollection(room, "signs"), cb);
+};
+export const watchRoom2 = (room, cb) => {
+  return watchCollection2(getCollection(room, "signs"), cb);
 };
 
 export const watchRoomTx = (room, network, cb) => {
@@ -38,11 +49,13 @@ export const watchTxNotifiers = (room, hash, cb) => {
   return watchCollection(query( collection(db, `rooms`, room, "tx", hash, "addresses"), orderBy("addedAt", "desc")), cb);
 };
 
-export const signIntoRoom = async (room, signature) => {
-  const signRoomFunction = httpsCallable(functions, "signRoom");
+export const signIntoRoom = async (room, signature, isVerified) => {
+  const signRoomFunction = httpsCallable(functions, "signRoomWithVerification");
 
-  return signRoomFunction({ room, signature });
+  return signRoomFunction({ room, signature, isVerified });
 };
+
+
 
 export const registerTransactionForRoom = (room, hash, network) => {
   const addRoomTxFunction = httpsCallable(functions, "addRoomTx");

@@ -46,6 +46,7 @@ export default function GuestRoom({
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const [modal, setModal] = useState(false);
   const receivedHashes = useRef([]);
+  const isVerified = twitterName ? true : false;
 
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
@@ -234,7 +235,7 @@ export default function GuestRoom({
 
       try {
         // sign into room
-        await storage.signIntoRoom(room, signature);
+        await storage.signIntoRoom(room, signature, isVerified);
 
         // notify user of signIn
         setIsSignedIn(true);
