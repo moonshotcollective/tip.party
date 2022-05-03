@@ -1,8 +1,9 @@
-import { Button, Menu, Dropdown } from "antd";
+import { Button, Menu, Dropdown, Tag, Space, notification } from "antd";
 import React from "react";
 import Address from "../Address";
 import Balance from "../Balance";
 import { DownOutlined, LogoutOutlined } from "@ant-design/icons";
+import twitterAuthStep1 from "../../helpers/twitterAuthStep1";
 import "./Account.css";
 // import Wallet from "./Wallet";
 
@@ -54,10 +55,16 @@ export default function Account({
   networkSelect,
   networkDisplay,
   hostToggleSwitch,
+  twitterName,
+  verifiedAddress
 }) {
   function isValidAddress(address) {
     return address && address !== "0x0000000000000000000000000000000000000000";
   }
+
+  const redirect = params => {
+    window.location.href = `https://api.twitter.com/oauth/authorize?${params}`;
+  };
 
   const menu = (
     <Menu>
@@ -85,19 +92,49 @@ export default function Account({
                 <label className="md:text-base">Select Network:</label>
                 {networkSelect}
               </div>
-              <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click">
-                <Address
-                  address={address}
-                  ensProvider={mainnetProvider}
-                  blockExplorer={blockExplorer}
-                  blockieSize={10}
-                />
-              </Dropdown.Button>
-              {networkDisplay}
+              <Space direction="vertical" >
+                <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click">
+                  <Address
+                    address={address}
+                    ensProvider={mainnetProvider}
+                    blockExplorer={blockExplorer}
+                    blockieSize={10}
+                  />
+
+                </Dropdown.Button>
+                {twitterName && address ===  verifiedAddress ? (
+                  <Tag color="green">
+                    {" "}
+                    Verified
+                  </Tag>
+                ) : (
+                    <Space direction="vertical" >
+                      <Tag color="grey">
+                        Not verified
+                  </Tag>
+                      <Button type="primary" size="small" onClick={() => {
+                        if(twitterName){
+                          return notification.error({
+                            message: "Twitter verification failed",
+                            description: "You have already authenticated different address. Please logout and try again.",
+                            placement: "bottomRight",
+                          });
+                        }
+                        else{
+                        localStorage.setItem("lastPage", window.location.pathname);
+                        localStorage.setItem("verifiedAddress", address);
+                        twitterAuthStep1(redirect);
+                        }
+                      }} >Verify Your Address</Button>
+
+                    </Space>
+                  )}
+                {networkDisplay}
+              </Space>
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
         </div>,
       );
     } else {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import twitterAuthStep3 from "../helpers/twitterAuthStep3";
 import { useHistory } from "react-router-dom";
 
-export default function TwitterVerify() {
+export default function TwitterVerify({address}) {
   let history = useHistory();
 
   const url = window.location.href;
@@ -12,8 +12,8 @@ export default function TwitterVerify() {
     const index = res.indexOf("screen_name=") + 12;
     const username = res.substring(index);
     localStorage.setItem("twitterName", username);
-    const room = localStorage.getItem("lastRoom");
-    history.push(`/room/${room}`);
+    const page = localStorage.getItem("lastPage");
+    history.push(page);
   }
 
   useEffect(() => {

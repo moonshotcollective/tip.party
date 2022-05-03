@@ -162,8 +162,12 @@ function App(props) {
   const [isHost, setHost] = useState(false);
   const [room, setRoom] = useState();
   const [twitterName, setTwitterName] = useState("");
+  const [verifiedAddress, setVerifiedAddress] = useState("");
 
   const logoutOfWeb3Modal = async () => {
+    localStorage.removeItem('twitterName');
+    localStorage.removeItem('verifiedAddress');
+
     await web3Modal.clearCachedProvider();
     if (injectedProvider && injectedProvider.provider && typeof injectedProvider.provider.disconnect == "function") {
       await injectedProvider.provider.disconnect();
@@ -178,6 +182,8 @@ function App(props) {
   useEffect(() => {
     setRoom(location.pathname.slice(6));
     setTwitterName(localStorage.getItem("twitterName"));
+    setVerifiedAddress(localStorage.getItem("verifiedAddress"));
+    console.log(verifiedAddress + "hi");
   }, [location]);
 
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
@@ -548,6 +554,8 @@ function App(props) {
             blockExplorer={blockExplorer}
             networkSelect={networkSelect}
             networkDisplay={networkDisplay}
+            twitterName={twitterName}
+            verifiedAddress={verifiedAddress}
             hostToggleSwitch={
               room && (
                 <div className="flex flex-col mt-5 px-7">
@@ -572,7 +580,7 @@ function App(props) {
           />
         </span>
       </div>
-      {twitterName}
+
 
       {targetNetwork.name === "localhost" && (
         <Menu style={{ textAlign: "center" }} selectedKeys={[route]} mode="horizontal">
@@ -637,10 +645,12 @@ function App(props) {
                 isWalletConnected={isWalletConnected}
                 loadWeb3Modal={loadWeb3Modal}
                 twitterName={twitterName}
+                verifiedAddress={verifiedAddress}
+
               />
             </Route>
             <Route path="/twitter">
-              <TwitterVerify />
+              <TwitterVerify address={address}/>
             </Route>
             {/* This is used when testing out smart contracts:
               <Route exact path="/contracts">

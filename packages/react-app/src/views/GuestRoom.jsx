@@ -10,7 +10,6 @@ import axios from "axios";
 import * as storage from "../utils/storage";
 import { NETWORK } from "../constants";
 import fetchTransaction from "../helpers/txHandler";
-import twitterAuthStep1 from "../helpers/twitterAuthStep1";
 
 //import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from "react-confetti";
@@ -33,6 +32,7 @@ export default function GuestRoom({
   isWalletConnected,
   loadWeb3Modal,
   twitterName,
+  verifiedAddress
 }) {
   const { room } = useParams();
 
@@ -46,7 +46,7 @@ export default function GuestRoom({
   const [contracts, loadContracts, addContracts] = useTokenImport(localProvider, userSigner);
   const [modal, setModal] = useState(false);
   const receivedHashes = useRef([]);
-  const isVerified = twitterName ? true : false;
+  const isVerified = twitterName && address ===  verifiedAddress ? true : false;
 
   const explorer = chainId ? NETWORK(chainId).blockExplorer : `https://etherscan.io/`;
 
@@ -106,9 +106,7 @@ export default function GuestRoom({
     }, 4000);
   };
 
-  const redirect = params => {
-    window.location.href = `https://api.twitter.com/oauth/authorize?${params}`;
-  };
+
 
   const handleHashes = async provider => {
     try {
@@ -211,9 +209,7 @@ export default function GuestRoom({
         placement: "bottomRight",
       });
     }
-    if (!twitterName) {
-      setModal(true);
-    } else {
+
       setIsSigning(true);
 
       // sign roomId using wallet
@@ -257,7 +253,7 @@ export default function GuestRoom({
       }
 
       setIsSigning(false);
-    }
+    
   };
 
   const copyToClipBoard = () => {
@@ -319,25 +315,7 @@ export default function GuestRoom({
         />
 
         <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-          <Modal
-            title="Verify your address through Twitter!"
-            onOk={() => {
-              setModal(false);
-            }}
-            onCancel={() => {
-              setModal(false);
-            }}
-            visible={modal}
-          >
-            <Button
-              onClick={() => {
-                localStorage.setItem("lastRoom", room);
-                twitterAuthStep1(redirect);
-              }}
-            >
-              Verify yourself
-            </Button>
-          </Modal>
+
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Room" key="1">
               <div style={{ marginTop: 10 }}>

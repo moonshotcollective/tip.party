@@ -20,6 +20,7 @@ export default function Rooms({
   isWalletConnected,
   loadWeb3Modal,
   twitterName,
+  verifiedAddress
 }) {
   return (
     <div>
@@ -43,6 +44,8 @@ export default function Rooms({
             isWalletConnected={isWalletConnected}
             loadWeb3Modal={loadWeb3Modal}
             twitterName={twitterName}
+            verifiedAddress={verifiedAddress}
+
           />
         )}
       </div>
@@ -65,6 +68,7 @@ export default function Rooms({
             isWalletConnected={isWalletConnected}
             loadWeb3Modal={loadWeb3Modal}
             twitterName={twitterName}
+            verifiedAddress={verifiedAddress}
           />
         </div>
       )}
