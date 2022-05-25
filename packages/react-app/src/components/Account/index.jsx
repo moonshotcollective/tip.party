@@ -1,9 +1,11 @@
-import { Button, Menu, Dropdown, Tag, Space, notification } from "antd";
+import { Button, Menu, Dropdown, Tag, Space, notification, Popover } from "antd";
 import React from "react";
 import Address from "../Address";
 import Balance from "../Balance";
 import { DownOutlined, LogoutOutlined } from "@ant-design/icons";
 import twitterAuthStep1 from "../../helpers/twitterAuthStep1";
+import { InfoCircleOutlined } from "@ant-design/icons";
+
 import "./Account.css";
 // import Wallet from "./Wallet";
 
@@ -56,7 +58,7 @@ export default function Account({
   networkDisplay,
   hostToggleSwitch,
   twitterName,
-  verifiedAddress
+  verifiedAddress,
 }) {
   function isValidAddress(address) {
     return address && address !== "0x0000000000000000000000000000000000000000";
@@ -92,7 +94,7 @@ export default function Account({
                 <label className="md:text-base">Select Network:</label>
                 {networkSelect}
               </div>
-              <Space direction="vertical" >
+              <Space direction="vertical">
                 <Dropdown.Button overlay={menu} icon={<DownOutlined />} trigger="click">
                   <Address
                     address={address}
@@ -100,41 +102,40 @@ export default function Account({
                     blockExplorer={blockExplorer}
                     blockieSize={10}
                   />
-
                 </Dropdown.Button>
-                {twitterName && address ===  verifiedAddress ? (
-                  <Tag color="green">
-                    {" "}
-                    Verified
-                  </Tag>
+                {twitterName && address === verifiedAddress ? (
+                  <Tag color="green"> Verified</Tag>
                 ) : (
-                    <Space direction="vertical" >
-                      <Tag color="grey">
-                        Not verified
-                  </Tag>
-                      <Button type="primary" size="small" onClick={() => {
-                        if(twitterName){
+                  <Space direction="vertical">
+                    <Tag color="grey">Not verified</Tag>
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={() => {
+                        if (twitterName) {
                           return notification.error({
                             message: "Twitter verification failed",
-                            description: "You have already authenticated different address. Please logout and try again.",
+                            description:
+                              "You have already authenticated different address. Please logout and try again.",
                             placement: "bottomRight",
                           });
+                        } else {
+                          localStorage.setItem("lastPage", window.location.pathname);
+                          localStorage.setItem("verifiedAddress", address);
+                          twitterAuthStep1(redirect);
                         }
-                        else{
-                        localStorage.setItem("lastPage", window.location.pathname);
-                        localStorage.setItem("verifiedAddress", address);
-                        twitterAuthStep1(redirect);
-                        }
-                      }} >Verify Your Address</Button>
-
-                    </Space>
-                  )}
+                      }}
+                    >
+                      Verify Your Address
+                    </Button>
+                  </Space>
+                )}
                 {networkDisplay}
               </Space>
             </div>
           ) : (
-              ""
-            )}
+            ""
+          )}
         </div>,
       );
     } else {
